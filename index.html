@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="description" content="성별·연령·날씨·계절·시간대 맞춤 오늘 메뉴 추천! 밀키트·식재료·주방용품 쿠팡 바로구매">
+<meta name="theme-color" content="#FF6B6B">
+<meta property="og:title" content="오늘은 뭐 먹을까? 🍽️">
+<meta property="og:description" content="AI가 나에게 딱 맞는 오늘 메뉴를 추천해드려요">
+<link rel="manifest" href="#" id="manifestLink">
+<title>오늘은 뭐 먹을까? 🍽️</title>
+<!--
+  ╔══════════════════════════════════════════════════╗
+  ║  오늘은 뭐 먹을까? v6                           ║
+  ║  Copyright 2026. 엄정일 All rights reserved.    ║
+  ║  무단 복제 및 배포 금지                         ║
+  ║  Unauthorized reproduction prohibited.          ║
+  ╚══════════════════════════════════════════════════╝
+-->
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+<!-- ✅ Google Analytics — G-XXXXXXXXXX 자리에 본인 GA4 측정 ID 입력 -->
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script> -->
+
+<style>
+:root{
+  --bg:#080810;--bg2:#10101E;--card:#15152A;--card2:#1C1C32;
+  --border:rgba(255,255,255,0.07);
+  --pr:#FF6B6B;--pg:rgba(255,107,107,0.28);
+  --gold:#FFD166;--goldg:rgba(255,209,102,0.22);
+  --mint:#4ECDC4;--mintg:rgba(78,205,196,0.22);
+  --blue:#4D96FF;--blueg:rgba(77,150,255,0.25);
+  --red:#E8003D;--redg:rgba(232,0,61,0.25);
+  --green:#06D6A0;--greeng:rgba(6,214,160,0.22);
+  --purple:#9B5DE5;--purpleg:rgba(155,93,229,0.22);
+  --orange:#FF8C42;--orangeg:rgba(255,140,66,0.22);
+  --kakao:#FEE500;
+  --text:#EEEEFF;--text2:#8888AA;
+  --r:22px;--rsm:13px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:90px;overflow-x:hidden;}
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(90px);}
+.o1{width:550px;height:550px;top:-150px;left:-150px;background:radial-gradient(circle,rgba(255,107,107,.09),transparent 70%);}
+.o2{width:450px;height:450px;bottom:-120px;right:-120px;background:radial-gradient(circle,rgba(77,150,255,.09),transparent 70%);}
+.o3{width:320px;height:320px;top:40%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,209,102,.05),transparent 70%);}
+
+/* ── TIME BAR ── */
+.time-bar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:9px 16px;background:rgba(8,8,16,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);font-size:13px;}
+.meal-badge{padding:4px 11px;border-radius:50px;font-weight:700;font-size:11px;letter-spacing:.5px;}
+.mb-morning{background:rgba(255,209,102,.15);color:var(--gold);border:1px solid rgba(255,209,102,.3);}
+.mb-lunch{background:rgba(255,107,107,.15);color:var(--pr);border:1px solid rgba(255,107,107,.3);}
+.mb-dinner{background:rgba(77,150,255,.15);color:var(--blue);border:1px solid rgba(77,150,255,.3);}
+.mb-night{background:rgba(78,205,196,.15);color:var(--mint);border:1px solid rgba(78,205,196,.3);}
+.season-badge{font-size:11px;padding:3px 9px;border-radius:50px;font-weight:700;}
+.sb-spring{background:rgba(255,182,193,.15);color:#FF9DB0;border:1px solid rgba(255,182,193,.3);}
+.sb-summer{background:rgba(77,150,255,.15);color:var(--blue);border:1px solid rgba(77,150,255,.3);}
+.sb-autumn{background:rgba(255,140,66,.15);color:var(--orange);border:1px solid rgba(255,140,66,.3);}
+.sb-winter{background:rgba(78,205,196,.15);color:var(--mint);border:1px solid rgba(78,205,196,.3);}
+.wx-tag{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);}
+
+/* ── HERO ── */
+.hero{position:relative;z-index:1;text-align:center;padding:34px 20px 22px;}
+.hero-icon{font-size:54px;display:block;margin-bottom:12px;animation:float 3.5s ease-in-out infinite;filter:drop-shadow(0 0 24px rgba(255,107,107,.55));}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-10px) rotate(4deg);}}
+.hero h1{font-family:'Black Han Sans',sans-serif;font-size:clamp(26px,7vw,42px);letter-spacing:-1px;background:linear-gradient(120deg,#FF6B6B 0%,#FFD166 50%,#4ECDC4 100%);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:grad 5s linear infinite alternate;}
+@keyframes grad{from{background-position:0%}to{background-position:100%}}
+.hero-sub{font-family:'Gowun Dodum',sans-serif;color:var(--text2);margin-top:8px;font-size:13px;line-height:1.7;}
+.badge-row{display:flex;gap:7px;justify-content:center;margin-top:10px;flex-wrap:wrap;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:50px;font-size:11px;font-weight:700;}
+.b-gold{background:rgba(255,209,102,.1);color:var(--gold);border:1px solid rgba(255,209,102,.2);}
+.b-mint{background:rgba(78,205,196,.1);color:var(--mint);border:1px solid rgba(78,205,196,.2);}
+.b-green{background:rgba(6,214,160,.1);color:var(--green);border:1px solid rgba(6,214,160,.2);}
+
+/* ── WRAP ── */
+.wrap{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:0 15px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px 18px;margin-bottom:12px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,107,107,.4),transparent);}
+.sl{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--pr);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.sl::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── PWA 배너 ── */
+.pwa-banner{
+  display:none;
+  background:linear-gradient(135deg,rgba(255,107,107,.08),rgba(77,150,255,.08));
+  border:1px solid rgba(255,107,107,.2);
+  border-radius:var(--rsm);padding:13px 15px;
+  margin-bottom:12px;
+  align-items:center;gap:12px;
+  animation:slideDown .4s ease;
+}
+.pwa-banner.show{display:flex;}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.pwa-icon{font-size:26px;flex-shrink:0;}
+.pwa-text{flex:1;}
+.pwa-title{font-size:13px;font-weight:700;color:var(--text);}
+.pwa-desc{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.5;}
+.pwa-actions{display:flex;gap:6px;flex-shrink:0;}
+.pwa-install{padding:7px 13px;border-radius:50px;border:none;background:var(--pr);color:#fff;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:0 3px 10px var(--pg);}
+.pwa-close{padding:7px 10px;border-radius:50px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;cursor:pointer;}
+
+/* 아이폰 설치 안내 팝업 */
+.ios-popup{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
+  align-items:flex-end;justify-content:center;
+  padding:20px;
+}
+.ios-popup.show{display:flex;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.ios-popup-inner{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:var(--r);padding:24px 20px;width:100%;max-width:420px;
+  position:relative;
+}
+.ios-popup-title{font-family:'Black Han Sans',sans-serif;font-size:18px;margin-bottom:16px;text-align:center;}
+.ios-steps{display:flex;flex-direction:column;gap:12px;}
+.ios-step{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--bg2);border-radius:var(--rsm);}
+.ios-step-num{width:24px;height:24px;border-radius:50%;background:var(--pr);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ios-step-text{font-size:13px;line-height:1.5;}
+.ios-step-text strong{color:var(--pr);}
+.ios-close{width:100%;margin-top:16px;padding:13px;border:1px solid var(--border);border-radius:var(--rsm);background:transparent;color:var(--text2);font-size:14px;font-weight:600;cursor:pointer;}
+.ios-arrow{display:inline-block;font-size:18px;}
+
+/* ── INPUT ── */
+.irow{display:flex;gap:8px;}
+.minput{flex:1;padding:12px 15px;border-radius:var(--rsm);border:1.5px solid var(--border);background:var(--bg2);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;}
+.minput::placeholder{color:var(--text2);font-size:13px;}
+.minput:focus{border-color:var(--pr);box-shadow:0 0 0 3px var(--pg);}
+.bgo{padding:12px 15px;border-radius:var(--rsm);border:none;background:var(--pr);color:#fff;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;transition:all .18s;box-shadow:0 4px 14px var(--pg);}
+.bgo:hover{filter:brightness(1.15);transform:translateY(-1px);}
+
+/* ── TOGGLE ── */
+.trow{display:flex;gap:7px;flex-wrap:wrap;}
+.tog{flex:1;min-width:60px;padding:10px 7px;border-radius:var(--rsm);border:1.5px solid var(--border);background:var(--bg2);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all .18s;user-select:none;}
+.tog:hover{border-color:var(--pr);color:var(--pr);}
+.sel-m{background:rgba(77,150,255,.18)!important;border-color:var(--blue)!important;color:var(--blue)!important;}
+.sel-f{background:rgba(255,107,107,.18)!important;border-color:var(--pr)!important;color:var(--pr)!important;}
+.sel-a{background:rgba(78,205,196,.18)!important;border-color:var(--mint)!important;color:var(--mint)!important;}
+
+/* ── CHIPS ── */
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{padding:6px 12px;border-radius:50px;border:1.5px solid var(--border);background:var(--bg2);font-size:12px;font-weight:500;cursor:pointer;transition:all .18s;color:var(--text2);user-select:none;}
+.chip:hover{border-color:var(--pr);color:var(--pr);}
+.chip.active{background:var(--pr);border-color:var(--pr);color:#fff;box-shadow:0 4px 14px var(--pg);transform:scale(1.05);}
+.chip.season-chip{border-color:var(--orange);color:var(--orange);}
+.chip.season-chip.active{background:var(--orange);border-color:var(--orange);box-shadow:0 4px 14px var(--orangeg);}
+
+/* ── PICK BTN ── */
+.pick-btn{width:100%;padding:19px;border:none;border-radius:var(--r);background:linear-gradient(135deg,var(--pr) 0%,#FF8E53 100%);color:#fff;font-family:'Black Han Sans',sans-serif;font-size:21px;letter-spacing:1px;cursor:pointer;box-shadow:0 8px 32px var(--pg);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden;}
+.pick-btn::after{content:'';position:absolute;top:-50%;left:-60%;width:40%;height:200%;background:rgba(255,255,255,.15);transform:skewX(-20deg);transition:left .5s;}
+.pick-btn:hover::after{left:120%;}
+.pick-btn:hover{transform:translateY(-3px);box-shadow:0 14px 40px var(--pg);}
+.bicon{font-size:22px;display:inline-block;}
+.pick-btn.spin .bicon{animation:spinZ .4s linear infinite;}
+@keyframes spinZ{to{transform:rotate(360deg);}}
+.pbar{height:3px;background:var(--border);border-radius:50px;margin-top:10px;overflow:hidden;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--pr),var(--gold));border-radius:50px;transition:width .5s;}
+.ptext{font-size:11px;color:var(--text2);text-align:center;margin-top:7px;opacity:.7;}
+
+/* ── RESULT ── */
+.result-card{display:none;border-radius:var(--r);margin-bottom:12px;overflow:hidden;}
+.result-card.show{display:block;animation:popIn .45s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{opacity:0;transform:scale(.86) translateY(18px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.food-img-wrap{position:relative;height:180px;overflow:hidden;background:var(--card2);display:flex;align-items:center;justify-content:center;}
+.food-img{width:100%;height:100%;object-fit:cover;}
+.food-img-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(8,8,16,.92) 100%);}
+.food-img-title{position:absolute;bottom:14px;left:18px;right:18px;}
+.fit-emoji{font-size:34px;}
+.fit-name{font-family:'Black Han Sans',sans-serif;font-size:30px;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;margin-top:4px;}
+.crown-label{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);border:1px solid rgba(255,209,102,.3);color:var(--gold);font-size:11px;font-weight:700;padding:4px 10px;border-radius:50px;}
+.result-body{background:var(--card);border:1.5px solid rgba(255,107,107,.25);border-top:none;padding:16px 18px 18px;}
+.rtag-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.rtag{font-size:11px;padding:3px 9px;border-radius:50px;font-weight:600;}
+.rt-cat{background:rgba(255,107,107,.12);color:var(--pr);border:1px solid rgba(255,107,107,.22);}
+.rt-per{background:rgba(255,209,102,.12);color:var(--gold);border:1px solid rgba(255,209,102,.22);}
+.rt-time{background:rgba(78,205,196,.12);color:var(--mint);border:1px solid rgba(78,205,196,.22);}
+.rt-wx{background:rgba(77,150,255,.12);color:var(--blue);border:1px solid rgba(77,150,255,.22);}
+.tip-box{background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.16);border-radius:var(--rsm);padding:11px 13px;font-size:12px;color:#BF9010;line-height:1.65;margin-bottom:14px;}
+.tip-box strong{color:var(--gold);}
+
+/* ── 연관상품 ── */
+.related-section{margin-bottom:14px;}
+.related-title{font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text2);text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:6px;}
+.related-title::before{content:'🛍️';}
+.related-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.rel-btn{padding:12px 10px;border-radius:var(--rsm);border:1.5px solid var(--border);background:var(--bg2);cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-decoration:none;transition:all .18s;position:relative;overflow:hidden;}
+.rel-btn:hover{transform:translateY(-2px);}
+.rel-milkit{border-color:rgba(232,0,61,.25);}
+.rel-milkit:hover{border-color:rgba(232,0,61,.5);box-shadow:0 4px 16px rgba(232,0,61,.15);}
+.rel-ingred{border-color:rgba(6,214,160,.25);}
+.rel-ingred:hover{border-color:rgba(6,214,160,.5);box-shadow:0 4px 16px rgba(6,214,160,.15);}
+.rel-tool{border-color:rgba(155,93,229,.25);}
+.rel-tool:hover{border-color:rgba(155,93,229,.5);box-shadow:0 4px 16px rgba(155,93,229,.15);}
+.rel-sauce{border-color:rgba(255,209,102,.25);}
+.rel-sauce:hover{border-color:rgba(255,209,102,.5);box-shadow:0 4px 16px rgba(255,209,102,.15);}
+.rel-icon{font-size:20px;}
+.rel-label{font-size:12px;font-weight:700;color:var(--text);}
+.rel-sub{font-size:10px;color:var(--text2);line-height:1.4;}
+.rel-tag{position:absolute;top:8px;right:8px;font-size:9px;padding:2px 6px;border-radius:50px;font-weight:700;}
+.tag-hot{background:rgba(255,107,107,.2);color:var(--pr);}
+.tag-new{background:rgba(6,214,160,.2);color:var(--green);}
+.tag-sale{background:rgba(255,209,102,.2);color:var(--gold);}
+
+/* ── 액션 버튼 ── */
+.main-actions{display:flex;flex-direction:column;gap:8px;}
+.bc{width:100%;padding:15px;border:none;border-radius:var(--rsm);background:linear-gradient(135deg,var(--red),#FF1A5E);color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:all .18s;box-shadow:0 4px 18px var(--redg);}
+.bc:hover{filter:brightness(1.1);transform:translateY(-2px);}
+.bm{width:100%;padding:15px;border:none;border-radius:var(--rsm);background:linear-gradient(135deg,var(--blue),#6B8CFF);color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:all .18s;box-shadow:0 4px 18px var(--blueg);}
+.bm:hover{filter:brightness(1.1);transform:translateY(-2px);}
+.btn2{display:flex;gap:8px;}
+.brr{flex:1;padding:12px;border:1.5px solid var(--border);border-radius:var(--rsm);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:5px;}
+.brr:hover{border-color:var(--pr);color:var(--pr);}
+.share-row{display:flex;gap:8px;}
+.bkakao{flex:1;padding:12px;border:none;border-radius:var(--rsm);background:var(--kakao);color:#3A1D00;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .18s;}
+.bkakao:hover{filter:brightness(1.05);transform:translateY(-1px);}
+.bcopy{flex:1;padding:12px;border:1.5px solid var(--border);border-radius:var(--rsm);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .18s;}
+.bcopy:hover{border-color:var(--mint);color:var(--mint);}
+
+/* ── 다음 추천 ── */
+.next-card{display:none;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:12px;}
+.next-card.show{display:block;animation:slideUp .38s ease both;}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.next-hint{font-size:12px;color:var(--text2);margin-bottom:10px;}
+.next-grid{display:flex;flex-direction:column;gap:8px;}
+.ni{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--rsm);background:var(--bg2);border:1.5px solid var(--border);cursor:pointer;transition:all .18s;}
+.ni:hover{border-color:rgba(255,107,107,.35);transform:translateX(3px);}
+.ni-rank{font-size:10px;padding:3px 7px;border-radius:50px;min-width:28px;text-align:center;font-weight:700;}
+.r2{background:rgba(192,192,192,.14);color:#C0C0C0;border:1px solid rgba(192,192,192,.22);}
+.r3{background:rgba(205,127,50,.14);color:#CD7F32;border:1px solid rgba(205,127,50,.22);}
+.r4{background:rgba(100,149,237,.14);color:#6495ED;border:1px solid rgba(100,149,237,.22);}
+.ni-e{font-size:24px;}
+.ni-info{flex:1;}
+.ni-name{font-weight:700;font-size:13px;}
+.ni-meta{font-size:11px;color:var(--text2);margin-top:2px;display:flex;gap:6px;align-items:center;}
+.ni-coupang{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:50px;background:rgba(232,0,61,.12);color:#FF4477;border:1px solid rgba(232,0,61,.22);font-size:10px;font-weight:700;text-decoration:none;}
+.ni-arr{color:var(--text2);font-size:15px;transition:transform .18s;}
+.ni:hover .ni-arr{transform:translateX(3px);color:var(--pr);}
+
+/* ── 히스토리 ── */
+.hist-wrap{display:none;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:12px;}
+.hrow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);}
+.hrow:last-child{border-bottom:none;}
+.hname{color:var(--text);font-weight:500;}
+.hbadge{font-size:10px;padding:2px 7px;border-radius:50px;background:var(--bg2);color:var(--text2);}
+.clrbtn{margin-top:8px;font-size:11px;color:var(--text2);background:none;border:none;cursor:pointer;text-decoration:underline;display:block;}
+
+/* ── 관리자 통계 패널 ── */
+.admin-trigger{position:fixed;bottom:80px;left:0;width:30px;height:50px;z-index:300;cursor:pointer;opacity:0;}
+.admin-overlay{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(10px);
+  align-items:center;justify-content:center;padding:20px;
+}
+.admin-overlay.show{display:flex;animation:fadeIn .3s ease;}
+.admin-box{
+  background:var(--card2);border:1px solid rgba(255,107,107,.3);
+  border-radius:var(--r);padding:28px 24px;width:100%;max-width:400px;
+  position:relative;
+}
+.admin-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--pr),var(--gold),var(--mint));}
+.admin-title{font-family:'Black Han Sans',sans-serif;font-size:20px;text-align:center;margin-bottom:20px;color:var(--pr);}
+/* 비밀번호 입력 */
+.admin-pw-wrap{display:flex;flex-direction:column;gap:10px;}
+.admin-pw-input{padding:13px 15px;border-radius:var(--rsm);border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:15px;outline:none;text-align:center;letter-spacing:4px;transition:border-color .2s;}
+.admin-pw-input:focus{border-color:var(--pr);}
+.admin-pw-btn{padding:13px;border:none;border-radius:var(--rsm);background:var(--pr);color:#fff;font-weight:700;font-size:14px;cursor:pointer;}
+.admin-pw-err{font-size:12px;color:var(--pr);text-align:center;display:none;}
+/* 통계 */
+.admin-stats{display:none;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat-item{background:var(--bg2);border-radius:var(--rsm);padding:14px 10px;text-align:center;}
+.stat-num{font-family:'Black Han Sans',sans-serif;font-size:28px;color:var(--pr);}
+.stat-label{font-size:10px;color:var(--text2);margin-top:4px;line-height:1.4;}
+.stat-detail{background:var(--bg2);border-radius:var(--rsm);padding:14px;font-size:12px;color:var(--text2);line-height:1.8;margin-bottom:12px;}
+.stat-detail strong{color:var(--text);}
+.admin-close{width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--rsm);background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;}
+.admin-logout{width:100%;padding:10px;border:none;border-radius:var(--rsm);background:transparent;color:var(--text2);font-size:11px;cursor:pointer;margin-top:6px;text-decoration:underline;}
+
+/* ── 파트너 바 ── */
+.partner-bar{background:rgba(255,107,107,.05);border:1px solid rgba(255,107,107,.1);border-radius:var(--rsm);padding:8px 13px;font-size:11px;color:var(--text2);text-align:center;margin-bottom:12px;line-height:1.6;}
+
+/* ── 시즌 배너 ── */
+.season-banner{background:linear-gradient(135deg,rgba(255,140,66,.08),rgba(255,107,107,.08));border:1px solid rgba(255,140,66,.2);border-radius:var(--rsm);padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .18s;}
+.season-banner:hover{border-color:rgba(255,140,66,.4);}
+.sb-icon{font-size:28px;}
+.sb-text{flex:1;}
+.sb-title{font-size:13px;font-weight:700;color:var(--text);}
+.sb-desc{font-size:11px;color:var(--text2);margin-top:2px;}
+.sb-btn{padding:6px 12px;border-radius:50px;border:none;background:var(--orange);color:#fff;font-size:11px;font-weight:700;cursor:pointer;}
+
+/* ── TOAST / FAB ── */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:50px;font-size:13px;z-index:9999;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:toastIn .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(18px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+.fab{position:fixed;bottom:24px;right:18px;z-index:200;width:48px;height:48px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--pr),#FF8E53);color:#fff;font-size:20px;cursor:pointer;box-shadow:0 4px 20px var(--pg);display:flex;align-items:center;justify-content:center;transition:all .2s;opacity:0;pointer-events:none;}
+.fab.vis{opacity:1;pointer-events:auto;}
+.fab:hover{transform:scale(1.1);}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+
+<!-- TIME BAR -->
+<div class="time-bar">
+  <div style="display:flex;align-items:center;gap:8px;">
+    <span id="mealBadge" class="meal-badge mb-lunch">🌞 점심</span>
+    <span id="clockStr" style="font-size:12px;color:var(--text2);"></span>
+    <span id="seasonBadge" class="season-badge" style="display:none;"></span>
+  </div>
+  <div class="wx-tag" id="wxTag">🌤️ 확인 중...</div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-icon">🍽️</span>
+  <h1>오늘은 뭐 먹을까?</h1>
+  <p class="hero-sub">성별·연령·날씨·계절·시간대 맞춤 AI 메뉴 추천</p>
+  <div class="badge-row">
+    <span class="badge b-gold">🗂️ 170개 메뉴 DB</span>
+    <span class="badge b-mint">📡 날씨·계절 연동</span>
+    <span class="badge b-green">🛍️ 연관상품 직링크</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="partner-bar">🔗 이 페이지의 쿠팡 링크는 파트너스 활동의 일환으로 수수료가 발생할 수 있습니다</div>
+
+  <!-- PWA 설치 배너 -->
+  <div class="pwa-banner" id="pwaBanner">
+    <span class="pwa-icon" id="pwaIcon">📲</span>
+    <div class="pwa-text">
+      <div class="pwa-title" id="pwaTitle">홈 화면에 추가하기</div>
+      <div class="pwa-desc" id="pwaDesc">앱처럼 바로 사용! 매일 편하게 접속해요</div>
+    </div>
+    <div class="pwa-actions">
+      <button class="pwa-install" id="pwaInstallBtn" onclick="installPWA()">설치</button>
+      <button class="pwa-close" onclick="closePWA()">✕</button>
+    </div>
+  </div>
+
+  <!-- 아이폰 설치 안내 팝업 -->
+  <div class="ios-popup" id="iosPopup">
+    <div class="ios-popup-inner">
+      <div class="ios-popup-title">📱 홈 화면에 추가하기</div>
+      <div class="ios-steps">
+        <div class="ios-step">
+          <div class="ios-step-num">1</div>
+          <div class="ios-step-text">하단 메뉴바의 <strong>공유 버튼 <span class="ios-arrow">⎙</span></strong> 을 탭해요</div>
+        </div>
+        <div class="ios-step">
+          <div class="ios-step-num">2</div>
+          <div class="ios-step-text">스크롤을 내려 <strong>"홈 화면에 추가"</strong> 를 탭해요</div>
+        </div>
+        <div class="ios-step">
+          <div class="ios-step-num">3</div>
+          <div class="ios-step-text">우측 상단 <strong>"추가"</strong> 버튼을 탭하면 완료!</div>
+        </div>
+      </div>
+      <button class="ios-close" onclick="closeIosPopup()">닫기</button>
+    </div>
+  </div>
+
+  <!-- ① 직접 입력 -->
+  <div class="card">
+    <div class="sl">✏️ 먹고 싶은 메뉴 직접 입력</div>
+    <div class="irow">
+      <input class="minput" id="directInput" type="text" placeholder="예: 김치찌개, 스테이크, 마라탕..." onkeydown="if(event.key==='Enter') directPick()">
+      <button class="bgo" onclick="directPick()">바로 →</button>
+    </div>
+  </div>
+
+  <!-- ② 성별 -->
+  <div class="card">
+    <div class="sl">👤 성별</div>
+    <div class="trow" id="gRow">
+      <div class="tog" data-g="M" onclick="selG(this)">👨 남성</div>
+      <div class="tog" data-g="F" onclick="selG(this)">👩 여성</div>
+      <div class="tog sel-a" data-g="N" onclick="selG(this)">🙂 무관</div>
+    </div>
+  </div>
+
+  <!-- ③ 연령대 -->
+  <div class="card">
+    <div class="sl">🎂 연령대</div>
+    <div class="trow" id="aRow">
+      <div class="tog" data-a="10" onclick="selA(this)">10대</div>
+      <div class="tog" data-a="20" onclick="selA(this)">20대</div>
+      <div class="tog sel-a" data-a="30" onclick="selA(this)">30대</div>
+      <div class="tog" data-a="40" onclick="selA(this)">40대</div>
+      <div class="tog" data-a="50" onclick="selA(this)">50대+</div>
+    </div>
+  </div>
+
+  <!-- ④ 카테고리 -->
+  <div class="card">
+    <div class="sl">🍱 카테고리</div>
+    <div class="chips" id="chips">
+      <div class="chip active" data-cat="random"   onclick="selCatF(this)">🎲 랜덤</div>
+      <div class="chip" data-cat="korean"          onclick="selCatF(this)">🥢 한식</div>
+      <div class="chip" data-cat="japanese"        onclick="selCatF(this)">🍣 일식</div>
+      <div class="chip" data-cat="chinese"         onclick="selCatF(this)">🥟 중식</div>
+      <div class="chip" data-cat="western"         onclick="selCatF(this)">🍝 양식</div>
+      <div class="chip" data-cat="chicken"         onclick="selCatF(this)">🍗 치킨</div>
+      <div class="chip" data-cat="pizza"           onclick="selCatF(this)">🍕 피자/버거</div>
+      <div class="chip" data-cat="cafe"            onclick="selCatF(this)">☕ 카페/브런치</div>
+      <div class="chip" data-cat="snack"           onclick="selCatF(this)">🍢 분식</div>
+      <div class="chip" data-cat="seafood"         onclick="selCatF(this)">🦞 해산물</div>
+      <div class="chip" data-cat="health"          onclick="selCatF(this)">🥗 건강식</div>
+      <div class="chip" data-cat="meat"            onclick="selCatF(this)">🥩 고기/구이</div>
+      <div class="chip" data-cat="noodle"          onclick="selCatF(this)">🍜 면류</div>
+      <div class="chip" data-cat="rice"            onclick="selCatF(this)">🍚 밥/덮밥</div>
+      <div class="chip season-chip" data-cat="season" onclick="selCatF(this)">🌸 계절메뉴</div>
+    </div>
+  </div>
+
+  <!-- ⑤ 뽑기 -->
+  <div class="card" style="padding:15px 18px;">
+    <button class="pick-btn" id="pickBtn" onclick="pickMenu()">
+      <span class="bicon" id="bicon">🎯</span>
+      <span id="btnTxt">메뉴 추천받기!</span>
+    </button>
+    <div class="pbar" style="margin-top:10px;"><div class="pfill" id="pfill" style="width:0%"></div></div>
+    <p class="ptext" id="ptext">추천된 메뉴: 0 / 40개</p>
+  </div>
+
+  <!-- ⑥ 결과 -->
+  <div class="result-card" id="resultCard">
+    <div class="food-img-wrap" id="imgWrap">
+      <img id="foodImg" src="" alt="" class="food-img" onerror="imgFallback()">
+      <div class="food-img-overlay"></div>
+      <div class="food-img-title">
+        <div class="fit-emoji" id="fitEmoji">🍜</div>
+        <div class="fit-name" id="fitName">부대찌개</div>
+      </div>
+      <div class="crown-label">👑 오늘의 1순위</div>
+    </div>
+    <div class="result-body">
+      <div class="rtag-row" id="rTags"></div>
+      <div class="tip-box" id="rTip">💡 <strong>꿀팁:</strong> 맛있게!</div>
+      <div class="related-section">
+        <div class="related-title">연관 상품 바로 구매</div>
+        <div class="related-grid" id="relatedGrid"></div>
+      </div>
+      <div class="main-actions">
+        <a id="btnCoupang" href="#" target="_blank" class="bc" onclick="snd('coupang')">🛒 쿠팡에서 밀키트 바로 구매</a>
+        <button class="bm" onclick="openMap();snd('map')">📍 내 주변 음식점 찾기 (네이버 지도)</button>
+        <div class="btn2">
+          <button class="brr" onclick="reroll();snd('reroll')">🔀 다른 메뉴</button>
+          <button class="brr" onclick="scrollToTop()">⬆️ 다시 선택</button>
+        </div>
+        <div class="share-row">
+          <button class="bkakao" onclick="shareKakao()">💬 카카오 공유</button>
+          <button class="bcopy" onclick="copyLink()">🔗 링크 복사</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑦ 다음 추천 -->
+  <div class="next-card" id="nextCard">
+    <div class="sl">🥈 다음 추천 순위</div>
+    <p class="next-hint">탭하면 바로 결과로! 🛒 버튼으로 밀키트 바로 구매 가능</p>
+    <div class="next-grid" id="nextGrid"></div>
+  </div>
+
+  <!-- ⑧ 히스토리 -->
+  <div class="hist-wrap" id="histWrap">
+    <div class="sl">📅 추천 기록</div>
+    <div id="histList"></div>
+    <button class="clrbtn" onclick="clearAll()">전체 초기화</button>
+  </div>
+</div>
+
+<!-- 관리자 트리거 (화면 왼쪽 하단 보이지 않는 영역 5번 탭) -->
+<div class="admin-trigger" id="adminTrigger"></div>
+
+<!-- 관리자 통계 패널 -->
+<div class="admin-overlay" id="adminOverlay">
+  <div class="admin-box">
+    <div class="admin-title">🔐 관리자 통계</div>
+    <!-- 비밀번호 입력 -->
+    <div class="admin-pw-wrap" id="adminPwWrap">
+      <input class="admin-pw-input" id="adminPwInput" type="password"
+        placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter') checkAdminPw()">
+      <button class="admin-pw-btn" onclick="checkAdminPw()">확인</button>
+      <div class="admin-pw-err" id="adminPwErr">❌ 비밀번호가 틀렸어요</div>
+      <button class="admin-close" onclick="closeAdmin()" style="margin-top:4px;">닫기</button>
+    </div>
+    <!-- 통계 (비번 맞을 때만 표시) -->
+    <div class="admin-stats" id="adminStats">
+      <div class="stat-grid">
+        <div class="stat-item">
+          <div class="stat-num" id="statToday">0</div>
+          <div class="stat-label">오늘<br>유입</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="statMonth">0</div>
+          <div class="stat-label">당월<br>누계</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="statTotal">0</div>
+          <div class="stat-label">전체<br>누계</div>
+        </div>
+      </div>
+      <div class="stat-detail" id="statDetail"></div>
+      <button class="admin-close" onclick="closeAdmin()">닫기</button>
+      <button class="admin-logout" onclick="adminLogout()">로그아웃</button>
+    </div>
+  </div>
+</div>
+
+<button class="fab" id="fab" onclick="scrollToTop()">⬆</button>
+
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" crossorigin="anonymous"></script>
+<script>
+/* ============================================================
+   ⚙️ 설정 — 아래 4가지만 본인 것으로 교체
+   ============================================================ */
+// 파트너스 ID (난독화 처리)
+const _cfg = (()=>{
+  const _a = "11782769-27ea-48c3-ab3f-ebdab57227a0"; // ← 재발급 키로 교체
+  const _b = "food_picker_v6";
+  const _c = "YOUR_KAKAO_JS_KEY";               // ← 카카오 JS 키
+  const _d = "https://foodpicker.kr";       // ← 배포 URL
+  const _e = "9efcbf6d4b73d6427db514cdfa6fc821";                    // ← OpenWeatherMap 키
+  return {p:_a, s:_b, k:_c, u:_d, w:_e};
+})();
+
+// ★ 관리자 비밀번호 — 본인이 원하는 숫자/문자로 변경하세요
+const _ADMIN_HASH = btoa("9531"); // "1234" 를 원하는 비번으로 변경 후 btoa()로 인코딩
+
+function _cu(kw, sid){
+  return `https://www.coupang.com/np/search?q=${encodeURIComponent(kw)}&channel=user&partner=${_cfg.p}&subId=${sid||_cfg.s}`;
+}
+
+/* ============================================================
+   📊 통계 (localStorage 기반 간이 통계)
+   ============================================================ */
+function recordVisit(){
+  const now = new Date();
+  const todayKey = `fp6_d_${now.getFullYear()}${now.getMonth()+1}${now.getDate()}`;
+  const monthKey = `fp6_m_${now.getFullYear()}${now.getMonth()+1}`;
+  const totalKey = `fp6_total`;
+  const sessionKey = `fp6_session_${now.getFullYear()}${now.getMonth()+1}${now.getDate()}`;
+
+  // 같은 날 세션 중복 방지 (1시간 단위)
+  const lastVisit = sessionStorage.getItem(sessionKey);
+  const nowH = now.getHours();
+  if(lastVisit === String(nowH)) return; // 같은 시간대 중복 방문 제외
+  sessionStorage.setItem(sessionKey, String(nowH));
+
+  // 카운트 증가
+  localStorage.setItem(todayKey, (parseInt(localStorage.getItem(todayKey)||"0")+1));
+  localStorage.setItem(monthKey, (parseInt(localStorage.getItem(monthKey)||"0")+1));
+  localStorage.setItem(totalKey, (parseInt(localStorage.getItem(totalKey)||"0")+1));
+}
+
+function getStats(){
+  const now = new Date();
+  const todayKey = `fp6_d_${now.getFullYear()}${now.getMonth()+1}${now.getDate()}`;
+  const monthKey = `fp6_m_${now.getFullYear()}${now.getMonth()+1}`;
+  const totalKey = `fp6_total`;
+
+  // 최근 7일 데이터
+  const weekly = [];
+  for(let i=6;i>=0;i--){
+    const d = new Date(now);d.setDate(d.getDate()-i);
+    const k = `fp6_d_${d.getFullYear()}${d.getMonth()+1}${d.getDate()}`;
+    const v = parseInt(localStorage.getItem(k)||"0");
+    weekly.push({date:`${d.getMonth()+1}/${d.getDate()}`, count:v});
+  }
+
+  return {
+    today: parseInt(localStorage.getItem(todayKey)||"0"),
+    month: parseInt(localStorage.getItem(monthKey)||"0"),
+    total: parseInt(localStorage.getItem(totalKey)||"0"),
+    weekly,
+  };
+}
+
+recordVisit(); // 페이지 로드 시 방문 기록
+
+/* ============================================================
+   🔐 관리자 패널
+   ============================================================ */
+let adminTapCount = 0;
+let adminTapTimer = null;
+let adminLoggedIn = sessionStorage.getItem("fp6_admin") === "1";
+
+document.getElementById("adminTrigger").addEventListener("click", ()=>{
+  adminTapCount++;
+  clearTimeout(adminTapTimer);
+  adminTapTimer = setTimeout(()=>{ adminTapCount=0; }, 2000);
+  if(adminTapCount >= 5){
+    adminTapCount = 0;
+    openAdmin();
+  }
+});
+
+function openAdmin(){
+  document.getElementById("adminOverlay").classList.add("show");
+  if(adminLoggedIn){
+    showAdminStats();
+  }
+}
+function closeAdmin(){
+  document.getElementById("adminOverlay").classList.remove("show");
+  document.getElementById("adminPwInput").value="";
+  document.getElementById("adminPwErr").style.display="none";
+}
+function checkAdminPw(){
+  const input = document.getElementById("adminPwInput").value;
+  if(btoa(input) === _ADMIN_HASH){
+    adminLoggedIn = true;
+    sessionStorage.setItem("fp6_admin","1");
+    document.getElementById("adminPwErr").style.display="none";
+    showAdminStats();
+  }else{
+    document.getElementById("adminPwErr").style.display="block";
+    document.getElementById("adminPwInput").value="";
+  }
+}
+function showAdminStats(){
+  document.getElementById("adminPwWrap").style.display="none";
+  document.getElementById("adminStats").style.display="block";
+  const s = getStats();
+  document.getElementById("statToday").textContent = s.today.toLocaleString();
+  document.getElementById("statMonth").textContent = s.month.toLocaleString();
+  document.getElementById("statTotal").textContent = s.total.toLocaleString();
+
+  // 주간 차트 (텍스트)
+  const weekStr = s.weekly.map(d=>
+    `<strong>${d.date}</strong>: ${d.count}명`
+  ).join(" &nbsp;|&nbsp; ");
+  document.getElementById("statDetail").innerHTML =
+    `📅 최근 7일<br>${weekStr}<br><br>⚠️ 이 통계는 기기별 로컬 저장이라 정확한 수치는 Google Analytics를 확인하세요.`;
+}
+function adminLogout(){
+  adminLoggedIn = false;
+  sessionStorage.removeItem("fp6_admin");
+  document.getElementById("adminStats").style.display="none";
+  document.getElementById("adminPwWrap").style.display="flex";
+  document.getElementById("adminOverlay").classList.remove("show");
+}
+
+/* ============================================================
+   📲 PWA 설치 유도
+   ============================================================ */
+let deferredPrompt = null;
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+const isAndroid = /Android/.test(navigator.userAgent);
+const isMobile = isIOS || isAndroid;
+const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+const pwaDismissed = localStorage.getItem("fp6_pwa_dismissed");
+
+// 이미 설치됐거나 배너 닫은 경우 표시 안 함
+if(!isInStandaloneMode && !pwaDismissed){
+  if(isIOS){
+    // 아이폰: 수동 안내 배너 표시
+    setTimeout(()=>{
+      const banner = document.getElementById("pwaBanner");
+      document.getElementById("pwaIcon").textContent = "📱";
+      document.getElementById("pwaTitle").textContent = "아이폰 홈 화면에 추가";
+      document.getElementById("pwaDesc").textContent = "사파리에서 공유 버튼 → 홈 화면에 추가";
+      document.getElementById("pwaInstallBtn").textContent = "방법 보기";
+      document.getElementById("pwaInstallBtn").onclick = showIosGuide;
+      banner.classList.add("show");
+    }, 3000);
+  } else {
+    // 안드로이드/PC: beforeinstallprompt 이벤트 대기
+    window.addEventListener("beforeinstallprompt", e=>{
+      e.preventDefault();
+      deferredPrompt = e;
+      const banner = document.getElementById("pwaBanner");
+      if(isMobile){
+        document.getElementById("pwaIcon").textContent = "📲";
+        document.getElementById("pwaTitle").textContent = "폰 홈 화면에 설치";
+        document.getElementById("pwaDesc").textContent = "앱처럼 빠르게 접속! 데이터 절약까지";
+      }else{
+        document.getElementById("pwaIcon").textContent = "🖥️";
+        document.getElementById("pwaTitle").textContent = "PC 바탕화면에 설치";
+        document.getElementById("pwaDesc").textContent = "바로가기로 언제든 빠르게 실행해요";
+      }
+      setTimeout(()=>banner.classList.add("show"), 3000);
+    });
+  }
+}
+
+function installPWA(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(r=>{
+      if(r.outcome==="accepted"){
+        toast("🎉 설치 완료! 홈 화면을 확인해보세요");
+        localStorage.setItem("fp6_pwa_dismissed","1");
+      }
+      deferredPrompt=null;
+      document.getElementById("pwaBanner").classList.remove("show");
+    });
+  }else{
+    showIosGuide();
+  }
+}
+function showIosGuide(){
+  document.getElementById("iosPopup").classList.add("show");
+}
+function closeIosPopup(){
+  document.getElementById("iosPopup").classList.remove("show");
+}
+function closePWA(){
+  document.getElementById("pwaBanner").classList.remove("show");
+  localStorage.setItem("fp6_pwa_dismissed","1");
+}
+
+/* ============================================================
+   🌸 계절 / 🕐 시간대 / ☁️ 날씨
+   ============================================================ */
+const SEASONS={
+  spring:{label:"🌸 봄",cls:"sb-spring",months:[3,4,5],icon:"🌸",title:"🌸 봄 시즌 메뉴!",desc:"딸기·봄나물·주꾸미 제철 메뉴를 즐겨보세요",catBonus:["health","cafe","seafood"]},
+  summer:{label:"☀️ 여름",cls:"sb-summer",months:[6,7,8],icon:"🍧",title:"☀️ 여름 시즌 메뉴!",desc:"냉면·삼계탕·빙수로 더위를 이겨요",catBonus:["noodle","korean","health"]},
+  autumn:{label:"🍂 가을",cls:"sb-autumn",months:[9,10,11],icon:"🍁",title:"🍂 가을 시즌 메뉴!",desc:"버섯전골·대하·전어 제철 메뉴예요",catBonus:["meat","korean","seafood"]},
+  winter:{label:"❄️ 겨울",cls:"sb-winter",months:[12,1,2],icon:"⛄",title:"❄️ 겨울 시즌 메뉴!",desc:"굴국밥·대게·떡국 따뜻한 메뉴예요",catBonus:["korean","seafood","noodle"]},
+};
+let curSeason="spring";
+function detectSeason(){
+  const m=new Date().getMonth()+1;
+  for(const[k,v]of Object.entries(SEASONS)){if(v.months.includes(m)){curSeason=k;break;}}
+  const s=SEASONS[curSeason];
+  const sb=document.getElementById("seasonBadge");
+  sb.textContent=s.label;sb.className="season-badge "+s.cls;sb.style.display="inline-block";
+}
+detectSeason();
+
+const MEAL_INFO={
+  morning:{label:"🌅 아침",cls:"mb-morning",bonus:["cafe","health","rice"]},
+  lunch:  {label:"🌞 점심",cls:"mb-lunch",  bonus:["korean","chinese","noodle","rice"]},
+  dinner: {label:"🌙 저녁",cls:"mb-dinner", bonus:["meat","seafood","chicken","pizza"]},
+  night:  {label:"🌛 야식",cls:"mb-night",  bonus:["chicken","pizza","snack","noodle"]},
+};
+let mealTime="lunch";
+function detectMeal(){
+  const h=new Date().getHours();
+  mealTime=h>=5&&h<10?"morning":h>=10&&h<15?"lunch":h>=15&&h<21?"dinner":"night";
+  const mi=MEAL_INFO[mealTime];
+  const b=document.getElementById("mealBadge");b.textContent=mi.label;b.className="meal-badge "+mi.cls;
+  const tx={morning:"아침 메뉴 추천!",lunch:"점심 메뉴 추천!",dinner:"저녁 메뉴 추천!",night:"야식 추천!"};
+  document.getElementById("btnTxt").textContent=tx[mealTime];
+}
+function tickClock(){
+  const n=new Date();
+  document.getElementById("clockStr").textContent=`${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}`;
+}
+setInterval(tickClock,30000);tickClock();detectMeal();
+
+const WX_LABELS={clear:"☀️ 맑음",cloud:"⛅ 흐림",rain:"🌧️ 비",snow:"❄️ 눈",hot:"🥵 더움",cold:"🥶 추움"};
+const WX_BONUS={rain:["korean","snack","noodle"],snow:["korean","noodle"],hot:["health","cafe"],cold:["meat","korean"],clear:[],cloud:[]};
+let wxCode="clear";
+async function fetchWeather(){
+  try{
+    if(_cfg.w==="YOUR_OWM_KEY"){
+      const h=new Date().getHours();wxCode=h<6||h>21?"cold":"clear";
+      document.getElementById("wxTag").textContent=WX_LABELS[wxCode];return;
+    }
+    const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:5000}));
+    const r=await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&appid=${_cfg.w}&units=metric`);
+    const d=await r.json();
+    const id=d.weather[0].id,t=d.main.temp;
+    wxCode=id>=200&&id<600?"rain":id>=600&&id<700?"snow":id>=800&&id<=801?"clear":"cloud";
+    if(t>=28)wxCode="hot";if(t<=5)wxCode="cold";
+    document.getElementById("wxTag").textContent=WX_LABELS[wxCode];
+  }catch(e){document.getElementById("wxTag").textContent="🌤️ 날씨 정보 없음";}
+}
+fetchWeather();
+
+/* ============================================================
+   🍱 메뉴 DB (v5와 동일 — 170개)
+   ============================================================ */
+const DB=[
+  {n:"부대찌개",e:"🥘",cat:"korean",q:"부대찌개 밀키트",t:"묵은지+햄 조합이 국물을 2배 깊게 만들어요",img:"army stew korean",w:{M10:7,M20:8,M30:7,M40:6,M50:6,F10:6,F20:6,F30:7,F40:6,F50:6},related:[{icon:"🛒",label:"부대찌개 밀키트",sub:"간편 조리 세트",q:"부대찌개 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🥫",label:"스팸·햄 세트",sub:"부대찌개 필수 재료",q:"스팸 햄 세트",cls:"rel-ingred",tag:"NEW"},{icon:"🍲",label:"뚝배기·냄비",sub:"제대로 끓이는 그릇",q:"뚝배기 찌개냄비",cls:"rel-tool",tag:null},{icon:"🌶️",label:"고추장·양념",sub:"깊은 맛의 비결",q:"고추장 찌개양념",cls:"rel-sauce",tag:"SALE"}]},
+  {n:"김치찌개",e:"🌶️",cat:"korean",q:"김치찌개 밀키트",t:"묵은지+돼지고기 조합이 가장 진한 맛이에요",img:"kimchi jjigae stew",w:{M10:7,M20:8,M30:8,M40:8,M50:8,F10:5,F20:7,F30:7,F40:7,F50:8},related:[{icon:"🛒",label:"김치찌개 밀키트",sub:"묵은지 포함 세트",q:"김치찌개 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🥬",label:"묵은지·김치",sub:"깊은 국물의 핵심",q:"묵은지 포기김치",cls:"rel-ingred",tag:null},{icon:"🍖",label:"돼지고기 앞다리",sub:"찌개용 신선 정육",q:"찌개용 돼지고기",cls:"rel-ingred",tag:"NEW"},{icon:"🍲",label:"뚝배기 세트",sub:"찌개 전용 그릇",q:"뚝배기 세트",cls:"rel-tool",tag:null}]},
+  {n:"된장찌개",e:"🍲",cat:"korean",q:"된장찌개 밀키트",t:"조개 육수로 끓이면 감칠맛이 폭발해요",img:"doenjang jjigae soybean",w:{M10:4,M20:5,M30:6,M40:8,M50:9,F10:5,F20:5,F30:7,F40:8,F50:9},related:[{icon:"🛒",label:"된장찌개 밀키트",sub:"재료 손질 완료",q:"된장찌개 밀키트",cls:"rel-milkit",tag:null},{icon:"🫙",label:"전통 된장",sub:"국산 콩 100%",q:"전통 된장 국산",cls:"rel-sauce",tag:"HOT"},{icon:"🥬",label:"두부·호박",sub:"찌개 기본 재료",q:"찌개용 두부 호박",cls:"rel-ingred",tag:null},{icon:"🐚",label:"바지락·조개",sub:"시원한 육수의 비결",q:"바지락 조개 신선",cls:"rel-ingred",tag:"NEW"}]},
+  {n:"비빔밥",e:"🍚",cat:"korean",q:"비빔밥 밀키트",t:"나물을 참기름에 버무리는 게 핵심이에요",img:"bibimbap korean mixed rice",w:{M10:5,M20:6,M30:6,M40:6,M50:7,F10:7,F20:8,F30:8,F40:7,F50:7},related:[{icon:"🛒",label:"비빔밥 밀키트",sub:"나물 손질 완료 세트",q:"비빔밥 밀키트",cls:"rel-milkit",tag:null},{icon:"🌶️",label:"비빔용 고추장",sub:"달콤 매콤 황금 비율",q:"비빔밥 고추장",cls:"rel-sauce",tag:"HOT"},{icon:"🌿",label:"나물 모음",sub:"시금치·고사리·콩나물",q:"비빔밥 나물 모음",cls:"rel-ingred",tag:null},{icon:"🥣",label:"돌솥·비빔그릇",sub:"바삭한 누룽지 완성",q:"돌솥 비빔밥 그릇",cls:"rel-tool",tag:null}]},
+  {n:"삼계탕",e:"🐔",cat:"korean",q:"삼계탕 밀키트",t:"인삼·마늘·찹쌀 세 가지가 정석이에요",img:"samgyetang ginseng chicken soup",w:{M10:3,M20:4,M30:6,M40:7,M50:9,F10:4,F20:5,F30:6,F40:8,F50:9},related:[{icon:"🛒",label:"삼계탕 밀키트",sub:"영계+인삼 세트",q:"삼계탕 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🌿",label:"홍삼·인삼",sub:"면역력 강화",q:"홍삼 인삼 건강",cls:"rel-ingred",tag:"NEW"},{icon:"🍚",label:"찹쌀",sub:"국산 찹쌀 500g",q:"국산 찹쌀",cls:"rel-ingred",tag:null},{icon:"🏺",label:"뚝배기·뚜껑",sub:"삼계탕 전용 냄비",q:"삼계탕 뚝배기",cls:"rel-tool",tag:null}]},
+  {n:"제육볶음",e:"🥬",cat:"korean",q:"제육볶음 밀키트",t:"고추장:간장:설탕=1:1:0.5 황금 비율이에요",img:"jeyuk bokkeum spicy pork",w:{M10:7,M20:8,M30:7,M40:7,M50:5,F10:5,F20:7,F30:7,F40:6,F50:5},related:[{icon:"🛒",label:"제육볶음 밀키트",sub:"양념 손질 완료",q:"제육볶음 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🥬",label:"쌈채소 모음",sub:"상추·깻잎·쌈무",q:"쌈채소 모음",cls:"rel-ingred",tag:null},{icon:"🌶️",label:"제육볶음 양념",sub:"매콤 달콤 소스",q:"제육볶음 양념 소스",cls:"rel-sauce",tag:null},{icon:"🍳",label:"프라이팬·웍",sub:"볶음 전용 팬",q:"볶음 프라이팬 웍",cls:"rel-tool",tag:"NEW"}]},
+  {n:"해물탕",e:"🦀",cat:"korean",q:"해물탕 밀키트",t:"조개류를 먼저 넣어 육수를 우려내세요",img:"haemul tang seafood hot pot",w:{M10:4,M20:5,M30:6,M40:7,M50:8,F10:4,F20:5,F30:6,F40:7,F50:8},related:[{icon:"🛒",label:"해물탕 밀키트",sub:"손질 해물 세트",q:"해물탕 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🦐",label:"모둠 해물",sub:"새우·낙지·바지락",q:"해물 모둠 신선",cls:"rel-ingred",tag:"NEW"},{icon:"🌶️",label:"해물탕 양념",sub:"칼칼한 국물 소스",q:"해물탕 양념",cls:"rel-sauce",tag:null},{icon:"🍲",label:"전골냄비",sub:"해물탕 전용",q:"전골냄비",cls:"rel-tool",tag:null}]},
+  {n:"초밥",e:"🍣",cat:"japanese",q:"초밥 밀키트",t:"와사비는 생선 아래에 발라야 정석이에요",img:"sushi japanese omakase",w:{M10:6,M20:8,M30:8,M40:7,M50:6,F10:8,F20:9,F30:9,F40:8,F50:7},related:[{icon:"🛒",label:"초밥 밀키트",sub:"신선 회+밥 세트",q:"초밥 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🐟",label:"신선 회 모둠",sub:"연어·참치·광어",q:"신선 회 모둠",cls:"rel-ingred",tag:"NEW"},{icon:"🫙",label:"초밥 식초·와사비",sub:"전용 양념 세트",q:"초밥 식초 와사비",cls:"rel-sauce",tag:null},{icon:"🍱",label:"초밥 그릇·트레이",sub:"홈파티 플레이팅",q:"초밥 그릇 트레이",cls:"rel-tool",tag:null}]},
+  {n:"라멘",e:"🍜",cat:"japanese",q:"라멘 밀키트",t:"달걀은 6분 30초 반숙이 가장 맛있어요",img:"ramen japanese noodle bowl",w:{M10:8,M20:9,M30:8,M40:7,M50:5,F10:6,F20:8,F30:7,F40:6,F50:5},related:[{icon:"🛒",label:"라멘 밀키트",sub:"생면+육수+토핑 세트",q:"라멘 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🍜",label:"라멘 생면",sub:"쫄깃한 일본식 면",q:"라멘 생면",cls:"rel-ingred",tag:null},{icon:"🫙",label:"라멘 육수팩",sub:"돈코츠·쇼유·미소",q:"라멘 육수팩",cls:"rel-sauce",tag:"NEW"},{icon:"🥣",label:"라멘 그릇",sub:"깊은 도자기 볼",q:"라멘 그릇 도자기",cls:"rel-tool",tag:null}]},
+  {n:"돈카츠",e:"🥩",cat:"japanese",q:"돈카츠 밀키트",t:"소스는 우스터 기반이 정통이에요",img:"tonkatsu japanese pork cutlet",w:{M10:8,M20:8,M30:7,M40:6,M50:5,F10:6,F20:7,F30:6,F40:5,F50:4},related:[{icon:"🛒",label:"돈카츠 밀키트",sub:"두껍게 썬 등심 세트",q:"돈카츠 밀키트",cls:"rel-milkit",tag:null},{icon:"🥩",label:"돈카츠용 등심",sub:"신선 냉장 돼지고기",q:"돈카츠 등심 정육",cls:"rel-ingred",tag:"HOT"},{icon:"🫙",label:"돈카츠 소스",sub:"우스터·돈카츠 전용",q:"돈카츠 소스",cls:"rel-sauce",tag:null},{icon:"🍳",label:"튀김 냄비",sub:"바삭함의 핵심",q:"튀김 냄비 온도계",cls:"rel-tool",tag:"NEW"}]},
+  {n:"짜장면",e:"🍝",cat:"chinese",q:"짜장면 밀키트",t:"춘장 볶을 때 설탕 한 스푼이 비법이에요",img:"jjajangmyeon black bean noodles",w:{M10:8,M20:8,M30:7,M40:7,M50:7,F10:7,F20:7,F30:7,F40:7,F50:7},related:[{icon:"🛒",label:"짜장면 밀키트",sub:"춘장+생면 세트",q:"짜장면 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🫙",label:"춘장",sub:"국산 메주 춘장",q:"짜장 춘장",cls:"rel-sauce",tag:null},{icon:"🍜",label:"중화 생면",sub:"쫄깃한 짜장 전용",q:"중화 생면 짜장",cls:"rel-ingred",tag:null},{icon:"🥢",label:"단무지 세트",sub:"짜장면 필수 사이드",q:"단무지 짜장면",cls:"rel-ingred",tag:"NEW"}]},
+  {n:"마라탕",e:"🌶️",cat:"chinese",q:"마라탕 밀키트",t:"재료는 먹고 싶은 걸로 자유롭게 조합해요",img:"malatang chinese spicy hot pot",w:{M10:7,M20:9,M30:7,M40:5,M50:3,F10:8,F20:9,F30:7,F40:5,F50:3},related:[{icon:"🛒",label:"마라탕 밀키트",sub:"육수+재료 세트",q:"마라탕 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🌶️",label:"마라 소스",sub:"화자오+고추 정통",q:"마라 소스 화자오",cls:"rel-sauce",tag:"NEW"},{icon:"🥬",label:"마라탕 재료 세트",sub:"건두부·어묵·야채",q:"마라탕 재료 세트",cls:"rel-ingred",tag:null},{icon:"🍲",label:"전골냄비 세트",sub:"마라탕 전용",q:"전골냄비 마라",cls:"rel-tool",tag:null}]},
+  {n:"카르보나라",e:"🍝",cat:"western",q:"카르보나라 밀키트",t:"면수를 넣어야 소스가 걸쭉하게 완성돼요",img:"carbonara pasta creamy",w:{M10:6,M20:8,M30:7,M40:5,M50:4,F10:8,F20:9,F30:8,F40:6,F50:5},related:[{icon:"🛒",label:"카르보나라 밀키트",sub:"생크림+판체타 세트",q:"카르보나라 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🍝",label:"생파스타 면",sub:"쫄깃한 이탈리아 면",q:"파스타 생면",cls:"rel-ingred",tag:null},{icon:"🫙",label:"카르보나라 소스",sub:"정통 크림 소스",q:"카르보나라 소스",cls:"rel-sauce",tag:"NEW"},{icon:"🧀",label:"파마산 치즈",sub:"갈아서 올리면 완성",q:"파마산 치즈 파스타",cls:"rel-ingred",tag:null}]},
+  {n:"스테이크",e:"🥩",cat:"western",q:"스테이크 밀키트",t:"굽기 전 상온에 30분 꺼내두세요",img:"beef steak medium rare",w:{M10:7,M20:8,M30:9,M40:8,M50:7,F10:5,F20:7,F30:7,F40:6,F50:5},related:[{icon:"🛒",label:"스테이크 밀키트",sub:"등심+소스 세트",q:"스테이크 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🥩",label:"소고기 등심·안심",sub:"1++ 냉장 한우",q:"한우 등심 스테이크",cls:"rel-ingred",tag:"NEW"},{icon:"🫙",label:"스테이크 소스",sub:"버섯·페퍼·레드와인",q:"스테이크 소스",cls:"rel-sauce",tag:null},{icon:"🍳",label:"무쇠 주철 팬",sub:"완벽한 시어링",q:"무쇠 스테이크 팬",cls:"rel-tool",tag:"NEW"}]},
+  {n:"연어 스테이크",e:"🐟",cat:"western",q:"연어 스테이크 밀키트",t:"레몬버터 소스가 최고의 궁합이에요",img:"salmon steak lemon butter",w:{M10:4,M20:6,M30:7,M40:6,M50:5,F10:6,F20:9,F30:9,F40:7,F50:6},related:[{icon:"🛒",label:"연어 스테이크 세트",sub:"노르웨이 생연어",q:"연어 스테이크 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🐟",label:"생연어 필렛",sub:"신선 냉장 배송",q:"생연어 필렛",cls:"rel-ingred",tag:"NEW"},{icon:"🍋",label:"레몬버터 소스",sub:"연어 전용 소스",q:"레몬버터 소스 연어",cls:"rel-sauce",tag:null},{icon:"🥗",label:"샐러드 세트",sub:"연어와 찰떡 사이드",q:"샐러드 세트 연어",cls:"rel-ingred",tag:null}]},
+  {n:"후라이드 치킨",e:"🍗",cat:"chicken",q:"후라이드치킨 밀키트",t:"에어프라이어 165°C로 15분이면 바삭해요",img:"fried chicken korean crispy",w:{M10:9,M20:9,M30:8,M40:7,M50:5,F10:7,F20:8,F30:7,F40:6,F50:4},related:[{icon:"🛒",label:"후라이드치킨 밀키트",sub:"닭+튀김가루 세트",q:"후라이드치킨 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🍗",label:"닭 한마리·닭다리",sub:"신선 냉장 국내산",q:"치킨용 닭 냉장",cls:"rel-ingred",tag:null},{icon:"🫙",label:"치킨 소스 세트",sub:"허니머스타드·양념",q:"치킨 소스 세트",cls:"rel-sauce",tag:"NEW"},{icon:"♨️",label:"에어프라이어",sub:"바삭함의 핵심 도구",q:"에어프라이어 추천",cls:"rel-tool",tag:"HOT"}]},
+  {n:"양념 치킨",e:"🌶️",cat:"chicken",q:"양념치킨 밀키트",t:"꿀 한 스푼이 윤기를 더해줘요",img:"yangnyeom chicken korean sweet spicy",w:{M10:8,M20:9,M30:8,M40:7,M50:5,F10:7,F20:8,F30:7,F40:6,F50:4},related:[{icon:"🛒",label:"양념치킨 밀키트",sub:"닭+양념 세트",q:"양념치킨 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🌶️",label:"치킨 양념 소스",sub:"매콤달콤 정통 양념",q:"양념치킨 소스",cls:"rel-sauce",tag:null},{icon:"🍺",label:"맥주 세트",sub:"치맥의 완성",q:"맥주 캔 세트",cls:"rel-ingred",tag:"NEW"},{icon:"♨️",label:"에어프라이어",sub:"바삭하게 완성",q:"에어프라이어",cls:"rel-tool",tag:"HOT"}]},
+  {n:"찜닭",e:"🍲",cat:"chicken",q:"찜닭 밀키트",t:"당면은 마지막에 넣어야 퍼지지 않아요",img:"jjimdak korean braised chicken",w:{M10:6,M20:7,M30:7,M40:7,M50:6,F10:6,F20:7,F30:7,F40:7,F50:6},related:[{icon:"🛒",label:"찜닭 밀키트",sub:"닭+당면+야채 세트",q:"찜닭 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🍜",label:"당면·유리면",sub:"찜닭 핵심 재료",q:"당면 유리면",cls:"rel-ingred",tag:null},{icon:"🫙",label:"찜닭 양념",sub:"간장 베이스 소스",q:"찜닭 양념 소스",cls:"rel-sauce",tag:"NEW"},{icon:"🍲",label:"찜닭 전용 냄비",sub:"넓은 볶음 냄비",q:"찜닭 냄비 볶음",cls:"rel-tool",tag:null}]},
+  {n:"마르게리타 피자",e:"🍕",cat:"pizza",q:"마르게리타 피자 밀키트",t:"바질은 꺼낸 후에 올려야 향이 살아요",img:"margherita pizza tomato basil",w:{M10:6,M20:7,M30:7,M40:6,M50:5,F10:7,F20:8,F30:8,F40:6,F50:5},related:[{icon:"🛒",label:"피자 밀키트",sub:"도우+소스+치즈 세트",q:"피자 밀키트 홈메이드",cls:"rel-milkit",tag:"HOT"},{icon:"🧀",label:"모차렐라 치즈",sub:"쫄깃 늘어나는",q:"모차렐라 치즈 피자",cls:"rel-ingred",tag:null},{icon:"🫙",label:"피자 소스",sub:"토마토 베이스",q:"피자 소스 토마토",cls:"rel-sauce",tag:"NEW"},{icon:"🍕",label:"피자 스톤·판",sub:"바삭한 크러스트",q:"피자스톤 오븐",cls:"rel-tool",tag:null}]},
+  {n:"수제 버거",e:"🍔",cat:"pizza",q:"수제버거 밀키트",t:"패티는 중심에 홈 파고 센 불에 구워요",img:"smash burger juicy beef patty",w:{M10:8,M20:9,M30:8,M40:7,M50:5,F10:5,F20:7,F30:7,F40:5,F50:4},related:[{icon:"🛒",label:"수제버거 밀키트",sub:"패티+번+소스 세트",q:"수제버거 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🥩",label:"수제버거 패티",sub:"냉장 정육 패티",q:"수제버거 패티",cls:"rel-ingred",tag:"NEW"},{icon:"🫙",label:"버거 소스 세트",sub:"스모키·머스타드",q:"버거 소스 세트",cls:"rel-sauce",tag:null},{icon:"🍟",label:"감자·어니언링",sub:"버거 사이드 세트",q:"냉동 감자튀김 어니언링",cls:"rel-ingred",tag:"SALE"}]},
+  {n:"에그 베네딕트",e:"🍳",cat:"cafe",q:"에그베네딕트 밀키트",t:"홀랜다이즈 소스는 중탕으로 천천히 만들어요",img:"eggs benedict hollandaise brunch",w:{M10:3,M20:6,M30:7,M40:5,M50:4,F10:5,F20:9,F30:9,F40:7,F50:6},related:[{icon:"🛒",label:"에그베네딕트 세트",sub:"잉글리쉬머핀+소스",q:"에그베네딕트 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🥚",label:"유정란·신선란",sub:"포칭용 신선 달걀",q:"유정란 신선 달걀",cls:"rel-ingred",tag:null},{icon:"🫙",label:"홀랜다이즈 소스",sub:"레몬버터 크림",q:"홀랜다이즈 소스",cls:"rel-sauce",tag:"NEW"},{icon:"☕",label:"커피·에스프레소",sub:"브런치 완성 음료",q:"원두 커피 에스프레소",cls:"rel-ingred",tag:null}]},
+  {n:"아보카도 토스트",e:"🥑",cat:"cafe",q:"아보카도토스트 밀키트",t:"레몬즙과 올리브오일이 포인트예요",img:"avocado toast brunch healthy",w:{M10:3,M20:6,M30:7,M40:5,M50:4,F10:5,F20:9,F30:9,F40:7,F50:6},related:[{icon:"🥑",label:"신선 아보카도",sub:"잘 익은 멕시코산",q:"신선 아보카도",cls:"rel-ingred",tag:"HOT"},{icon:"🍞",label:"사워도우·통밀빵",sub:"바삭한 토스트용",q:"사워도우 통밀빵",cls:"rel-ingred",tag:null},{icon:"🫙",label:"올리브오일",sub:"엑스트라버진",q:"엑스트라버진 올리브오일",cls:"rel-sauce",tag:"NEW"},{icon:"🍳",label:"토스터기",sub:"완벽한 바삭함",q:"토스터기 추천",cls:"rel-tool",tag:null}]},
+  {n:"떡볶이",e:"🍢",cat:"snack",q:"떡볶이 밀키트",t:"어묵 국물로 베이스 잡으면 국물이 달라요",img:"tteokbokki spicy rice cake korean",w:{M10:8,M20:7,M30:6,M40:5,M50:4,F10:9,F20:8,F30:7,F40:5,F50:4},related:[{icon:"🛒",label:"떡볶이 밀키트",sub:"떡+어묵+양념 세트",q:"떡볶이 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🍢",label:"쌀떡+밀떡",sub:"쫄깃한 떡볶이 떡",q:"떡볶이 떡",cls:"rel-ingred",tag:null},{icon:"🌶️",label:"떡볶이 소스",sub:"매콤 달콤 전용",q:"떡볶이 소스 양념",cls:"rel-sauce",tag:"NEW"},{icon:"🍳",label:"납작 냄비·팬",sub:"골고루 익히는 팬",q:"납작 냄비 떡볶이",cls:"rel-tool",tag:null}]},
+  {n:"김밥",e:"🍙",cat:"snack",q:"김밥 밀키트",t:"밥에 참기름·소금 간이 맛의 핵심이에요",img:"kimbap korean seaweed rice roll",w:{M10:6,M20:7,M30:7,M40:7,M50:7,F10:7,F20:7,F30:8,F40:7,F50:7},related:[{icon:"🛒",label:"김밥 밀키트",sub:"재료 손질 완료",q:"김밥 밀키트",cls:"rel-milkit",tag:null},{icon:"🌊",label:"김밥용 김",sub:"바삭한 전장 김",q:"김밥용 김 전장",cls:"rel-ingred",tag:"HOT"},{icon:"🥢",label:"김밥 재료 세트",sub:"단무지·맛살·시금치",q:"김밥 재료 세트",cls:"rel-ingred",tag:null},{icon:"🍱",label:"김밥 말이·커터",sub:"균일한 김밥 완성",q:"김밥말이 커터",cls:"rel-tool",tag:"NEW"}]},
+  {n:"조개구이",e:"🦪",cat:"seafood",q:"조개구이 밀키트",t:"마늘버터 소스를 미리 준비해두면 완성이에요",img:"clam grilled korean seafood",w:{M10:5,M20:6,M30:7,M40:7,M50:7,F10:4,F20:6,F30:7,F40:7,F50:7},related:[{icon:"🛒",label:"조개구이 세트",sub:"백합·새조개·바지락",q:"조개구이 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🦪",label:"모둠 조개 세트",sub:"신선 제철 조개",q:"모둠 조개 신선",cls:"rel-ingred",tag:"NEW"},{icon:"🧄",label:"마늘버터 소스",sub:"조개구이 필수",q:"마늘버터 소스",cls:"rel-sauce",tag:null},{icon:"🍳",label:"조개구이 판",sub:"직화 전용 석쇠",q:"조개구이 판 석쇠",cls:"rel-tool",tag:null}]},
+  {n:"게장",e:"🦀",cat:"seafood",q:"간장게장 밀키트",t:"밥 한 공기 뚝딱! 밥도둑의 원조예요",img:"ganjang gejang marinated crab",w:{M10:4,M20:6,M30:7,M40:7,M50:7,F10:3,F20:5,F30:7,F40:7,F50:7},related:[{icon:"🛒",label:"간장게장 세트",sub:"손질 완료 배송",q:"간장게장 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🦀",label:"꽃게 신선",sub:"제철 살 꽉 찬 게",q:"꽃게 신선 배송",cls:"rel-ingred",tag:"NEW"},{icon:"🍚",label:"햇반·밥",sub:"게장엔 밥 필수",q:"즉석밥 햇반",cls:"rel-ingred",tag:null},{icon:"🫙",label:"게장 양념장",sub:"비법 간장 소스",q:"게장 간장 소스",cls:"rel-sauce",tag:null}]},
+  {n:"닭가슴살 샐러드",e:"🥗",cat:"health",q:"닭가슴살 샐러드 밀키트",t:"발사믹 글레이즈를 뿌리면 풍미가 살아나요",img:"chicken salad healthy greens",w:{M10:3,M20:6,M30:7,M40:5,M50:5,F10:5,F20:9,F30:9,F40:7,F50:6},related:[{icon:"🛒",label:"샐러드 밀키트",sub:"닭가슴살+드레싱 세트",q:"닭가슴살 샐러드 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🍗",label:"닭가슴살 팩",sub:"저지방 고단백",q:"닭가슴살 팩 저지방",cls:"rel-ingred",tag:null},{icon:"🫙",label:"샐러드 드레싱",sub:"발사믹·시저·허니",q:"샐러드 드레싱 세트",cls:"rel-sauce",tag:"NEW"},{icon:"🥗",label:"샐러드 볼·집게",sub:"예쁜 플레이팅",q:"샐러드 볼 집게",cls:"rel-tool",tag:null}]},
+  {n:"포케 보울",e:"🌺",cat:"health",q:"포케 밀키트",t:"신선한 연어와 에다마메가 핵심이에요",img:"poke bowl salmon rice hawaiian",w:{M10:3,M20:7,M30:8,M40:5,M50:4,F10:4,F20:9,F30:9,F40:6,F50:4},related:[{icon:"🛒",label:"포케 밀키트",sub:"연어+소스+야채 세트",q:"포케 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🐟",label:"신선 연어",sub:"냉장 배송 연어",q:"신선 연어 포케",cls:"rel-ingred",tag:"NEW"},{icon:"🫙",label:"포케 소스",sub:"스파이시 마요·간장",q:"포케 소스",cls:"rel-sauce",tag:null},{icon:"🥣",label:"포케 보울",sub:"트렌디한 볼",q:"포케 보울 그릇",cls:"rel-tool",tag:null}]},
+  {n:"삼겹살 구이",e:"🥩",cat:"meat",q:"삼겹살 밀키트",t:"소금·참기름·마늘이 삼겹살의 삼위일체예요",img:"samgyeopsal korean pork belly bbq",w:{M10:8,M20:9,M30:9,M40:8,M50:7,F10:6,F20:7,F30:7,F40:6,F50:5},related:[{icon:"🛒",label:"삼겹살 밀키트",sub:"양념+쌈채소 세트",q:"삼겹살 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🥩",label:"삼겹살 정육",sub:"국내산 냉장 삼겹",q:"삼겹살 국내산 냉장",cls:"rel-ingred",tag:null},{icon:"🥬",label:"쌈채소 모음",sub:"상추·깻잎·쌈무",q:"쌈채소 모음",cls:"rel-ingred",tag:"NEW"},{icon:"🔥",label:"휴대용 가스버너",sub:"야외 삼겹살",q:"휴대용 가스버너",cls:"rel-tool",tag:"HOT"}]},
+  {n:"와규 스테이크",e:"🥩",cat:"meat",q:"와규 스테이크 밀키트",t:"미디엄레어로 구워야 마블링이 살아나요",img:"wagyu beef steak marbling premium",w:{M10:4,M20:7,M30:9,M40:8,M50:6,F10:4,F20:7,F30:8,F40:7,F50:5},related:[{icon:"🛒",label:"와규 스테이크 세트",sub:"마블링 등급 소고기",q:"와규 스테이크 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🥩",label:"와규 등심·채끝",sub:"1++ 최고급 마블링",q:"와규 등심 1++",cls:"rel-ingred",tag:"NEW"},{icon:"🍷",label:"레드와인",sub:"스테이크 최고 페어링",q:"레드와인 스테이크",cls:"rel-ingred",tag:null},{icon:"🍳",label:"무쇠 주철 팬",sub:"완벽한 시어링",q:"무쇠 주철 팬",cls:"rel-tool",tag:"HOT"}]},
+  {n:"칼국수",e:"🍜",cat:"noodle",q:"칼국수 밀키트",t:"멸치 육수로 우려야 국물이 시원해요",img:"kalguksu korean knife cut noodles",w:{M10:5,M20:6,M30:6,M40:7,M50:8,F10:5,F20:6,F30:7,F40:7,F50:8},related:[{icon:"🛒",label:"칼국수 밀키트",sub:"생면+육수 세트",q:"칼국수 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🍜",label:"칼국수 생면",sub:"쫄깃한 수제면",q:"칼국수 생면",cls:"rel-ingred",tag:null},{icon:"🐟",label:"멸치 육수팩",sub:"시원한 국물 완성",q:"멸치 육수팩",cls:"rel-sauce",tag:"NEW"},{icon:"🍲",label:"칼국수 냄비",sub:"넉넉한 용량",q:"칼국수 냄비",cls:"rel-tool",tag:null}]},
+  {n:"냉면",e:"🍜",cat:"noodle",q:"냉면 밀키트",t:"육수는 하루 전날 만들어 두어야 맛있어요",img:"naengmyeon korean cold noodles",w:{M10:5,M20:7,M30:7,M40:7,M50:7,F10:5,F20:7,F30:7,F40:7,F50:7},related:[{icon:"🛒",label:"냉면 밀키트",sub:"면+육수+고명 세트",q:"냉면 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🍜",label:"냉면 면",sub:"평양·함흥 선택",q:"냉면 면 평양",cls:"rel-ingred",tag:null},{icon:"🫙",label:"냉면 육수팩",sub:"깊은 육수 완성",q:"냉면 육수팩",cls:"rel-sauce",tag:"NEW"},{icon:"🥣",label:"냉면 그릇",sub:"시원한 스테인리스",q:"냉면 그릇 스테인리스",cls:"rel-tool",tag:null}]},
+  {n:"쌀국수",e:"🍜",cat:"noodle",q:"쌀국수 밀키트",t:"라임과 고수가 진짜 쌀국수의 향을 살려줘요",img:"pho vietnamese rice noodle soup",w:{M10:5,M20:8,M30:8,M40:6,M50:4,F10:5,F20:8,F30:8,F40:6,F50:4},related:[{icon:"🛒",label:"쌀국수 밀키트",sub:"면+육수+토핑 세트",q:"쌀국수 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🍜",label:"쌀국수 면",sub:"베트남 정통 면",q:"쌀국수 면",cls:"rel-ingred",tag:null},{icon:"🌿",label:"고수·라임·숙주",sub:"정통 쌀국수 토핑",q:"고수 라임 쌀국수",cls:"rel-ingred",tag:"NEW"},{icon:"🫙",label:"쌀국수 소스",sub:"피시소스·호이신",q:"쌀국수 피시소스",cls:"rel-sauce",tag:null}]},
+  {n:"카레라이스",e:"🍛",cat:"rice",q:"카레라이스 밀키트",t:"채소를 크게 썰어야 식감이 살아요",img:"curry rice japanese style",w:{M10:7,M20:7,M30:7,M40:6,M50:6,F10:6,F20:7,F30:7,F40:6,F50:6},related:[{icon:"🛒",label:"카레 밀키트",sub:"채소+닭고기+소스 세트",q:"카레라이스 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🍛",label:"카레 루·소스",sub:"일본식·인도식 선택",q:"카레 루 소스",cls:"rel-sauce",tag:null},{icon:"🥕",label:"카레 채소 세트",sub:"감자·당근·양파",q:"카레 채소 세트",cls:"rel-ingred",tag:"NEW"},{icon:"🍚",label:"카레 전용 냄비",sub:"눌음 방지 코팅",q:"카레 냄비",cls:"rel-tool",tag:null}]},
+  {n:"김치볶음밥",e:"🍳",cat:"rice",q:"김치볶음밥 밀키트",t:"묵은지를 써야 더 깊은 맛이 나요",img:"kimchi fried rice korean",w:{M10:8,M20:8,M30:7,M40:6,M50:6,F10:6,F20:7,F30:7,F40:6,F50:6},related:[{icon:"🛒",label:"김치볶음밥 세트",sub:"묵은지+참기름 세트",q:"김치볶음밥 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🥬",label:"묵은지",sub:"3년 숙성 묵은지",q:"묵은지 포기",cls:"rel-ingred",tag:null},{icon:"🥚",label:"계란·달걀",sub:"반숙 프라이 올리기",q:"신선 계란 달걀",cls:"rel-ingred",tag:"NEW"},{icon:"🍳",label:"볶음밥 전용 팬",sub:"고온 볶음 가능",q:"볶음밥 팬 웍",cls:"rel-tool",tag:null}]},
+  /* 계절 메뉴 */
+  {n:"딸기 케이크",e:"🍓",cat:"season",season:"spring",q:"딸기 케이크 밀키트",t:"딸기는 케이크 완성 직전에 올려야 신선해요",img:"strawberry cake spring dessert",w:{M10:5,M20:6,M30:5,M40:4,M50:3,F10:8,F20:9,F30:8,F40:6,F50:5},related:[{icon:"🛒",label:"딸기 케이크 세트",sub:"딸기+생크림 세트",q:"딸기 케이크 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🍓",label:"신선 딸기",sub:"제철 국산 딸기",q:"신선 딸기 제철",cls:"rel-ingred",tag:"NEW"},{icon:"🫙",label:"생크림·딸기잼",sub:"케이크 재료",q:"생크림 딸기잼",cls:"rel-ingred",tag:null},{icon:"🎂",label:"케이크 틀·짤주머니",sub:"홈베이킹 도구",q:"케이크 틀 짤주머니",cls:"rel-tool",tag:null}]},
+  {n:"봄나물 비빔밥",e:"🌿",cat:"season",season:"spring",q:"봄나물 비빔밥 밀키트",t:"달래·냉이·봄동으로 봄을 한 그릇에 담아요",img:"spring namul bibimbap korean",w:{M10:3,M20:4,M30:6,M40:7,M50:8,F10:5,F20:7,F30:8,F40:8,F50:9},related:[{icon:"🛒",label:"봄나물 비빔밥 세트",sub:"봄나물 손질 완료",q:"봄나물 비빔밥 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🌿",label:"봄나물 모음",sub:"달래·냉이·봄동",q:"봄나물 달래 냉이",cls:"rel-ingred",tag:"NEW"},{icon:"🌶️",label:"비빔 고추장",sub:"봄나물 전용",q:"비빔밥 고추장",cls:"rel-sauce",tag:null},{icon:"🥣",label:"돌솥",sub:"바삭 누룽지 완성",q:"돌솥 비빔밥",cls:"rel-tool",tag:null}]},
+  {n:"삼계탕 (복날)",e:"🐔",cat:"season",season:"summer",q:"삼계탕 밀키트 복날",t:"복날엔 삼계탕! 인삼+마늘+찹쌀이 정석이에요",img:"samgyetang ginseng chicken summer",w:{M10:4,M20:5,M30:7,M40:8,M50:9,F10:4,F20:5,F30:7,F40:8,F50:9},related:[{icon:"🛒",label:"삼계탕 밀키트",sub:"복날 영계 세트",q:"삼계탕 밀키트 복날",cls:"rel-milkit",tag:"HOT"},{icon:"🌿",label:"수삼·홍삼",sub:"면역력 보충",q:"수삼 홍삼",cls:"rel-ingred",tag:"NEW"},{icon:"🍚",label:"찹쌀",sub:"국산 찹쌀",q:"국산 찹쌀",cls:"rel-ingred",tag:null},{icon:"🏺",label:"삼계탕 뚝배기",sub:"전통 옹기",q:"삼계탕 뚝배기",cls:"rel-tool",tag:null}]},
+  {n:"물냉면",e:"🍜",cat:"season",season:"summer",q:"물냉면 밀키트",t:"육수는 전날 미리 얼려두면 시원함이 배가돼요",img:"mul naengmyeon cold noodle summer",w:{M10:6,M20:7,M30:7,M40:7,M50:7,F10:5,F20:7,F30:7,F40:7,F50:7},related:[{icon:"🛒",label:"물냉면 밀키트",sub:"면+육수+고명 세트",q:"물냉면 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🍜",label:"냉면 면",sub:"메밀 냉면 면",q:"냉면 메밀 면",cls:"rel-ingred",tag:null},{icon:"🫙",label:"냉면 육수팩",sub:"깊은 육수",q:"냉면 육수팩",cls:"rel-sauce",tag:"NEW"},{icon:"🥣",label:"냉면 그릇",sub:"시원함 유지",q:"냉면 그릇 스테인리스",cls:"rel-tool",tag:null}]},
+  {n:"버섯전골",e:"🍄",cat:"season",season:"autumn",q:"버섯전골 밀키트",t:"다양한 버섯을 섞을수록 육수가 깊어져요",img:"mushroom hot pot korean autumn",w:{M10:4,M20:5,M30:7,M40:8,M50:8,F10:4,F20:6,F30:7,F40:8,F50:8},related:[{icon:"🛒",label:"버섯전골 밀키트",sub:"5가지 버섯 세트",q:"버섯전골 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🍄",label:"버섯 모둠",sub:"표고·팽이·느타리",q:"버섯 모둠 신선",cls:"rel-ingred",tag:"NEW"},{icon:"🫙",label:"전골 육수팩",sub:"깊은 국물 완성",q:"전골 육수팩",cls:"rel-sauce",tag:null},{icon:"🍲",label:"전골냄비",sub:"인덕션 전용",q:"전골냄비 인덕션",cls:"rel-tool",tag:null}]},
+  {n:"대하구이",e:"🦐",cat:"season",season:"autumn",q:"대하구이 밀키트",t:"가을 대하는 생으로 소금구이하면 최고예요",img:"large shrimp grilled korean autumn",w:{M10:5,M20:6,M30:7,M40:7,M50:7,F10:4,F20:6,F30:7,F40:7,F50:7},related:[{icon:"🛒",label:"대하구이 세트",sub:"가을 대하 손질 완료",q:"대하구이 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🦐",label:"가을 대하",sub:"제철 왕새우",q:"가을 대하 신선",cls:"rel-ingred",tag:"NEW"},{icon:"🧄",label:"마늘버터 소스",sub:"새우 최고 소스",q:"마늘버터 소스",cls:"rel-sauce",tag:null},{icon:"🔥",label:"구이 팬·그릴",sub:"직화 구이",q:"구이 그릴 팬",cls:"rel-tool",tag:null}]},
+  {n:"굴국밥",e:"🦪",cat:"season",season:"winter",q:"굴국밥 밀키트",t:"겨울 굴은 살이 통통해서 국밥으로 최고예요",img:"oyster soup rice korean winter",w:{M10:4,M20:5,M30:6,M40:7,M50:8,F10:4,F20:5,F30:7,F40:7,F50:8},related:[{icon:"🛒",label:"굴국밥 밀키트",sub:"겨울 굴+육수 세트",q:"굴국밥 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🦪",label:"겨울 굴",sub:"통영 석화 신선",q:"굴 통영 신선",cls:"rel-ingred",tag:"NEW"},{icon:"🫙",label:"굴 소스·간장",sub:"굴 요리 전용",q:"굴소스 간장",cls:"rel-sauce",tag:null},{icon:"🍲",label:"뚝배기",sub:"국밥 전용 그릇",q:"뚝배기 국밥",cls:"rel-tool",tag:null}]},
+  {n:"떡국",e:"🍲",cat:"season",season:"winter",q:"떡국 밀키트",t:"사골 육수로 끓이면 진짜 설날 떡국 맛이에요",img:"tteokguk rice cake soup korean",w:{M10:5,M20:5,M30:6,M40:7,M50:8,F10:5,F20:6,F30:7,F40:7,F50:8},related:[{icon:"🛒",label:"떡국 밀키트",sub:"떡+육수+고명 세트",q:"떡국 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🍡",label:"떡국 떡",sub:"얇게 썬 흰 떡",q:"떡국 떡",cls:"rel-ingred",tag:null},{icon:"🫙",label:"사골 육수팩",sub:"진한 사골 육수",q:"사골 육수팩",cls:"rel-sauce",tag:"NEW"},{icon:"🥚",label:"지단용 계란",sub:"달걀 고명",q:"신선 달걀",cls:"rel-ingred",tag:null}]},
+];
+
+/* ============================================================
+   상태
+   ============================================================ */
+const CAT_KR={korean:"한식",japanese:"일식",chinese:"중식",western:"양식",chicken:"치킨",pizza:"피자/버거",cafe:"카페/브런치",snack:"분식",seafood:"해산물",health:"건강식",meat:"고기/구이",noodle:"면류",rice:"밥/덮밥",season:"계절메뉴",random:"랜덤",custom:"직접입력"};
+const TAG_CLS={HOT:"tag-hot",NEW:"tag-new",SALE:"tag-sale"};
+let selGend="N",selAgeV="30",selCatV="random",curMenu=null;
+let used=JSON.parse(localStorage.getItem("fp6_used")||"[]");
+let hist=JSON.parse(localStorage.getItem("fp6_hist")||"[]");
+
+/* ============================================================
+   Web Audio
+   ============================================================ */
+const AC=new(window.AudioContext||window.webkitAudioContext)();
+document.addEventListener("click",()=>{if(AC.state==="suspended")AC.resume();},{once:true});
+function snd(t){
+  try{
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.connect(g);g.connect(AC.destination);
+    const now=AC.currentTime;
+    const c={pick:{f:[300,550,800,1000],d:.07,tp:"sine",v:.13},success:{f:[523,659,784,1046],d:.1,tp:"sine",v:.13},coupang:{f:[440,554,659],d:.09,tp:"triangle",v:.1},map:{f:[330,440,550],d:.09,tp:"sine",v:.1},reroll:{f:[200,160,120],d:.07,tp:"sawtooth",v:.08},click:{f:[400,300],d:.07,tp:"square",v:.07},next:{f:[500,700],d:.08,tp:"sine",v:.09},related:{f:[600,800],d:.07,tp:"sine",v:.09},share:{f:[880,1100,880],d:.07,tp:"sine",v:.1}};
+    const cf=c[t]||c.click;
+    o.type=cf.tp;g.gain.setValueAtTime(cf.v,now);
+    cf.f.forEach((f,i)=>o.frequency.setValueAtTime(f,now+i*cf.d));
+    g.gain.exponentialRampToValueAtTime(.001,now+cf.f.length*cf.d+.06);
+    o.start(now);o.stop(now+cf.f.length*cf.d+.1);
+  }catch(e){}
+}
+
+/* ============================================================
+   선택
+   ============================================================ */
+function selG(el){document.querySelectorAll("#gRow .tog").forEach(t=>t.classList.remove("sel-m","sel-f","sel-a"));const g=el.dataset.g;el.classList.add(g==="M"?"sel-m":g==="F"?"sel-f":"sel-a");selGend=g;snd("click");}
+function selA(el){document.querySelectorAll("#aRow .tog").forEach(t=>t.classList.remove("sel-m","sel-f","sel-a"));el.classList.add("sel-a");selAgeV=el.dataset.a;snd("click");}
+function selCatF(el){document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));el.classList.add("active");selCatV=el.dataset.cat;snd("click");}
+
+/* ============================================================
+   스코어
+   ============================================================ */
+function personaKey(){
+  const gArr=selGend==="N"?["M","F"]:[selGend];
+  const ages=["10","20","30","40","50"];
+  const aKey=ages.includes(selAgeV)?selAgeV:"30";
+  return gArr.map(gg=>gg+aKey);
+}
+function scoredPool(pool){
+  const keys=personaKey();
+  const mealBonus=MEAL_INFO[mealTime].bonus;
+  const wxBonus=WX_BONUS[wxCode]||[];
+  const seasonBonus=SEASONS[curSeason].catBonus;
+  return pool.map(m=>{
+    let sc=0;keys.forEach(k=>{sc+=(m.w[k]||5);});sc/=keys.length;
+    if(mealBonus.includes(m.cat))sc+=1.5;
+    if(wxBonus.includes(m.cat))sc+=1.8;
+    if(seasonBonus.includes(m.cat))sc+=1.2;
+    if(m.season===curSeason)sc+=3.0;
+    sc+=(Math.random()-.5)*1.2;
+    return{...m,score:sc};
+  }).sort((a,b)=>b.score-a.score);
+}
+function getPool(){
+  if(selCatV==="random")return DB;
+  if(selCatV==="season")return DB.filter(m=>m.cat==="season");
+  return DB.filter(m=>m.cat===selCatV);
+}
+
+/* ============================================================
+   뽑기
+   ============================================================ */
+function pickMenu(){
+  snd("pick");
+  const btn=document.getElementById("pickBtn"),icon=document.getElementById("bicon");
+  btn.classList.add("spin");icon.textContent="🌀";
+  setTimeout(()=>{
+    btn.classList.remove("spin");icon.textContent="🎯";
+    let pool=getPool().filter(m=>!used.includes(m.n));
+    if(!pool.length||used.length>=40){used=[];localStorage.setItem("fp6_used","[]");pool=getPool();toast("🎉 40끼 달성! 메뉴 풀 리셋이에요");}
+    const sorted=scoredPool(pool);
+    const top=sorted[0],next=sorted.slice(1,4);
+    used.push(top.n);localStorage.setItem("fp6_used",JSON.stringify(used));
+    showResult(top,next);snd("success");
+  },480);
+}
+function reroll(){pickMenu();}
+
+function directPick(){
+  const val=document.getElementById("directInput").value.trim();
+  if(!val){toast("메뉴 이름을 입력해주세요 😊");return;}
+  snd("click");
+  const match=DB.find(m=>m.n.includes(val)||val.includes(m.n));
+  if(match){const pool=DB.filter(m=>m.n!==match.n&&!used.includes(m.n));showResult(match,scoredPool(pool).slice(0,3));}
+  else{
+    const custom={n:val,e:"🍽️",cat:"custom",q:val+" 밀키트",t:"오늘도 맛있는 한 끼 되세요!",img:"food meal delicious",w:{},score:10,
+      related:[{icon:"🛒",label:val+" 밀키트",sub:"쿠팡 검색",q:val+" 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🥬",label:val+" 재료",sub:"신선 식재료",q:val+" 재료",cls:"rel-ingred",tag:null},{icon:"🫙",label:val+" 소스",sub:"전용 소스",q:val+" 소스",cls:"rel-sauce",tag:null},{icon:"🍳",label:"조리 도구",sub:"필요한 주방 도구",q:"주방 도구",cls:"rel-tool",tag:null}]};
+    showResult(custom,scoredPool(DB.filter(m=>!used.includes(m.n))).slice(0,3));
+  }
+  document.getElementById("directInput").value="";
+}
+
+/* ============================================================
+   결과 표시
+   ============================================================ */
+function showResult(menu,nextMenus){
+  curMenu=menu;
+  // 이미지
+  const img=document.getElementById("foodImg"),wrap=document.getElementById("imgWrap");
+  const prev=wrap.querySelector(".fb-e");if(prev)prev.remove();
+  img.style.display="block";
+  img.src=`https://source.unsplash.com/520x200/?${encodeURIComponent(menu.img||menu.n)}&sig=${Date.now()}`;
+  img.alt=menu.n;img.onerror=imgFallback;
+  document.getElementById("fitEmoji").textContent=menu.e;
+  document.getElementById("fitName").textContent=menu.n;
+
+  const pLabel=selGend==="N"?"전체":(selGend==="M"?"남성":"여성")+" "+selAgeV+"대";
+  document.getElementById("rTags").innerHTML=
+    `<span class="rtag rt-cat">${CAT_KR[menu.cat]||"음식"}</span>
+     <span class="rtag rt-per">📊 ${pLabel}</span>
+     <span class="rtag rt-time">${MEAL_INFO[mealTime].label}</span>
+     <span class="rtag rt-wx">${WX_LABELS[wxCode]}</span>`;
+  document.getElementById("rTip").innerHTML=`💡 <strong>꿀팁:</strong> ${menu.t}`;
+  document.getElementById("btnCoupang").href=_cu(menu.q);
+
+  // 연관상품
+  const TAG_CLS2={HOT:"tag-hot",NEW:"tag-new",SALE:"tag-sale"};
+  document.getElementById("relatedGrid").innerHTML=(menu.related||[]).map(r=>`
+    <a href="${_cu(r.q, _cfg.s+'_rel')}" target="_blank" class="rel-btn ${r.cls}" onclick="snd('related')" title="${r.label}">
+      ${r.tag?`<span class="rel-tag ${TAG_CLS2[r.tag]||'tag-hot'}">${r.tag}</span>`:''}
+      <span class="rel-icon">${r.icon}</span>
+      <span class="rel-label">${r.label}</span>
+      <span class="rel-sub">${r.sub}</span>
+    </a>`).join("");
+
+  const rc=document.getElementById("resultCard");
+  rc.classList.remove("show");void rc.offsetWidth;rc.classList.add("show");
+  renderNext(nextMenus);addHist(menu);updateProg();
+  setTimeout(()=>rc.scrollIntoView({behavior:"smooth",block:"nearest"}),100);
+}
+
+function imgFallback(){
+  const img=document.getElementById("foodImg"),wrap=document.getElementById("imgWrap");
+  img.style.display="none";
+  if(!wrap.querySelector(".fb-e")){
+    const sp=document.createElement("span");sp.className="fb-e";
+    sp.style.cssText="font-size:80px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);";
+    sp.textContent=curMenu?.e||"🍽️";wrap.appendChild(sp);
+  }
+}
+
+/* ============================================================
+   다음 추천
+   ============================================================ */
+const RCLS=["r2","r3","r4"],REMO=["🥈","🥉","4️⃣"];
+function renderNext(menus){
+  const nc=document.getElementById("nextCard");
+  if(!menus?.length){nc.classList.remove("show");return;}
+  nc.classList.add("show");
+  document.getElementById("nextGrid").innerHTML=menus.map((m,i)=>`
+    <div class="ni" onclick="pickNext('${m.n.replace(/'/g,"\\'")}');snd('next')">
+      <span class="ni-rank ${RCLS[i]}">${REMO[i]}</span>
+      <span class="ni-e">${m.e}</span>
+      <div class="ni-info">
+        <div class="ni-name">${m.n}</div>
+        <div class="ni-meta">
+          <span>${CAT_KR[m.cat]||""}</span>
+          <a class="ni-coupang" href="${_cu(m.q)}" target="_blank" onclick="event.stopPropagation();snd('coupang')">🛒 밀키트</a>
+        </div>
+      </div>
+      <span class="ni-arr">›</span>
+    </div>`).join("");
+}
+function pickNext(name){
+  const menu=DB.find(m=>m.n===name);if(!menu)return;
+  const pool=DB.filter(m=>m.n!==name&&!used.includes(m.n));
+  used.push(name);localStorage.setItem("fp6_used",JSON.stringify(used));
+  showResult(menu,scoredPool(pool).slice(0,3));snd("next");
+}
+
+/* ============================================================
+   지도 / 공유 / 히스토리 / 진행률
+   ============================================================ */
+function openMap(){
+  if(!curMenu)return;
+  const q=encodeURIComponent(curMenu.n);
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      pos=>window.open(`https://map.naver.com/v5/search/${q}?c=${pos.coords.longitude},${pos.coords.latitude},15,0,0,0,dh`,"_blank"),
+      ()=>window.open(`https://map.naver.com/v5/search/${q}`,"_blank")
+    );
+  }else window.open(`https://map.naver.com/v5/search/${q}`,"_blank");
+}
+function shareKakao(){
+  snd("share");
+  if(!curMenu){toast("먼저 메뉴를 추천받아 주세요!");return;}
+  try{
+    if(typeof Kakao!=="undefined"&&Kakao.isInitialized()){
+      Kakao.Share.sendDefault({objectType:"feed",
+        content:{title:`오늘의 추천: ${curMenu.n} ${curMenu.e}`,
+          description:"성별·연령·날씨·계절 맞춤 AI 메뉴! 쿠팡 밀키트로 간편하게 🛒",
+          imageUrl:`https://source.unsplash.com/600x400/?${encodeURIComponent(curMenu.img||curMenu.n)}`,
+          link:{mobileWebUrl:_cfg.u,webUrl:_cfg.u}},
+        buttons:[{title:"나도 추천받기",link:{mobileWebUrl:_cfg.u,webUrl:_cfg.u}},{title:"밀키트 보기",link:{mobileWebUrl:_cu(curMenu.q),webUrl:_cu(curMenu.q)}}]});
+    }else{fallbackShare();}
+  }catch(e){fallbackShare();}
+}
+function fallbackShare(){
+  if(navigator.share)navigator.share({title:"오늘은 뭐 먹을까?",text:`${curMenu?.n} 추천받았어요!`,url:_cfg.u});
+  else copyLink();
+}
+function copyLink(){
+  snd("share");
+  const url=_cfg.u+(curMenu?`#${encodeURIComponent(curMenu.n)}`:"");
+  navigator.clipboard?.writeText(url).then(()=>toast("🔗 링크가 복사됐어요!")).catch(()=>{
+    const inp=document.createElement("input");inp.value=url;document.body.appendChild(inp);inp.select();document.execCommand("copy");inp.remove();toast("🔗 링크가 복사됐어요!");
+  });
+}
+function addHist(menu){
+  const now=new Date(),label=`${now.getMonth()+1}/${now.getDate()} ${MEAL_INFO[mealTime].label}`;
+  hist.unshift({n:menu.n,e:menu.e,t:label});if(hist.length>8)hist.pop();
+  localStorage.setItem("fp6_hist",JSON.stringify(hist));renderHist();
+}
+function renderHist(){
+  if(!hist.length){document.getElementById("histWrap").style.display="none";return;}
+  document.getElementById("histWrap").style.display="block";
+  document.getElementById("histList").innerHTML=hist.slice(0,6).map(h=>`
+    <div class="hrow"><span class="hname">${h.e} ${h.n}</span><span class="hbadge">${h.t}</span></div>`).join("");
+}
+function clearAll(){
+  used=[];hist=[];localStorage.removeItem("fp6_used");localStorage.removeItem("fp6_hist");
+  document.getElementById("histWrap").style.display="none";updateProg();toast("초기화 완료 🍽️");snd("click");
+}
+function updateProg(){
+  const pct=Math.round((used.length/40)*100);
+  document.getElementById("pfill").style.width=pct+"%";
+  document.getElementById("ptext").textContent=`추천된 메뉴: ${used.length} / 40개`;
+}
+function scrollToTop(){window.scrollTo({top:0,behavior:"smooth"});}
+window.addEventListener("scroll",()=>{document.getElementById("fab").classList.toggle("vis",window.scrollY>300);});
+
+/* 카카오 초기화 */
+try{if(typeof Kakao!=="undefined"&&_cfg.k!=="YOUR_KAKAO_JS_KEY")Kakao.init(_cfg.k);}catch(e){}
+
+updateProg();renderHist();
+</script>
+</body>
+</html>
