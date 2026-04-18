@@ -29,8 +29,9 @@
 
 <style>
 :root{
-  --bg:#080810;--bg2:#10101E;--card:#15152A;--card2:#1C1C32;
-  --border:rgba(255,255,255,0.07);
+  --bg:#1E1E32;--bg2:#252545;--card:#2A2A48;--card2:#323255;
+  --border:rgba(255,255,255,0.12);
+  --fs-base:16px;--fs-sm:14px;--fs-xs:12px;
   --pr:#FF6B6B;--pg:rgba(255,107,107,0.28);
   --gold:#FFD166;--goldg:rgba(255,209,102,0.22);
   --mint:#4ECDC4;--mintg:rgba(78,205,196,0.22);
@@ -45,7 +46,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
-body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:90px;overflow-x:hidden;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:90px;overflow-x:hidden;font-size:16px;}
 .orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(90px);}
 .o1{width:550px;height:550px;top:-150px;left:-150px;background:radial-gradient(circle,rgba(255,107,107,.09),transparent 70%);}
 .o2{width:450px;height:450px;bottom:-120px;right:-120px;background:radial-gradient(circle,rgba(77,150,255,.09),transparent 70%);}
@@ -329,21 +330,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 </div>
 
 <div class="wrap">
-  <div class="partner-bar">🔗 이 페이지의 쿠팡 링크는 파트너스 활동의 일환으로 수수료가 발생할 수 있습니다</div>
+  <div class="partner-bar">🔗 이 페이지의 쿠팡 링크는 파트너스 활동의 일환으로 수수료가 발생합니다</div>
 
-  <!-- PWA 설치 배너 -->
-  <div class="pwa-banner" id="pwaBanner">
-    <span class="pwa-icon" id="pwaIcon">📲</span>
-    <div class="pwa-text">
-      <div class="pwa-title" id="pwaTitle">홈 화면에 추가하기</div>
-      <div class="pwa-desc" id="pwaDesc">앱처럼 바로 사용! 매일 편하게 접속해요</div>
-    </div>
-    <div class="pwa-actions">
-      <button class="pwa-install" id="pwaInstallBtn" onclick="installPWA()">설치</button>
-      <button class="pwa-close" onclick="closePWA()">✕</button>
-    </div>
-  </div>
-
+  
   <!-- 아이폰 설치 안내 팝업 -->
   <div class="ios-popup" id="iosPopup">
     <div class="ios-popup-inner">
@@ -448,16 +437,15 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         <div class="related-grid" id="relatedGrid"></div>
       </div>
       <div class="main-actions">
-        <a id="btnCoupang" href="#" target="_blank" class="bc" onclick="snd('coupang')">🛒 쿠팡에서 밀키트 바로 구매</a>
+        
         <button class="bm" onclick="openMap();snd('map')">📍 내 주변 음식점 찾기 (네이버 지도)</button>
         <div class="btn2">
           <button class="brr" onclick="reroll();snd('reroll')">🔀 다른 메뉴</button>
           <button class="brr" onclick="scrollToTop()">⬆️ 다시 선택</button>
         </div>
-        <div class="share-row">
-          <button class="bkakao" onclick="shareKakao()">💬 카카오 공유</button>
-          <button class="bcopy" onclick="copyLink()">🔗 링크 복사</button>
-        </div>
+       <button onclick="copyLink()" style="width:100%;padding:15px;border:2px solid rgba(78,205,196,.4);border-radius:13px;background:linear-gradient(135deg,rgba(78,205,196,.12),rgba(77,150,255,.08));color:#4ECDC4;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;">
+          🔗 링크 복사 (친구에게 전달하기)
+        </button>
       </div>
     </div>
   </div>
@@ -951,13 +939,30 @@ function showResult(menu,nextMenus){
 
   // 연관상품
   const TAG_CLS2={HOT:"tag-hot",NEW:"tag-new",SALE:"tag-sale"};
-  document.getElementById("relatedGrid").innerHTML=(menu.related||[]).map(r=>`
-    <a href="${_cu(r.q, _cfg.s+'_rel')}" target="_blank" class="rel-btn ${r.cls}" onclick="snd('related')" title="${r.label}">
+  const related = menu.related||[];
+  document.getElementById("relatedGrid").innerHTML = related.map((r,i)=>{
+    if(i===0){
+      // 첫번째 버튼 — 전체 너비 강조
+      return `<a href="${_cu(r.q,_cfg.s+'_rel')}" target="_blank"
+        style="grid-column:1/-1;padding:16px 18px;border-radius:13px;border:2px solid rgba(232,0,61,.5);background:linear-gradient(135deg,rgba(232,0,61,.15),rgba(255,107,107,.08));cursor:pointer;display:flex;align-items:center;gap:14px;text-decoration:none;transition:all .2s;box-shadow:0 4px 20px rgba(232,0,61,.2);"
+        onclick="snd('related')">
+        <span style="font-size:28px;">${r.icon}</span>
+        <span style="flex:1;">
+          <span style="display:block;font-size:15px;font-weight:700;color:#fff;">${r.label}</span>
+          <span style="display:block;font-size:12px;color:rgba(255,255,255,.7);margin-top:2px;">${r.sub}</span>
+        </span>
+        ${r.tag?`<span style="background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:50px;">${r.tag}</span>`:''}
+        <span style="font-size:20px;color:rgba(255,255,255,.6);">›</span>
+      </a>`;
+    }
+    // 나머지 버튼
+    return `<a href="${_cu(r.q,_cfg.s+'_rel')}" target="_blank" class="rel-btn ${r.cls}" onclick="snd('related')" title="${r.label}">
       ${r.tag?`<span class="rel-tag ${TAG_CLS2[r.tag]||'tag-hot'}">${r.tag}</span>`:''}
       <span class="rel-icon">${r.icon}</span>
       <span class="rel-label">${r.label}</span>
       <span class="rel-sub">${r.sub}</span>
-    </a>`).join("");
+    </a>`;
+  }).join("");
 
   const rc=document.getElementById("resultCard");
   rc.classList.remove("show");void rc.offsetWidth;rc.classList.add("show");
@@ -1010,12 +1015,23 @@ function pickNext(name){
 function openMap(){
   if(!curMenu)return;
   const q=encodeURIComponent(curMenu.n);
-  if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(
-      pos=>window.open(`https://map.naver.com/v5/search/${q}?c=${pos.coords.longitude},${pos.coords.latitude},15,0,0,0,dh`,"_blank"),
-      ()=>window.open(`https://map.naver.com/v5/search/${q}`,"_blank")
-    );
-  }else window.open(`https://map.naver.com/v5/search/${q}`,"_blank");
+  const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if(isMobile){
+    // 모바일: 네이버 지도 앱 딥링크
+    window.location.href=`nmap://search?query=${q}&appname=com.foodpicker`;
+    setTimeout(()=>{
+      // 앱 없으면 모바일 웹으로 fallback
+      window.open(`https://m.map.naver.com/search2/search.naver?query=${q}`,"_blank");
+    },1500);
+  }else{
+    // PC: 네이버 지도 웹
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(
+        pos=>window.open(`https://map.naver.com/v5/search/${q}?c=${pos.coords.longitude},${pos.coords.latitude},15,0,0,0,dh`,"_blank"),
+        ()=>window.open(`https://map.naver.com/v5/search/${q}`,"_blank")
+      );
+    }else window.open(`https://map.naver.com/v5/search/${q}`,"_blank");
+  }
 }
 function shareKakao(){
   snd("share");
@@ -1038,9 +1054,17 @@ function fallbackShare(){
 function copyLink(){
   snd("share");
   const url=_cfg.u+(curMenu?`#${encodeURIComponent(curMenu.n)}`:"");
-  navigator.clipboard?.writeText(url).then(()=>toast("🔗 링크가 복사됐어요!")).catch(()=>{
-    const inp=document.createElement("input");inp.value=url;document.body.appendChild(inp);inp.select();document.execCommand("copy");inp.remove();toast("🔗 링크가 복사됐어요!");
-  });
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(url).then(()=>toast("✅ 복사되었습니다!")).catch(()=>fallbackCopy(url));
+  }else{fallbackCopy(url);}
+}
+function fallbackCopy(url){
+  const inp=document.createElement("input");
+  inp.value=url;inp.style.position="fixed";inp.style.opacity="0";
+  document.body.appendChild(inp);inp.focus();inp.select();
+  try{document.execCommand("copy");toast("✅ 복사되었습니다!");}
+  catch(e){toast("주소창 URL을 직접 복사해주세요");}
+  document.body.removeChild(inp);
 }
 function addHist(menu){
   const now=new Date(),label=`${now.getMonth()+1}/${now.getDate()} ${MEAL_INFO[mealTime].label}`;
