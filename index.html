@@ -648,62 +648,11 @@ const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').match
 const pwaDismissed = localStorage.getItem("fp6_pwa_dismissed");
 
 // 이미 설치됐거나 배너 닫은 경우 표시 안 함
-if(!isInStandaloneMode && !pwaDismissed){
-  if(isIOS){
-    // 아이폰: 수동 안내 배너 표시
-    setTimeout(()=>{
-      const banner = document.getElementById("pwaBanner");
-      document.getElementById("pwaIcon").textContent = "📱";
-      document.getElementById("pwaTitle").textContent = "아이폰 홈 화면에 추가";
-      document.getElementById("pwaDesc").textContent = "사파리에서 공유 버튼 → 홈 화면에 추가";
-      document.getElementById("pwaInstallBtn").textContent = "방법 보기";
-      document.getElementById("pwaInstallBtn").onclick = showIosGuide;
-      banner.classList.add("show");
-    }, 3000);
-  } else {
-    // 안드로이드/PC: beforeinstallprompt 이벤트 대기
-    window.addEventListener("beforeinstallprompt", e=>{
-      e.preventDefault();
-      deferredPrompt = e;
-      const banner = document.getElementById("pwaBanner");
-      if(isMobile){
-        document.getElementById("pwaIcon").textContent = "📲";
-        document.getElementById("pwaTitle").textContent = "폰 홈 화면에 설치";
-        document.getElementById("pwaDesc").textContent = "앱처럼 빠르게 접속! 데이터 절약까지";
-      }else{
-        document.getElementById("pwaIcon").textContent = "🖥️";
-        document.getElementById("pwaTitle").textContent = "PC 바탕화면에 설치";
-        document.getElementById("pwaDesc").textContent = "바로가기로 언제든 빠르게 실행해요";
-      }
-      setTimeout(()=>banner.classList.add("show"), 3000);
-    });
-  }
-}
-
-function installPWA(){
-  if(deferredPrompt){
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(r=>{
-      if(r.outcome==="accepted"){
-        toast("🎉 설치 완료! 홈 화면을 확인해보세요");
-        localStorage.setItem("fp6_pwa_dismissed","1");
-      }
-      deferredPrompt=null;
-      document.getElementById("pwaBanner").classList.remove("show");
-    });
-  }else{
-    showIosGuide();
-  }
-}
 function showIosGuide(){
   document.getElementById("iosPopup").classList.add("show");
 }
 function closeIosPopup(){
   document.getElementById("iosPopup").classList.remove("show");
-}
-function closePWA(){
-  document.getElementById("pwaBanner").classList.remove("show");
-  localStorage.setItem("fp6_pwa_dismissed","1");
 }
 
 /* ============================================================
@@ -935,7 +884,7 @@ function showResult(menu,nextMenus){
      <span class="rtag rt-time">${MEAL_INFO[mealTime].label}</span>
      <span class="rtag rt-wx">${WX_LABELS[wxCode]}</span>`;
   document.getElementById("rTip").innerHTML=`💡 <strong>꿀팁:</strong> ${menu.t}`;
-  document.getElementById("btnCoupang").href=_cu(menu.q);
+
 
   // 연관상품
   const TAG_CLS2={HOT:"tag-hot",NEW:"tag-new",SALE:"tag-sale"};
