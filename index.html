@@ -435,7 +435,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
             <div class="main-actions">
 <!-- ① 네이버 지도 -->
   <button class="bm" onclick="openMap();snd('map')">
-    📍 내 주변 음식점 찾기 (네이버 지도)
+    📍 주변 맛집 찾기 (리뷰 많은 순 · 네이버)
   </button>
 
   <!-- ② 쿠팡이츠 / ③ 배달의민족 -->
@@ -1163,26 +1163,17 @@ function pickNext(name){
    ============================================================ */
 function openMap(){
   if(!curMenu)return;
-  const q=encodeURIComponent(curMenu.n);
+  const q=encodeURIComponent(curMenu.n+" 맛집");
   const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   if(isMobile){
-    // 모바일: 네이버 지도 앱 딥링크
-    window.location.href=`nmap://search?query=${q}&appname=com.foodpicker`;
-    setTimeout(()=>{
-      // 앱 없으면 모바일 웹으로 fallback
-      window.open(`https://m.map.naver.com/search2/search.naver?query=${q}`,"_blank");
-    },1500);
+    // 모바일: 네이버 플레이스 리뷰 많은 순
+    window.open(`https://m.place.naver.com/restaurant/list?query=${q}&sortingOrder=review`,"_blank");
   }else{
-    // PC: 네이버 지도 웹
-    if(navigator.geolocation){
-      navigator.geolocation.getCurrentPosition(
-        pos=>window.open(`https://map.naver.com/v5/search/${q}?c=${pos.coords.longitude},${pos.coords.latitude},15,0,0,0,dh`,"_blank"),
-        ()=>window.open(`https://map.naver.com/v5/search/${q}`,"_blank")
-      );
-    }else window.open(`https://map.naver.com/v5/search/${q}`,"_blank");
+    // PC: 네이버 지도 웹 리뷰 많은 순
+    window.open(`https://map.naver.com/v5/search/${q}?sortingOrder=review`,"_blank");
   }
-}
-function openCoupangEats(){
+  snd("map");
+}function openCoupangEats(){
   if(!curMenu)return;
   const q=encodeURIComponent(curMenu.n);
   window.location.href=`coupangeats://search?keyword=${q}`;
