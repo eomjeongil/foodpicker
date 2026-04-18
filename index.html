@@ -432,11 +432,55 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <div class="result-body">
       <div class="rtag-row" id="rTags"></div>
       <div class="tip-box" id="rTip">💡 <strong>꿀팁:</strong> 맛있게!</div>
-      <div class="related-section">
-        <div class="related-title">연관 상품 바로 구매</div>
-        <div class="related-grid" id="relatedGrid"></div>
-      </div>
-      <div class="main-actions">
+            <div class="main-actions">
+<!-- ① 네이버 지도 -->
+  <button class="bm" onclick="openMap();snd('map')">
+    📍 내 주변 음식점 찾기 (네이버 지도)
+  </button>
+
+  <!-- ② 쿠팡이츠 / ③ 배달의민족 -->
+  <div style="display:flex;gap:8px;">
+    <button onclick="openCoupangEats()" style="flex:1;padding:14px;border:none;border-radius:13px;background:linear-gradient(135deg,#E8003D,#FF1A5E);color:#fff;font-size:14px;font-weight:700;cursor:pointer;">
+      🛵 쿠팡이츠
+    </button>
+    <button onclick="openBaemin()" style="flex:1;padding:14px;border:none;border-radius:13px;background:linear-gradient(135deg,#2AC1BC,#1AA8A3);color:#fff;font-size:14px;font-weight:700;cursor:pointer;">
+      🍀 배달의민족
+    </button>
+  </div>
+
+  <!-- ④ 쿠팡 구매 — 연관상품 그리드 (기존 위치에서 이동) -->
+  <div class="related-section">
+    <div class="related-title">🛒 밀키트 · 관련 상품 구매</div>
+    <div class="related-grid" id="relatedGrid"></div>
+  </div>
+
+  <!-- ⑤ 네이버 레시피 -->
+  <button onclick="openRecipe()" style="width:100%;padding:14px;border:1.5px solid rgba(6,214,160,.4);border-radius:13px;background:rgba(6,214,160,.1);color:#06D6A0;font-size:14px;font-weight:700;cursor:pointer;">
+    👨‍🍳 네이버 레시피 보기
+  </button>
+
+  <!-- ⑥ 식재료 구매 -->
+  <button onclick="openIngredients()" style="width:100%;padding:14px;border:1.5px solid rgba(255,209,102,.4);border-radius:13px;background:rgba(255,209,102,.1);color:#FFD166;font-size:14px;font-weight:700;cursor:pointer;">
+    🥬 신선 식재료 구매 (쿠팡)
+  </button>
+
+  <!-- ⑦ 유튜브 -->
+  <button onclick="openYoutube()" style="width:100%;padding:14px;border:1.5px solid rgba(255,0,0,.4);border-radius:13px;background:rgba(255,0,0,.1);color:#FF4444;font-size:14px;font-weight:700;cursor:pointer;">
+    🎬 유튜브 요리 영상 보기
+  </button>
+
+  <!-- ⑧ 다른 메뉴 / 다시 선택 -->
+  <div class="btn2">
+    <button class="brr" onclick="reroll();snd('reroll')">🔀 다른 메뉴</button>
+    <button class="brr" onclick="scrollToTop()">⬆️ 다시 선택</button>
+  </div>
+
+  <!-- ⑨ 링크 복사 -->
+  <button onclick="copyLink()" style="width:100%;padding:15px;border:2px solid rgba(78,205,196,.4);border-radius:13px;background:linear-gradient(135deg,rgba(78,205,196,.12),rgba(77,150,255,.08));color:#4ECDC4;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;">
+    🔗 링크 복사 (친구에게 전달하기)
+  </button>
+
+</div>
         
         <button class="bm" onclick="openMap();snd('map')">📍 내 주변 음식점 찾기 (네이버 지도)</button>
         <div class="btn2">
@@ -980,6 +1024,42 @@ function openMap(){
       );
     }else window.open(`https://map.naver.com/v5/search/${q}`,"_blank");
   }
+}
+function openCoupangEats(){
+  if(!curMenu)return;
+  const q=encodeURIComponent(curMenu.n);
+  window.location.href=`coupangeats://search?keyword=${q}`;
+  setTimeout(()=>{
+    window.open(`https://www.coupangeats.com`,"_blank");
+  },1500);
+  snd("map");
+}
+function openBaemin(){
+  if(!curMenu)return;
+  const q=encodeURIComponent(curMenu.n);
+  window.location.href=`baemin://search?query=${q}`;
+  setTimeout(()=>{
+    window.open(`https://www.baemin.com`,"_blank");
+  },1500);
+  snd("map");
+}
+function openRecipe(){
+  if(!curMenu)return;
+  const q=encodeURIComponent(curMenu.n+" 레시피");
+  window.open(`https://search.naver.com/search.naver?query=${q}`,"_blank");
+  snd("click");
+}
+function openIngredients(){
+  if(!curMenu)return;
+  const q=encodeURIComponent(curMenu.n+" 재료");
+  window.open(`https://www.coupang.com/np/search?q=${q}&channel=user&partner=${_cfg.p}&subId=${_cfg.s}_ingred`,"_blank");
+  snd("related");
+}
+function openYoutube(){
+  if(!curMenu)return;
+  const q=encodeURIComponent(curMenu.n+" 만들기");
+  window.open(`https://www.youtube.com/results?search_query=${q}`,"_blank");
+  snd("click");
 }
 function shareKakao(){
   snd("share");
