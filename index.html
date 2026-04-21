@@ -29,10 +29,10 @@
 
 <style>
 :root{
-  --bg:#1E1E32;--bg2:#252545;--card:#2A2A48;--card2:#323255;
+  --bg:#1A2530;--bg2:#233D4C;--card:#2C4A5A;--card2:#355566;
   --border:rgba(255,255,255,0.12);
   --fs-base:16px;--fs-sm:14px;--fs-xs:12px;
-  --pr:#FF6B6B;--pg:rgba(255,107,107,0.28);
+  --pr:#FD802E;--pg:rgba(255,107,107,0.28);
   --gold:#FFD166;--goldg:rgba(255,209,102,0.22);
   --mint:#4ECDC4;--mintg:rgba(78,205,196,0.22);
   --blue:#4D96FF;--blueg:rgba(77,150,255,0.25);
@@ -362,6 +362,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <input class="minput" id="directInput" type="text" placeholder="예: 김치찌개, 스테이크, 마라탕..." onkeydown="if(event.key==='Enter') directPick()">
       <button class="bgo" onclick="directPick()">바로 →</button>
     </div>
+    <input class="minput" id="lastInput" type="text" placeholder="직전 식사는 뭘 하셨나요? (선택)" oninput="setLast(this.value)" style="margin-top:8px;width:100%;box-sizing:border-box;">
   </div>
 
   <!-- ② 성별 -->
@@ -1355,6 +1356,13 @@ function personaKey(){
   const aKey=ages.includes(selAgeV)?selAgeV:"30";
   return gArr.map(gg=>gg+aKey);
 }
+let lastMeal="";
+function setLast(v){lastMeal=v.trim();}
+function getLastCat(){
+  if(!lastMeal)return null;
+  const m=DB.find(x=>x.n.includes(lastMeal)||lastMeal.includes(x.n));
+  return m?m.cat:null;
+}
 function scoredPool(pool){
   const keys=personaKey();
   const mealBonus=MEAL_INFO[mealTime].bonus;
@@ -1366,7 +1374,9 @@ function scoredPool(pool){
     if(wxBonus.includes(m.cat))sc+=1.8;
     if(seasonBonus.includes(m.cat))sc+=1.2;
     if(m.season===curSeason)sc+=3.0;
-    sc+=(Math.random()-.5)*1.2;
+    const lastCat=getLastCat();
+if(lastCat&&m.cat===lastCat)sc-=3.0;
+sc+=(Math.random()-.5)*1.2;
     return{...m,score:sc};
   }).sort((a,b)=>b.score-a.score);
 }
