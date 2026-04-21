@@ -1366,6 +1366,7 @@ function confirmLast(){
   const v=document.getElementById('lastInput').value.trim();
   const msg=document.getElementById('lastMsg');
   if(!v){msg.textContent='';return;}
+  snd("click");
   setLast(v);
   msg.textContent='✅ 직전 식사 감안해서 추천할게요 😊';
 }
