@@ -1537,34 +1537,32 @@ function openMap(){
   snd("map");
 }function openCoupangEats(){
   if(!curMenu)return;
-  const q=encodeURIComponent(curMenu.n);
   const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
   const isAndroid=/Android/.test(navigator.userAgent);
+  if(!isIOS&&!isAndroid){toast("📱 쿠팡이츠는 모바일에서 열립니다");return;}
+  const q=encodeURIComponent(curMenu.n);
   window.location.href=`coupangeats://search?keyword=${q}`;
   setTimeout(()=>{
     if(isIOS){
       window.open(`https://apps.apple.com/kr/app/id1441782759`,"_blank");
-    }else if(isAndroid){
-      window.open(`https://play.google.com/store/apps/details?id=com.coupangeats`,"_blank");
     }else{
-      window.open(`https://www.coupangeats.com`,"_blank");
+      window.open(`https://play.google.com/store/apps/details?id=com.coupangeats`,"_blank");
     }
   },1500);
   snd("map");
 }
 function openBaemin(){
   if(!curMenu)return;
-  const q=encodeURIComponent(curMenu.n);
   const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
   const isAndroid=/Android/.test(navigator.userAgent);
+  if(!isIOS&&!isAndroid){toast("📱 배달의민족은 모바일에서 열립니다");return;}
+  const q=encodeURIComponent(curMenu.n);
   window.location.href=`baemin://search?query=${q}`;
   setTimeout(()=>{
     if(isIOS){
       window.open(`https://apps.apple.com/kr/app/id1239744091`,"_blank");
-    }else if(isAndroid){
-      window.open(`https://play.google.com/store/apps/details?id=com.woowa.client.android`,"_blank");
     }else{
-      window.open(`https://www.baemin.com`,"_blank");
+      window.open(`https://play.google.com/store/apps/details?id=com.woowa.client.android`,"_blank");
     }
   },1500);
   snd("map");
