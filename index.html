@@ -1480,7 +1480,7 @@ function showResult(menu,nextMenus){
   const rc=document.getElementById("resultCard");
   rc.classList.remove("show");void rc.offsetWidth;rc.classList.add("show");
   renderNext(nextMenus);addHist(menu);updateProg();
-  setTimeout(()=>rc.scrollIntoView({behavior:"smooth",block:"nearest"}),100);
+  setTimeout(()=>rc.scrollIntoView({behavior:"smooth",block:"start"}),100);
 }
 
 function imgFallback(){
