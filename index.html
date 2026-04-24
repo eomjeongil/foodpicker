@@ -1481,7 +1481,7 @@ function showResult(menu,nextMenus){
   rc.classList.remove("show");void rc.offsetWidth;rc.classList.add("show");
   renderNext(nextMenus);addHist(menu);updateProg();
   setTimeout(()=>{
-    const top=rc.getBoundingClientRect().top+window.scrollY-60;
+    const top=rc.getBoundingClientRect().top+window.scrollY-120;
     window.scrollTo({top:top,behavior:"smooth"});
   },100);
 }
