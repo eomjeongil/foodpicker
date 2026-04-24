@@ -130,7 +130,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .ios-arrow{display:inline-block;font-size:18px;}
 
 /* ── INPUT ── */
-.irow{display:flex;gap:8px;}
+.irow{display:flex;gap:8px;width:100%;overflow:hidden;}
 .minput{flex:1;padding:12px 15px;border-radius:var(--rsm);border:1.5px solid var(--border);background:var(--bg2);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;}
 .minput::placeholder{color:var(--text2);font-size:13px;}
 .minput:focus{border-color:var(--pr);box-shadow:0 0 0 3px var(--pg);}
@@ -359,12 +359,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <div class="card">
     <div class="sl">✏️ 먹고 싶은 메뉴 직접 입력</div>
     <div class="irow">
-      <input class="minput" id="directInput" type="text" placeholder="예: 김치찌개, 스테이크, 마라탕..." onkeydown="if(event.key==='Enter') directPick()">
-      <button class="bgo" onclick="directPick()">바로 →</button>
+      <input class="minput" id="directInput" type="text" placeholder="예: 김치찌개, 스테이크, 마라탕..." onkeydown="if(event.key==='Enter') directPick()" style="flex:1;min-width:0;">
+      <button class="bgo" onclick="directPick()" style="flex-shrink:0;">바로 →</button>
     </div>
     <div class="irow" style="margin-top:8px;">
-      <input class="minput" id="lastInput" type="text" placeholder="직전 식사는 뭘 하셨나요? (선택)" onkeydown="if(event.key==='Enter')confirmLast()">
-      <button class="bgo" onclick="confirmLast()" style="background:#4ECDC4;">확인</button>
+      <input class="minput" id="lastInput" type="text" placeholder="직전 식사는 뭘 하셨나요? (선택)" onkeydown="if(event.key==='Enter')confirmLast()" style="flex:1;min-width:0;">
+      <button class="bgo" onclick="confirmLast()" style="background:#4ECDC4;flex-shrink:0;">확인</button>
     </div>
     <div id="lastMsg" style="font-size:13px;color:#4ECDC4;margin-top:6px;min-height:18px;"></div>
   </div>
