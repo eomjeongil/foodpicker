@@ -303,6 +303,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .fab.vis{opacity:1;pointer-events:auto;}
 .fab:hover{transform:scale(1.1);}
 </style>
+<script src="fruit-db.js"></script>
+<script src="fruit-card.js"></script>
 </head>
 <body>
 <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
@@ -490,6 +492,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <button onclick="copyLink()" style="width:100%;padding:15px;border:2px solid rgba(78,205,196,.4);border-radius:13px;background:linear-gradient(135deg,rgba(78,205,196,.12),rgba(77,150,255,.08));color:#4ECDC4;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;">
     🔗 링크 복사 (친구에게 전달하기)
   </button>
+  <button onclick="openFruitMatch()" style="width:100%;padding:15px;border:2px solid rgba(137,233,0,.4);border-radius:13px;background:linear-gradient(135deg,rgba(137,233,0,.12),rgba(78,205,196,.08));color:#89E900;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;margin-top:8px;">
+    🍎 이 음식과 궁합 맞는 과일 찾기
+  </button>
+  <div id="fruitSection"><div id="fruitCardWrap"></div></div>
 
       </div>
     </div>
