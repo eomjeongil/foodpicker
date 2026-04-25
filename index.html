@@ -482,18 +482,14 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     🥬 신선 식재료 구매 (쿠팡)
   </button>
 
-  <!-- ⑥ 다른 메뉴 / 다시 선택 -->
-  <div class="btn2">
-    <button class="brr" onclick="reroll();snd('reroll')">🔀 다른 메뉴</button>
-    <button class="brr" onclick="scrollToTop()">⬆️ 다시 선택</button>
-  </div>
+  <!-- ⑥ 궁합 과일 -->
+  <button onclick="openFruitMatch()" style="width:100%;padding:15px;border:2px solid rgba(137,233,0,.4);border-radius:13px;background:linear-gradient(135deg,rgba(137,233,0,.12),rgba(78,205,196,.08));color:#89E900;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;margin-bottom:8px;">
+    🍎 이 음식과 궁합 맞는 과일 찾기
+  </button>
 
   <!-- ⑦ 링크 복사 -->
   <button onclick="copyLink()" style="width:100%;padding:15px;border:2px solid rgba(78,205,196,.4);border-radius:13px;background:linear-gradient(135deg,rgba(78,205,196,.12),rgba(77,150,255,.08));color:#4ECDC4;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;">
     🔗 링크 복사 (친구에게 전달하기)
-  </button>
-  <button onclick="openFruitMatch()" style="width:100%;padding:15px;border:2px solid rgba(137,233,0,.4);border-radius:13px;background:linear-gradient(135deg,rgba(137,233,0,.12),rgba(78,205,196,.08));color:#89E900;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;margin-top:8px;">
-    🍎 이 음식과 궁합 맞는 과일 찾기
   </button>
   <div id="fruitSection"><div id="fruitCardWrap"></div></div>
 
@@ -505,6 +501,15 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <div class="sl">🥈 다음 추천 순위</div>
     <p class="next-hint">탭하면 바로 결과로! 🛒 버튼으로 밀키트 바로 구매 가능</p>
     <div class="next-grid" id="nextGrid"></div>
+  </div>
+
+  <!-- 다시 선택하기 -->
+  <div style="margin-bottom:12px;">
+    <button onclick="scrollToTop()" style="width:100%;padding:15px;border:2px solid rgba(255,255,255,.12);border-radius:13px;background:rgba(255,255,255,.04);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;"
+      onmouseover="this.style.borderColor='rgba(255,255,255,.25)';this.style.color='#fff'"
+      onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='var(--text2)'">
+      ⬆️ 다시 선택하기
+    </button>
   </div>
 
   <!-- ⑧ 히스토리 -->
