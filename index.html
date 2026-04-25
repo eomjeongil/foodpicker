@@ -1469,7 +1469,7 @@ function showResult(menu,nextMenus){
       </a>`;
     }
     // 나머지 칸 — 기존 스타일
-    return `<a href="${_cu(r.q,_cfg.s+'_rel')}" target="_blank" class="rel-btn ${r.cls}" onclick="snd('related')" title="${r.label}">
+   return `<a href="${_cu(r.q,_cfg.s+'_rel')}" target="_blank" class="rel-btn ${r.cls}" onclick="snd('related');localStorage.setItem('fp6_click_coupang',String(parseInt(localStorage.getItem('fp6_click_coupang')||'0')+1))" title="${r.label}">
       ${r.tag?`<span class="rel-tag ${TAG_CLS2[r.tag]||'tag-hot'}">${r.tag}</span>`:''}
       <span class="rel-icon">${r.icon}</span>
       <span class="rel-label">${r.label}</span>
