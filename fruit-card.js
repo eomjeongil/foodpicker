@@ -105,24 +105,13 @@ function _renderFruitCard(menuName, data) {
 /* ── AI API 호출 (DB 미등록 메뉴) ───────────────── */
 async function _getFruitByAI(menuName) {
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetch("https://foodpicker.kr/api/fruit-match", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        messages: [{
-          role: "user",
-          content: `한국 음식 "${menuName}"과 궁합이 좋은 과일 3가지를 영양학적 근거와 함께 알려줘.
-반드시 아래 JSON 형식으로만 답해줘. 다른 텍스트 없이 JSON만:
-{"risk":"이 음식의 영양 리스크 (나트륨/지방/당분 등 간결하게)","fruits":[{"name":"과일명","emoji":"이모지","reason":"궁합 이유 (소화·영양 흡수·건강 효능 근거)","q":"쿠팡 검색 키워드 (예: 파인애플 신선)"},{"name":"과일명2","emoji":"이모지2","reason":"이유2","q":"키워드2"},{"name":"과일명3","emoji":"이모지3","reason":"이유3","q":"키워드3"}],"avoid":"피해야 할 과일과 이유 (없으면 없음)"}`
-        }]
-      })
+      body: JSON.stringify({ menuName })
     });
-    const data = await res.json();
-    const text = data.content?.[0]?.text || "";
-    const clean = text.replace(/```json|```/g, "").trim();
-    return JSON.parse(clean);
+    const { data } = await res.json();
+    return data;
   } catch(e) {
     return null;
   }
