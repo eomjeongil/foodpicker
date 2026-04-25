@@ -1530,6 +1530,8 @@ function pickNext(name){
    ============================================================ */
 function openMap(){
   if(!curMenu)return;
+  const mc=parseInt(localStorage.getItem("fp6_click_map")||"0")+1;
+  localStorage.setItem("fp6_click_map",String(mc));
   const q=encodeURIComponent(curMenu.n+" 맛집");
   const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   if(isMobile){
@@ -1543,6 +1545,8 @@ function openMap(){
   const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
   const isAndroid=/Android/.test(navigator.userAgent);
   if(!isIOS&&!isAndroid){toast("📱 쿠팡이츠는 모바일에서 열립니다");return;}
+  const cc=parseInt(localStorage.getItem("fp6_click_coupang")||"0")+1;
+  localStorage.setItem("fp6_click_coupang",String(cc));
   const q=encodeURIComponent(curMenu.n);
   window.location.href=`coupangeats://search?keyword=${q}`;
   setTimeout(()=>{
@@ -1570,6 +1574,8 @@ function openBaemin(){
   },1500);
   snd("map");
 }function openKakaoMap(){
+  const mc=parseInt(localStorage.getItem("fp6_click_map")||"0")+1;
+  localStorage.setItem("fp6_click_map",String(mc));
   if(!curMenu)return;
   const q=encodeURIComponent(curMenu.n);
   const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -1609,6 +1615,8 @@ function openYoutube(){
 function shareKakao(){
   snd("share");
   if(!curMenu){toast("먼저 메뉴를 추천받아 주세요!");return;}
+  const sc=parseInt(localStorage.getItem("fp6_click_share")||"0")+1;
+  localStorage.setItem("fp6_click_share",String(sc));
   try{
     if(typeof Kakao!=="undefined"&&Kakao.isInitialized()){
       Kakao.Share.sendDefault({objectType:"feed",
@@ -1626,6 +1634,8 @@ function fallbackShare(){
 }
 function copyLink(){
   snd("share");
+  const sc=parseInt(localStorage.getItem("fp6_click_share")||"0")+1;
+  localStorage.setItem("fp6_click_share",String(sc));
   const url=_cfg.u+(curMenu?`#${encodeURIComponent(curMenu.n)}`:"");
   if(navigator.clipboard&&window.isSecureContext){
     navigator.clipboard.writeText(url).then(()=>toast("✅ 복사되었습니다!")).catch(()=>fallbackCopy(url));
