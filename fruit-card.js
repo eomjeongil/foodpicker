@@ -143,14 +143,21 @@ async function openFruitMatch() {
     setTimeout(() => section.scrollIntoView({ behavior:"smooth", block:"start" }), 100);
   }
 
-  // DB에서 먼저 검색
+  // 1순위: 개별 메뉴 DB
   const dbData = FRUIT_DB[curMenu.n];
   if (dbData) {
     _renderFruitCard(curMenu.n, dbData);
     return;
   }
 
-  // DB에 없으면 AI API 호출
+  // 2순위: 카테고리 공통 DB
+  const catData = FRUIT_DB_CAT[curMenu.cat];
+  if (catData) {
+    _renderFruitCard(curMenu.n, catData);
+    return;
+  }
+
+  // 3순위: AI API 호출
   _showFruitLoading();
   const aiData = await _getFruitByAI(curMenu.n);
   if (aiData) {
