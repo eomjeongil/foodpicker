@@ -141,7 +141,19 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
 /* 그리드 2열 */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
-@media(max-width:700px){.grid2{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:700px){
+  .grid2{grid-template-columns:1fr;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .card{padding:14px;}
+  .kpi-val{font-size:28px;}
+  .kpi-label{font-size:11px;}
+  .bar-label{font-size:11px;min-width:55px;}
+  .donut-wrap{flex-direction:column;}
+  .feed-list{max-height:300px;}
+  .section-header{font-size:13px;}
+  .header{padding:10px 14px;}
+  .header-left{gap:6px;}
+}
 
 /* 도넛 차트 대체 */
 .donut-wrap{display:flex;align-items:center;gap:20px;}
@@ -654,9 +666,9 @@ function renderFeed(){
   const feed = raw ? JSON.parse(raw) : [];
   document.getElementById("feedList").innerHTML = feed.length ? feed.slice(0,20).map(f=>`
     <div class="feed-item">
-      <span class="feed-time">${f.time}</span>
-      <span class="feed-emoji">${f.emoji}</span>
-      <span class="feed-name">${f.name}</span>
+      <span class="feed-time">${f.t?new Date(f.t).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):'-'}</span>
+      <span class="feed-emoji">${f.e||''}</span>
+      <span class="feed-name">${f.n||''}</span>
       <span class="feed-cat">${CAT_KR[f.cat]||f.cat}</span>
     </div>
   `).join("") : `<div style="color:var(--text2);font-size:12px;text-align:center;padding:20px;">아직 추천 기록이 없어요</div>`;
