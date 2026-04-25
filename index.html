@@ -1639,7 +1639,47 @@ function fallbackCopy(url){
   catch(e){toast("주소창 URL을 직접 복사해주세요");}
   document.body.removeChild(inp);
 }
+function saveStats(menu){
+  // 메뉴 카운트
+  const mc=JSON.parse(localStorage.getItem("fp6_menu_counts")||"{}");
+  mc[menu.n]=(mc[menu.n]||0)+1;
+  localStorage.setItem("fp6_menu_counts",JSON.stringify(mc));
+  // 카테고리 카운트
+  const cc=JSON.parse(localStorage.getItem("fp6_cat_counts")||"{}");
+  cc[menu.cat]=(cc[menu.cat]||0)+1;
+  localStorage.setItem("fp6_cat_counts",JSON.stringify(cc));
+  // 성별 카운트
+  const gc=JSON.parse(localStorage.getItem("fp6_gender_counts")||"{}");
+  gc[selGend]=(gc[selGend]||0)+1;
+  localStorage.setItem("fp6_gender_counts",JSON.stringify(gc));
+  // 연령대 카운트
+  const ac=JSON.parse(localStorage.getItem("fp6_age_counts")||"{}");
+  ac[selAgeV]=(ac[selAgeV]||0)+1;
+  localStorage.setItem("fp6_age_counts",JSON.stringify(ac));
+  // 식사시간 카운트
+  const mc2=JSON.parse(localStorage.getItem("fp6_meal_counts")||"{}");
+  mc2[mealTime]=(mc2[mealTime]||0)+1;
+  localStorage.setItem("fp6_meal_counts",JSON.stringify(mc2));
+  // 계절 카운트
+  const sc=JSON.parse(localStorage.getItem("fp6_season_counts")||"{}");
+  sc[curSeason]=(sc[curSeason]||0)+1;
+  localStorage.setItem("fp6_season_counts",JSON.stringify(sc));
+  // 시간대 카운트
+  const hc=JSON.parse(localStorage.getItem("fp6_hour_counts")||"{}");
+  const hr=new Date().getHours();
+  hc[hr]=(hc[hr]||0)+1;
+  localStorage.setItem("fp6_hour_counts",JSON.stringify(hc));
+  // 총 추천 수
+  const tot=parseInt(localStorage.getItem("fp6_menu_total")||"0")+1;
+  localStorage.setItem("fp6_menu_total",String(tot));
+  // 최근 피드
+  const rf=JSON.parse(localStorage.getItem("fp6_recent_feed")||"[]");
+  rf.unshift({n:menu.n,e:menu.e,cat:menu.cat,g:selGend,age:selAgeV,meal:mealTime,t:new Date().toISOString()});
+  if(rf.length>20)rf.pop();
+  localStorage.setItem("fp6_recent_feed",JSON.stringify(rf));
+}
 function addHist(menu){
+  saveStats(menu);
   const now=new Date(),label=`${now.getMonth()+1}/${now.getDate()} ${MEAL_INFO[mealTime].label}`;
   hist.unshift({n:menu.n,e:menu.e,t:label});if(hist.length>8)hist.pop();
   localStorage.setItem("fp6_hist",JSON.stringify(hist));renderHist();
