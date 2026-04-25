@@ -45,8 +45,8 @@ function _renderFruitCard(menuName, data) {
        onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
       <span style="font-size:28px;flex-shrink:0;">${f.emoji}</span>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:2px;">${f.name}</div>
-        <div style="font-size:11px;color:var(--text2);line-height:1.5;">${f.reason}</div>
+        <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">${f.name}</div>
+        <div style="font-size:11px;color:#89E900;line-height:1.6;letter-spacing:-.2px;">${f.reason}</div>
       </div>
       <div style="flex-shrink:0;font-size:11px;font-weight:700;
                   color:#89E900;background:rgba(137,233,0,.1);
@@ -151,27 +151,24 @@ async function openFruitMatch() {
   }
 
   // 2순위: 카테고리 공통 DB
-  const catData = FRUIT_DB_CAT[curMenu.cat];
+  const catDB = (typeof FRUIT_DB_CAT !== "undefined") ? FRUIT_DB_CAT : null;
+  const catData = catDB ? catDB[curMenu.cat] : null;
   if (catData) {
     _renderFruitCard(curMenu.n, catData);
     return;
   }
 
-  // 3순위: AI API 호출
-  _showFruitLoading();
-  const aiData = await _getFruitByAI(curMenu.n);
-  if (aiData) {
-    _renderFruitCard(curMenu.n, aiData);
-  } else {
-    // API 실패 시 기본 메시지
-    const wrap = document.getElementById("fruitCardWrap");
-    if (wrap) {
-      wrap.innerHTML = `
-        <div style="text-align:center;padding:20px;color:var(--text2);font-size:13px;">
-          😅 궁합 과일 정보를 불러오지 못했어요.<br>잠시 후 다시 시도해주세요.
-        </div>`;
-    }
-  }
+  // 3순위: 카테고리 기본값 (최후 보루)
+  const fallback = {
+    risk: "음식별 영양 불균형 가능",
+    fruits: [
+      { name:"사과",     emoji:"🍎", reason:"펙틴·식이섬유로 소화 촉진·혈당 안정화", q:"사과 신선" },
+      { name:"바나나",   emoji:"🍌", reason:"칼륨·마그네슘으로 영양 균형 보완", q:"바나나 신선" },
+      { name:"키위",     emoji:"🥝", reason:"비타민C·효소로 면역력·소화 도움", q:"키위 제스프리" }
+    ],
+    avoid: "없음"
+  };
+  _renderFruitCard(curMenu.n, fallback);
 }
 
 /* ── 로딩바 애니메이션 CSS 삽입 ─────────────────── */
@@ -190,3 +187,13 @@ async function openFruitMatch() {
   `;
   document.head.appendChild(style);
 })();
+
+/* ── DB 로드 확인 ───────────────────────────────── */
+window.addEventListener('load', function() {
+  if (typeof FRUIT_DB === 'undefined') {
+    console.warn('⚠️ fruit-db.js 로드 실패');
+  }
+  if (typeof FRUIT_DB_CAT === 'undefined') {
+    console.warn('⚠️ FRUIT_DB_CAT 로드 실패 - fruit-db.js 순서 확인 필요');
+  }
+});
