@@ -231,7 +231,17 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       </div>
       <div class="kpi-card c-gold">
         <div class="kpi-icon">📅</div>
-        <div class="kpi-num" id="kMonth">0</div>
+        <div class="kpi-num" <div class="stat-card">
+  <div style="font-size:22px">💻</div>
+  <div id="kPC" class="stat-num">0</div>
+  <div class="stat-label">PC 유입</div>
+</div>
+<div class="stat-card">
+  <div style="font-size:22px">📱</div>
+  <div id="kMobile" class="stat-num">0</div>
+  <div class="stat-label">모바일 유입</div>
+</div>
+<div class="stat-card" id="kMonthCard"><div>0</div>
         <div class="kpi-label">당월 누계</div>
         <div class="kpi-sub" id="kMonthAvg"></div>
       </div>
@@ -473,6 +483,8 @@ function renderKPI(){
 
   document.getElementById("kToday").textContent = today.toLocaleString();
   document.getElementById("kMonth").textContent = month.toLocaleString();
+  if(document.getElementById("kPC")) document.getElementById("kPC").textContent = (s.pcVisits||0).toLocaleString();
+  if(document.getElementById("kMobile")) document.getElementById("kMobile").textContent = (s.mobileVisits||0).toLocaleString();
   document.getElementById("kTotal").textContent = total.toLocaleString();
   document.getElementById("kMenuTotal").textContent = menuTotal.toLocaleString();
   document.getElementById("kCoupang").textContent = coupang.toLocaleString();
