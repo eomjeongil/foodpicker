@@ -1526,14 +1526,14 @@ function showResult(menu,nextMenus){
     if(i===0){
       return `<a href="${_cu(r.q, sid)}" target="_blank"
         style="padding:16px 14px;border-radius:13px;border:none;background:linear-gradient(135deg,#E8003D,#FF1A5E);cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-decoration:none;transition:all .2s;box-shadow:0 6px 24px rgba(232,0,61,.4);position:relative;overflow:hidden;"
-        onclick="${gaCall};localStorage.setItem('fp6_click_coupang',String(parseInt(localStorage.getItem('fp6_click_coupang')||'0')+1))">
+        onclick="${gaCall};_logClick('coupang','${menu.n}');localStorage.setItem('fp6_click_coupang',String(parseInt(localStorage.getItem('fp6_click_coupang')||'0')+1))">
         ${r.tag?`<span style="position:absolute;top:8px;right:8px;background:rgba(255,255,255,.25);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:50px;">${r.tag}</span>`:''}
         <span style="font-size:24px;">${r.icon}</span>
         <span style="font-size:13px;font-weight:700;color:#fff;">${r.label}</span>
         <span style="font-size:11px;color:rgba(255,255,255,.8);">${r.sub}</span>
       </a>`;
     }
-   return `<a href="${_cu(r.q, sid)}" target="_blank" class="rel-btn ${r.cls}" onclick="${gaCall};localStorage.setItem('fp6_click_coupang',String(parseInt(localStorage.getItem('fp6_click_coupang')||'0')+1))" title="${r.label}">
+   return `<a href="${_cu(r.q, sid)}" target="_blank" class="rel-btn ${r.cls}" onclick="${gaCall};_logClick('coupang','${menu.n}');localStorage.setItem('fp6_click_coupang',String(parseInt(localStorage.getItem('fp6_click_coupang')||'0')+1))" title="${r.label}">
       ${r.tag?`<span class="rel-tag ${TAG_CLS2[r.tag]||'tag-hot'}">${r.tag}</span>`:''}
       <span class="rel-icon">${r.icon}</span>
       <span class="rel-label">${r.label}</span>
@@ -1605,6 +1605,7 @@ function pickNext(name){
    ============================================================ */
 function openMap(){
   if(!curMenu)return;
+  _logClick('map_naver', curMenu.n);
   const mc=parseInt(localStorage.getItem("fp6_click_map")||"0")+1;
   localStorage.setItem("fp6_click_map",String(mc));
   const q=encodeURIComponent(curMenu.n+" 맛집");
@@ -1652,6 +1653,7 @@ function openBaemin(){
   const mc=parseInt(localStorage.getItem("fp6_click_map")||"0")+1;
   localStorage.setItem("fp6_click_map",String(mc));
   if(!curMenu)return;
+  _logClick('map_kakao', curMenu.n);
   const q=encodeURIComponent(curMenu.n);
   const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
   const isAndroid=/Android/.test(navigator.userAgent);

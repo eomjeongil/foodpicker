@@ -20,44 +20,18 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-
-/* LOGIN */
-.login-wrap{
-  min-height:100vh;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(ellipse at 50% 0%,rgba(108,99,255,.15),transparent 70%);
-}
-.login-box{
-  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
-  padding:40px 36px;width:100%;max-width:380px;text-align:center;
-}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 0%,rgba(108,99,255,.15),transparent 70%);}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:40px 36px;width:100%;max-width:380px;text-align:center;}
 .login-logo{font-size:48px;margin-bottom:12px;}
 .login-title{font-family:'Black Han Sans',sans-serif;font-size:24px;color:var(--pr);margin-bottom:6px;}
 .login-sub{font-size:13px;color:var(--text2);margin-bottom:28px;}
-.login-input{
-  width:100%;padding:14px 16px;border-radius:var(--rsm);
-  border:1.5px solid var(--border);background:var(--bg2);
-  color:var(--text);font-size:18px;text-align:center;letter-spacing:6px;
-  outline:none;margin-bottom:12px;transition:border-color .2s;
-}
+.login-input{width:100%;padding:14px 16px;border-radius:var(--rsm);border:1.5px solid var(--border);background:var(--bg2);color:var(--text);font-size:18px;text-align:center;letter-spacing:6px;outline:none;margin-bottom:12px;transition:border-color .2s;}
 .login-input:focus{border-color:var(--pr);}
-.login-btn{
-  width:100%;padding:14px;border:none;border-radius:var(--rsm);
-  background:linear-gradient(135deg,var(--pr),#8B7CF8);
-  color:#fff;font-size:15px;font-weight:700;cursor:pointer;
-  box-shadow:0 6px 24px var(--pg);transition:all .2s;
-}
-.login-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px var(--pg);}
+.login-btn{width:100%;padding:14px;border:none;border-radius:var(--rsm);background:linear-gradient(135deg,var(--pr),#8B7CF8);color:#fff;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 6px 24px var(--pg);transition:all .2s;}
+.login-btn:hover{transform:translateY(-2px);}
 .login-err{font-size:12px;color:var(--red);margin-top:8px;display:none;}
-
-/* DASHBOARD */
 .dash{display:none;}
-.topbar{
-  background:rgba(5,5,15,.9);backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--border);
-  padding:14px 24px;
-  display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:100;
-}
+.topbar{background:rgba(5,5,15,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
 .topbar-left{display:flex;align-items:center;gap:12px;}
 .topbar-logo{font-family:'Black Han Sans',sans-serif;font-size:18px;color:var(--pr);}
 .topbar-badge{font-size:11px;padding:3px 9px;border-radius:50px;background:rgba(108,99,255,.15);color:var(--pr);border:1px solid rgba(108,99,255,.3);}
@@ -67,15 +41,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 .logout-btn{padding:6px 14px;border-radius:50px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .18s;}
 .logout-btn:hover{border-color:var(--red);color:var(--red);}
-
 .main{padding:24px;max-width:1200px;margin:0 auto;}
-
-/* KPI 카드 */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px;}
-.kpi-card{
-  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
-  padding:18px 16px;position:relative;overflow:hidden;
-}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 16px;position:relative;overflow:hidden;}
 .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
 .kpi-card.c-pr::before{background:linear-gradient(90deg,var(--pr),#8B7CF8);}
 .kpi-card.c-gold::before{background:linear-gradient(90deg,var(--gold),var(--orange));}
@@ -87,37 +55,24 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .kpi-num{font-family:'Black Han Sans',sans-serif;font-size:32px;line-height:1;}
 .kpi-label{font-size:11px;color:var(--text2);margin-top:5px;}
 .kpi-sub{font-size:11px;color:var(--green);margin-top:3px;}
-
-/* 섹션 */
 .section{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;}
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .sec-title{font-size:13px;font-weight:700;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;gap:7px;}
 .sec-badge{font-size:10px;padding:2px 8px;border-radius:50px;background:rgba(108,99,255,.12);color:var(--pr);border:1px solid rgba(108,99,255,.2);}
-
-/* 차트 바 */
 .bar-chart{display:flex;flex-direction:column;gap:8px;}
 .bar-row{display:flex;align-items:center;gap:10px;}
 .bar-label{font-size:12px;color:var(--text2);min-width:60px;text-align:right;}
-.bar-wrap{flex:1;background:rgba(255,255,255,.04);border-radius:50px;height:22px;overflow:hidden;position:relative;}
+.bar-wrap{flex:1;background:rgba(255,255,255,.04);border-radius:50px;height:22px;overflow:hidden;}
 .bar-fill{height:100%;border-radius:50px;display:flex;align-items:center;padding-left:10px;font-size:11px;font-weight:700;color:#fff;transition:width .8s cubic-bezier(.34,1.56,.64,1);}
 .bar-val{min-width:40px;font-size:11px;color:var(--text2);text-align:right;}
-
-/* 7일 차트 */
 .week-chart{display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:10px;}
 .week-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
 .week-bar-wrap{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center;}
 .week-bar{width:80%;border-radius:6px 6px 0 0;min-height:4px;transition:height .6s ease;position:relative;}
-.week-bar:hover::after{
-  content:attr(data-val);position:absolute;top:-24px;left:50%;transform:translateX(-50%);
-  background:var(--card2);border:1px solid var(--border);border-radius:5px;
-  padding:2px 7px;font-size:10px;white-space:nowrap;color:var(--text);
-}
 .week-date{font-size:10px;color:var(--text2);}
 .week-num{font-size:10px;color:var(--text);font-weight:700;}
-
-/* 테이블 */
 .rank-table{width:100%;border-collapse:collapse;}
-.rank-table th{font-size:11px;color:var(--text2);text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);font-weight:600;letter-spacing:.5px;}
+.rank-table th{font-size:11px;color:var(--text2);text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);font-weight:600;}
 .rank-table td{font-size:13px;padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.03);}
 .rank-table tr:last-child td{border-bottom:none;}
 .rank-table tr:hover td{background:rgba(108,99,255,.04);}
@@ -126,69 +81,28 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .rank-2{color:#C0C0C0;}
 .rank-3{color:#CD7F32;}
 .rank-bar-mini{height:4px;border-radius:50px;background:linear-gradient(90deg,var(--pr),var(--mint));margin-top:4px;}
-
-/* 시간대 히트맵 */
 .heatmap{display:grid;grid-template-columns:repeat(24,1fr);gap:3px;margin-top:8px;}
-.hm-cell{
-  height:28px;border-radius:3px;cursor:pointer;position:relative;
-  transition:transform .15s;
-}
+.hm-cell{height:28px;border-radius:3px;cursor:pointer;position:relative;transition:transform .15s;}
 .hm-cell:hover{transform:scale(1.3);z-index:10;}
-.hm-cell:hover::after{
-  content:attr(data-tip);position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
-  background:var(--card2);border:1px solid var(--border);border-radius:5px;
-  padding:3px 8px;font-size:10px;white-space:nowrap;color:var(--text);z-index:20;
-}
 .hm-labels{display:grid;grid-template-columns:repeat(24,1fr);gap:3px;margin-top:4px;}
 .hm-label{font-size:9px;color:var(--text2);text-align:center;}
-
-/* 그리드 2열 */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
-@media(max-width:700px){
-  .grid2{grid-template-columns:1fr;}
-  .kpi-grid{grid-template-columns:repeat(2,1fr);}
-  .card{padding:14px;}
-  .kpi-val{font-size:28px;}
-  .kpi-label{font-size:11px;}
-  .bar-label{font-size:11px;min-width:55px;}
-  .donut-wrap{flex-direction:column;}
-  .feed-list{max-height:300px;}
-  .section-header{font-size:13px;}
-  .header{padding:10px 14px;}
-  .header-left{gap:6px;}
-}
-
-/* 도넛 차트 대체 */
-.donut-wrap{display:flex;align-items:center;gap:20px;}
-.donut-legend{display:flex;flex-direction:column;gap:8px;flex:1;}
-.legend-item{display:flex;align-items:center;gap:8px;font-size:12px;}
-.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.legend-pct{margin-left:auto;font-weight:700;font-size:13px;}
-
-/* 실시간 피드 */
 .feed-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;}
 .feed-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg2);border-radius:var(--rsm);font-size:12px;}
 .feed-time{color:var(--text2);min-width:50px;}
 .feed-emoji{font-size:16px;}
 .feed-name{font-weight:500;flex:1;}
 .feed-cat{font-size:10px;padding:2px 7px;border-radius:50px;background:rgba(108,99,255,.1);color:var(--pr);}
-
-/* 리셋 버튼 */
 .reset-section{text-align:center;padding:16px;}
 .reset-btn{padding:10px 24px;border:1px solid rgba(255,107,107,.3);border-radius:var(--rsm);background:transparent;color:var(--red);font-size:12px;cursor:pointer;transition:all .18s;}
 .reset-btn:hover{background:rgba(255,107,107,.1);}
-
-/* 새로고침 */
 .refresh-btn{padding:6px 12px;border-radius:50px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;cursor:pointer;transition:all .18s;}
 .refresh-btn:hover{border-color:var(--pr);color:var(--pr);}
-
-/* 고지 */
-.notice-box{background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.15);border-radius:var(--rsm);padding:10px 14px;font-size:11px;color:#9A7A10;margin-bottom:16px;line-height:1.7;}
+@media(max-width:700px){.grid2{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
 <body>
 
-<!-- 로그인 화면 -->
 <div class="login-wrap" id="loginWrap">
   <div class="login-box">
     <div class="login-logo">🍽️</div>
@@ -201,14 +115,11 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   </div>
 </div>
 
-<!-- 대시보드 -->
 <div class="dash" id="dash">
-
-  <!-- 상단바 -->
   <div class="topbar">
     <div class="topbar-left">
       <span class="topbar-logo">🍽️ FoodPicker</span>
-      <span class="topbar-badge">Admin v1.0</span>
+      <span class="topbar-badge">Admin v2.0</span>
     </div>
     <div class="topbar-right">
       <div class="live-badge"><span class="live-dot"></span>LIVE</div>
@@ -218,64 +129,17 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   </div>
 
   <div class="main">
-
-    <!-- 고지 -->
-    <div class="notice-box">
-      ⚠️ 이 통계는 <strong>기기별 localStorage 기반</strong>이에요. 정확한 방문자 수는 Google Analytics를 참고하세요. 같은 기기에서 여러 번 접속 시 중복 카운트될 수 있어요.
-    </div>
-
-    <!-- KPI 카드 6개 -->
     <div class="kpi-grid">
-      <div class="kpi-card c-pr">
-        <div class="kpi-icon">👁️</div>
-        <div class="kpi-num" id="kToday">0</div>
-        <div class="kpi-label">오늘 유입</div>
-        <div class="kpi-sub" id="kTodayDiff"></div>
-      </div>
-     <div class="kpi-card c-gold">
-  <div class="kpi-icon">🗓️</div>
-  <div class="kpi-num" id="kMonth">0</div>
-  <div class="kpi-label">당월 누계</div>
-  <div class="kpi-sub" id="kMonthAvg"></div>
-</div>
-<div class="kpi-card c-blue">
-  <div class="kpi-icon">🖥️</div>
-  <div class="kpi-num" id="kPC">0</div>
-  <div class="kpi-label">PC 유입</div>
-</div>
-<div class="kpi-card c-purple">
-  <div class="kpi-icon">📱</div>
-  <div class="kpi-num" id="kMobile">0</div>
-  <div class="kpi-label">모바일 유입</div>
-</div>
-
-      <div class="kpi-card c-mint">
-        <div class="kpi-icon">🌍</div>
-        <div class="kpi-num" id="kTotal">0</div>
-        <div class="kpi-label">전체 누계</div>
-        <div class="kpi-sub" id="kTotalDays"></div>
-      </div>
-      <div class="kpi-card c-red">
-        <div class="kpi-icon">🍽️</div>
-        <div class="kpi-num" id="kMenuTotal">0</div>
-        <div class="kpi-label">총 메뉴 추천 수</div>
-        <div class="kpi-sub" id="kMenuAvg"></div>
-      </div>
-      <div class="kpi-card c-green">
-        <div class="kpi-icon">🛒</div>
-        <div class="kpi-num" id="kCoupang">0</div>
-        <div class="kpi-label">쿠팡 버튼 클릭</div>
-        <div class="kpi-sub" id="kCoupangRate"></div>
-      </div>
-      <div class="kpi-card c-blue">
-        <div class="kpi-icon">📍</div>
-        <div class="kpi-num" id="kMap">0</div>
-        <div class="kpi-label">지도 버튼 클릭</div>
-        <div class="kpi-sub" id="kShare"></div>
-      </div>
+      <div class="kpi-card c-pr"><div class="kpi-icon">👁️</div><div class="kpi-num" id="kToday">0</div><div class="kpi-label">오늘 유입</div><div class="kpi-sub" id="kTodayDiff"></div></div>
+      <div class="kpi-card c-gold"><div class="kpi-icon">🗓️</div><div class="kpi-num" id="kMonth">0</div><div class="kpi-label">당월 누계</div><div class="kpi-sub" id="kMonthAvg"></div></div>
+      <div class="kpi-card c-blue"><div class="kpi-icon">🖥️</div><div class="kpi-num" id="kPC">0</div><div class="kpi-label">PC 유입</div></div>
+      <div class="kpi-card c-mint"><div class="kpi-icon">📱</div><div class="kpi-num" id="kMobile">0</div><div class="kpi-label">모바일 유입</div></div>
+      <div class="kpi-card c-mint"><div class="kpi-icon">🌍</div><div class="kpi-num" id="kTotal">0</div><div class="kpi-label">전체 누계</div><div class="kpi-sub" id="kTotalDays"></div></div>
+      <div class="kpi-card c-red"><div class="kpi-icon">🍽️</div><div class="kpi-num" id="kMenuTotal">0</div><div class="kpi-label">총 메뉴 추천 수</div><div class="kpi-sub" id="kMenuAvg"></div></div>
+      <div class="kpi-card c-green"><div class="kpi-icon">🛒</div><div class="kpi-num" id="kCoupang">0</div><div class="kpi-label">쿠팡 버튼 클릭</div><div class="kpi-sub" id="kCoupangRate"></div></div>
+      <div class="kpi-card c-blue"><div class="kpi-icon">📍</div><div class="kpi-num" id="kMap">0</div><div class="kpi-label">지도 버튼 클릭</div><div class="kpi-sub" id="kShare"></div></div>
     </div>
 
-    <!-- 7일 방문 차트 -->
     <div class="section">
       <div class="sec-head">
         <div class="sec-title">📈 최근 7일 방문 현황</div>
@@ -285,122 +149,72 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     </div>
 
     <div class="grid2">
-
-      <!-- 인기 메뉴 TOP 10 -->
       <div class="section">
-        <div class="sec-head">
-          <div class="sec-title">🏆 인기 메뉴 TOP 10</div>
-          <span class="sec-badge">전체 기간</span>
-        </div>
+        <div class="sec-head"><div class="sec-title">🏆 인기 메뉴 TOP 10</div><span class="sec-badge">전체 기간</span></div>
         <table class="rank-table">
-          <thead>
-            <tr>
-              <th>순위</th>
-              <th>메뉴</th>
-              <th style="text-align:right;">추천 수</th>
-            </tr>
-          </thead>
+          <thead><tr><th>순위</th><th>메뉴</th><th style="text-align:right;">추천 수</th></tr></thead>
           <tbody id="menuRankBody"></tbody>
         </table>
       </div>
-
-      <!-- 카테고리별 선택 -->
       <div class="section">
-        <div class="sec-head">
-          <div class="sec-title">🍱 카테고리별 선택</div>
-          <span class="sec-badge">전체 기간</span>
-        </div>
+        <div class="sec-head"><div class="sec-title">🍱 카테고리별 선택</div><span class="sec-badge">전체 기간</span></div>
         <div class="bar-chart" id="catChart"></div>
       </div>
-
     </div>
 
     <div class="grid2">
-
-      <!-- 성별 통계 -->
       <div class="section">
-        <div class="sec-head">
-          <div class="sec-title">👤 성별 선택 현황</div>
-        </div>
+        <div class="sec-head"><div class="sec-title">👤 성별 선택 현황</div></div>
         <div class="bar-chart" id="genderChart"></div>
       </div>
-
-      <!-- 연령대 통계 -->
       <div class="section">
-        <div class="sec-head">
-          <div class="sec-title">🎂 연령대 선택 현황</div>
-        </div>
+        <div class="sec-head"><div class="sec-title">🎂 연령대 선택 현황</div></div>
         <div class="bar-chart" id="ageChart"></div>
       </div>
-
     </div>
 
-    <!-- 시간대별 히트맵 -->
     <div class="section">
-      <div class="sec-head">
-        <div class="sec-title">⏰ 시간대별 접속 현황 (24시간)</div>
-        <span class="sec-badge">전체 기간</span>
-      </div>
+      <div class="sec-head"><div class="sec-title">⏰ 시간대별 접속 현황 (24시간)</div><span class="sec-badge">전체 기간</span></div>
       <div class="heatmap" id="heatmap"></div>
       <div class="hm-labels" id="hmLabels"></div>
     </div>
 
     <div class="grid2">
-
-      <!-- 식사 시간대 -->
       <div class="section">
-        <div class="sec-head">
-          <div class="sec-title">🌞 식사 시간대 분포</div>
-        </div>
+        <div class="sec-head"><div class="sec-title">🌞 식사 시간대 분포</div></div>
         <div class="bar-chart" id="mealChart"></div>
       </div>
-
-      <!-- 계절 메뉴 선택 -->
       <div class="section">
-        <div class="sec-head">
-          <div class="sec-title">🌸 계절 메뉴 선택</div>
-        </div>
+        <div class="sec-head"><div class="sec-title">🌸 계절 메뉴 선택</div></div>
         <div class="bar-chart" id="seasonChart"></div>
       </div>
-
     </div>
 
-    <!-- 최근 추천 피드 -->
     <div class="section">
-      <div class="sec-head">
-        <div class="sec-title">🔴 최근 메뉴 추천 피드</div>
-        <span class="sec-badge">최근 20건</span>
-      </div>
+      <div class="sec-head"><div class="sec-title">🔴 최근 메뉴 추천 피드</div><span class="sec-badge">최근 20건</span></div>
       <div class="feed-list" id="feedList"></div>
     </div>
 
-    <!-- 월별 누계 -->
     <div class="section">
-      <div class="sec-head">
-        <div class="sec-title">📆 월별 방문 누계</div>
-      </div>
+      <div class="sec-head"><div class="sec-title">📆 월별 방문 누계</div></div>
       <div class="bar-chart" id="monthChart"></div>
     </div>
 
-    <!-- 데이터 관리 -->
     <div class="section reset-section">
       <div class="sec-title" style="justify-content:center;margin-bottom:12px;">⚙️ 데이터 관리</div>
       <p style="font-size:12px;color:var(--text2);margin-bottom:14px;">통계 데이터를 초기화하면 복구할 수 없어요</p>
       <button class="reset-btn" onclick="resetData()">🗑️ 전체 통계 초기화</button>
     </div>
-
   </div>
 </div>
 
 <script>
-/* ============================================================
-   ⚙️ 설정
-   ============================================================ */
-const ADMIN_PW = btoa("9531"); // ← v6와 동일한 비밀번호
+const ADMIN_PW = btoa("9531");
+const API = 'https://foodpicker.kr';
 
-/* ============================================================
-   로그인
-   ============================================================ */
+const CAT_KR={korean:"🥢 한식",japanese:"🍣 일식",chinese:"🥟 중식",western:"🍝 양식",chicken:"🍗 치킨",pizza:"🍕 피자/버거",cafe:"☕ 카페",snack:"🍢 분식",seafood:"🦞 해산물",health:"🥗 건강식",meat:"🥩 고기/구이",noodle:"🍜 면류",rice:"🍚 밥/덮밥",season:"🌸 계절",random:"🎲 랜덤"};
+const CAT_COLORS=["#6C63FF","#4ECDC4","#FF6B6B","#FFD166","#06D6A0","#4D96FF","#FF8C42","#9B5DE5","#F72585","#4CC9F0","#7B2D8B","#00B4D8","#E63946","#2DC653"];
+
 let isLoggedIn = sessionStorage.getItem("fp_admin_dash") === "1";
 if(isLoggedIn) showDash();
 
@@ -408,22 +222,18 @@ function doLogin(){
   const v = document.getElementById("pwInput").value;
   if(btoa(v) === ADMIN_PW){
     sessionStorage.setItem("fp_admin_dash","1");
-    isLoggedIn = true;
     showDash();
-  }else{
+  } else {
     document.getElementById("loginErr").style.display="block";
     document.getElementById("pwInput").value="";
   }
 }
-function doLogout(){
-  sessionStorage.removeItem("fp_admin_dash");
-  location.reload();
-}
+function doLogout(){ sessionStorage.removeItem("fp_admin_dash"); location.reload(); }
 function showDash(){
   document.getElementById("loginWrap").style.display="none";
   document.getElementById("dash").style.display="block";
   renderAll();
-  setInterval(renderAll, 30000); // 30초마다 자동 새로고침
+  setInterval(renderAll, 30000);
   setInterval(tickClock, 1000);
   tickClock();
 }
@@ -433,302 +243,169 @@ function tickClock(){
     `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')} ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
 }
 
-/* ============================================================
-   데이터 읽기
-   ============================================================ */
-function getAllLS(){
-  const data = {};
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    data[k]=localStorage.getItem(k);
-  }
-  return data;
-}
-
-function getNum(key){ return parseInt(localStorage.getItem(key)||"0"); }
-
-function getToday(){
-  const n=new Date();
-  return `${n.getFullYear()}${n.getMonth()+1}${n.getDate()}`;
-}
-function getMonth(){
-  const n=new Date();
-  return `${n.getFullYear()}${n.getMonth()+1}`;
-}
-
-/* ============================================================
-   전체 렌더
-   ============================================================ */
 function renderAll(){
-  renderKPI();
-  renderWeekChart();
-  renderMenuRank();
-  renderCatChart();
-  renderGenderChart();
-  renderAgeChart();
-  renderHeatmap();
-  renderMealChart();
-  renderSeasonChart();
-  renderFeed();
-  renderMonthChart();
+  fetch(`${API}/api/stats`)
+    .then(r=>r.json())
+    .then(s=>{
+      renderKPI(s);
+      renderWeekChart(s.last7||[]);
+      renderMenuRank(s.topMenus||[]);
+      renderCatChart(s.categories||[]);
+      renderGenderChart(s.genders||[]);
+      renderAgeChart(s.ages||[]);
+      renderHeatmap(s.hours||[]);
+      renderMealChart(s.meals||[]);
+      renderSeasonChart(s.seasons||[]);
+      renderFeed(s.recentFeed||[]);
+      renderMonthChart(s.monthVisits6||[]);
+    })
+    .catch(e=>console.error('API 오류',e));
 }
 
-/* ============================================================
-   KPI
-   ============================================================ */
-function renderKPI(){
-  fetch('/api/stats').then(r=>r.json()).then(s=>{
-    document.getElementById("kToday").textContent = (s.todayVisits||0).toLocaleString();
-    document.getElementById("kMonth").textContent = (s.monthVisits||0).toLocaleString();
-    if(document.getElementById("kPC")) document.getElementById("kPC").textContent = (s.pcVisits||0).toLocaleString();
-    if(document.getElementById("kMobile")) document.getElementById("kMobile").textContent = (s.mobileVisits||0).toLocaleString();
-    document.getElementById("kTotal").textContent = (s.totalVisits||0).toLocaleString();
-    document.getElementById("kMenuTotal").textContent = (s.totalMenus||0).toLocaleString();
-    document.getElementById("kCoupang").textContent = (s.coupangClicks||0).toLocaleString();
-    document.getElementById("kMap").textContent = (s.mapClicks||0).toLocaleString();
-  });
-  const today = getNum(`fp6_d_${getToday()}`);
-  const month = getNum(`fp6_m_${getMonth()}`);
-  const total = getNum(`fp6_total`);
-  const menuTotal = getNum(`fp6_menu_total`);
-  const coupang = getNum(`fp6_click_coupang`);
-  const map = getNum(`fp6_click_map`);
-  const share = getNum(`fp6_click_share`);
+function renderKPI(s){
+  document.getElementById("kToday").textContent = (s.todayVisits||0).toLocaleString();
+  document.getElementById("kMonth").textContent = (s.monthVisits||0).toLocaleString();
+  document.getElementById("kPC").textContent = (s.pcVisits||0).toLocaleString();
+  document.getElementById("kMobile").textContent = (s.mobileVisits||0).toLocaleString();
+  document.getElementById("kTotal").textContent = (s.totalVisits||0).toLocaleString();
+  document.getElementById("kMenuTotal").textContent = (s.totalMenus||0).toLocaleString();
+  document.getElementById("kCoupang").textContent = (s.coupangClicks||0).toLocaleString();
+  document.getElementById("kMap").textContent = (s.mapClicks||0).toLocaleString();
 
- 
+  const total = s.totalVisits||0;
+  const menuTotal = s.totalMenus||0;
+  const coupang = s.coupangClicks||0;
+  const month = s.monthVisits||0;
+  const dayOfMonth = new Date().getDate();
 
-  // 어제 대비
-  const yd = new Date();yd.setDate(yd.getDate()-1);
-  const yKey = `fp6_d_${yd.getFullYear()}${yd.getMonth()+1}${yd.getDate()}`;
-  const yesterday = getNum(yKey);
-  if(yesterday > 0){
-    const diff = today - yesterday;
-    document.getElementById("kTodayDiff").textContent =
-      diff >= 0 ? `▲ 어제 대비 +${diff}` : `▼ 어제 대비 ${diff}`;
-    document.getElementById("kTodayDiff").style.color = diff >= 0 ? "var(--green)" : "var(--red)";
-  }
-
-  // 일평균
-  const n=new Date();
-  const dayOfMonth = n.getDate();
-  const avg = dayOfMonth > 0 ? Math.round(month/dayOfMonth) : 0;
-  document.getElementById("kMonthAvg").textContent = `일평균 ${avg}명`;
-
-  // 운영 일수
+  document.getElementById("kMonthAvg").textContent = `일평균 ${dayOfMonth>0?Math.round(month/dayOfMonth):0}명`;
   document.getElementById("kTotalDays").textContent = `누적 운영 중`;
+  document.getElementById("kMenuAvg").textContent = `인당 ${total>0?(menuTotal/total).toFixed(1):0}회`;
+  document.getElementById("kCoupangRate").textContent = `전환율 ${total>0?((coupang/total)*100).toFixed(1):0}%`;
+  document.getElementById("kShare").textContent = `지도 클릭`;
 
-  // 메뉴 인당
-  const perUser = total > 0 ? (menuTotal/total).toFixed(1) : 0;
-  document.getElementById("kMenuAvg").textContent = `인당 ${perUser}회`;
-
-  // 쿠팡 전환율
-  const rate = total > 0 ? ((coupang/total)*100).toFixed(1) : 0;
-  document.getElementById("kCoupangRate").textContent = `전환율 ${rate}%`;
-
-  document.getElementById("kShare").textContent = `공유 ${share}회`;
+  if(s.yesterdayVisits !== undefined){
+    const diff = (s.todayVisits||0) - (s.yesterdayVisits||0);
+    const el = document.getElementById("kTodayDiff");
+    el.textContent = diff >= 0 ? `▲ 어제 대비 +${diff}` : `▼ 어제 대비 ${diff}`;
+    el.style.color = diff >= 0 ? "var(--green)" : "var(--red)";
+  }
 }
 
-/* ============================================================
-   7일 차트
-   ============================================================ */
-function renderWeekChart(){
-  const now = new Date();
-  const days = [];
-  for(let i=6;i>=0;i--){
-    const d=new Date(now);d.setDate(d.getDate()-i);
-    const k=`fp6_d_${d.getFullYear()}${d.getMonth()+1}${d.getDate()}`;
-    days.push({
-      date:`${d.getMonth()+1}/${d.getDate()}`,
-      count:getNum(k),
-      isToday:i===0
-    });
-  }
-  const max = Math.max(...days.map(d=>d.count), 1);
+function renderWeekChart(last7){
+  const max = Math.max(...last7.map(d=>d.cnt), 1);
   const colors = ["#6C63FF","#7B73FF","#8B83FF","#9B93FF","#AB83EF","#BB73DF","#FF6B6B"];
-
-  document.getElementById("weekChart").innerHTML = days.map((d,i)=>`
-    <div class="week-col">
+  document.getElementById("weekChart").innerHTML = last7.map((d,i)=>{
+    const isToday = i === last7.length-1;
+    return `<div class="week-col">
       <div class="week-bar-wrap">
-        <div class="week-bar" data-val="${d.count}명"
-          style="height:${Math.max((d.count/max)*100,4)}%;background:${d.isToday?'var(--gold)':colors[i]};opacity:${d.isToday?1:0.7};">
+        <div class="week-bar" data-val="${d.cnt}명"
+          style="height:${Math.max((d.cnt/max)*100,4)}%;background:${isToday?'var(--gold)':colors[i]};opacity:${isToday?1:0.7};">
         </div>
       </div>
-      <div class="week-date" style="color:${d.isToday?'var(--gold)':'var(--text2)'}">${d.date}</div>
-      <div class="week-num">${d.count}</div>
-    </div>
-  `).join("");
+      <div class="week-date" style="color:${isToday?'var(--gold)':'var(--text2)'}">${d.date}</div>
+      <div class="week-num">${d.cnt}</div>
+    </div>`;
+  }).join("");
 }
 
-/* ============================================================
-   인기 메뉴 TOP 10
-   ============================================================ */
-function renderMenuRank(){
-  const raw = localStorage.getItem("fp6_menu_counts");
-  const counts = raw ? JSON.parse(raw) : {};
-  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const max = sorted[0]?.[1] || 1;
-
-  const rankColors = ["rank-1","rank-2","rank-3"];
+function renderMenuRank(topMenus){
   const rankEmoji = ["🥇","🥈","🥉"];
-
-  document.getElementById("menuRankBody").innerHTML = sorted.length ? sorted.map(([name,cnt],i)=>`
+  const rankColors = ["rank-1","rank-2","rank-3"];
+  const max = topMenus[0]?.cnt || 1;
+  document.getElementById("menuRankBody").innerHTML = topMenus.length ? topMenus.map(({menu,cnt},i)=>`
     <tr>
       <td><span class="rank-num ${rankColors[i]||''}">${i<3?rankEmoji[i]:i+1}</span></td>
-      <td>
-        <div>${name}</div>
-        <div class="rank-bar-mini" style="width:${(cnt/max)*100}%;opacity:0.6;"></div>
-      </td>
+      <td><div>${menu}</div><div class="rank-bar-mini" style="width:${(cnt/max)*100}%;opacity:0.6;"></div></td>
       <td style="text-align:right;font-weight:700;color:var(--pr);">${cnt}</td>
     </tr>
   `).join("") : `<tr><td colspan="3" style="text-align:center;color:var(--text2);padding:20px;">아직 데이터가 없어요</td></tr>`;
 }
 
-/* ============================================================
-   카테고리 차트
-   ============================================================ */
-const CAT_KR={korean:"🥢 한식",japanese:"🍣 일식",chinese:"🥟 중식",western:"🍝 양식",chicken:"🍗 치킨",pizza:"🍕 피자/버거",cafe:"☕ 카페",snack:"🍢 분식",seafood:"🦞 해산물",health:"🥗 건강식",meat:"🥩 고기/구이",noodle:"🍜 면류",rice:"🍚 밥/덮밥",season:"🌸 계절",random:"🎲 랜덤"};
-const CAT_COLORS=["#6C63FF","#4ECDC4","#FF6B6B","#FFD166","#06D6A0","#4D96FF","#FF8C42","#9B5DE5","#F72585","#4CC9F0","#7B2D8B","#00B4D8","#E63946","#2DC653"];
-
-function renderBarChart(containerId, data, colorArr){
-  const sorted = Object.entries(data).sort((a,b)=>b[1]-a[1]);
-  const max = sorted[0]?.[1] || 1;
-  document.getElementById(containerId).innerHTML = sorted.length ? sorted.map(([k,v],i)=>`
+function renderBarChart(containerId, items, colorArr){
+  const max = items[0]?.[1] || 1;
+  document.getElementById(containerId).innerHTML = items.length ? items.map(([k,v],i)=>`
     <div class="bar-row">
       <div class="bar-label">${k}</div>
-      <div class="bar-wrap">
-        <div class="bar-fill" style="width:${Math.max((v/max)*100,3)}%;background:${colorArr[i%colorArr.length]};">
-          ${v > 0 ? '' : ''}
-        </div>
-      </div>
+      <div class="bar-wrap"><div class="bar-fill" style="width:${Math.max((v/max)*100,3)}%;background:${colorArr[i%colorArr.length]};"></div></div>
       <div class="bar-val">${v}</div>
     </div>
   `).join("") : `<div style="color:var(--text2);font-size:12px;text-align:center;padding:16px;">데이터 없음</div>`;
 }
 
-function renderCatChart(){
-  const raw = localStorage.getItem("fp6_cat_counts");
-  const counts = raw ? JSON.parse(raw) : {};
-  const labeled = {};
-  Object.entries(counts).forEach(([k,v])=>{ labeled[CAT_KR[k]||k]=v; });
-  renderBarChart("catChart", labeled, CAT_COLORS);
+function renderCatChart(categories){
+  const items = categories.map(({category,cnt})=>[CAT_KR[category]||category, cnt]);
+  renderBarChart("catChart", items, CAT_COLORS);
 }
 
-function renderGenderChart(){
-  const raw = localStorage.getItem("fp6_gender_counts");
-  const counts = raw ? JSON.parse(raw) : {};
-  const labeled = {"👨 남성":counts.M||0,"👩 여성":counts.F||0,"🙂 무관":counts.N||0};
-  renderBarChart("genderChart", labeled, ["#4D96FF","#FF6B6B","#4ECDC4"]);
+function renderGenderChart(genders){
+  const map = {};
+  genders.forEach(({gender,cnt})=>map[gender]=cnt);
+  renderBarChart("genderChart",[["👨 남성",map.M||0],["👩 여성",map.F||0],["🙂 무관",map.N||0]],["#4D96FF","#FF6B6B","#4ECDC4"]);
 }
 
-function renderAgeChart(){
-  const raw = localStorage.getItem("fp6_age_counts");
-  const counts = raw ? JSON.parse(raw) : {};
-  const labeled = {
-    "10대":counts["10"]||0,
-    "20대":counts["20"]||0,
-    "30대":counts["30"]||0,
-    "40대":counts["40"]||0,
-    "50대+":counts["50"]||0
-  };
-  renderBarChart("ageChart", labeled, ["#FF6B6B","#FFD166","#06D6A0","#4D96FF","#9B5DE5"]);
+function renderAgeChart(ages){
+  const map = {};
+  ages.forEach(({age,cnt})=>map[age]=cnt);
+  renderBarChart("ageChart",[["10대",map["10"]||0],["20대",map["20"]||0],["30대",map["30"]||0],["40대",map["40"]||0],["50대+",map["50"]||0]],["#FF6B6B","#FFD166","#06D6A0","#4D96FF","#9B5DE5"]);
 }
 
-function renderMealChart(){
-  const raw = localStorage.getItem("fp6_meal_counts");
-  const counts = raw ? JSON.parse(raw) : {};
-  const labeled = {
-    "🌅 아침":counts.morning||0,
-    "🌞 점심":counts.lunch||0,
-    "🌙 저녁":counts.dinner||0,
-    "🌛 야식":counts.night||0
-  };
-  renderBarChart("mealChart", labeled, ["#FFD166","#FF6B6B","#4D96FF","#4ECDC4"]);
-}
-
-function renderSeasonChart(){
-  const raw = localStorage.getItem("fp6_season_counts");
-  const counts = raw ? JSON.parse(raw) : {};
-  const labeled = {
-    "🌸 봄":counts.spring||0,
-    "☀️ 여름":counts.summer||0,
-    "🍂 가을":counts.autumn||0,
-    "❄️ 겨울":counts.winter||0
-  };
-  renderBarChart("seasonChart", labeled, ["#FF9DB0","#4D96FF","#FF8C42","#4ECDC4"]);
-}
-
-/* ============================================================
-   시간대 히트맵
-   ============================================================ */
-function renderHeatmap(){
-  const raw = localStorage.getItem("fp6_hour_counts");
-  const counts = raw ? JSON.parse(raw) : {};
-  const hours = Array.from({length:24},(_,i)=>counts[i]||0);
-  const max = Math.max(...hours, 1);
-
-  document.getElementById("heatmap").innerHTML = hours.map((v,h)=>{
-    const intensity = v/max;
-    const bg = `rgba(108,99,255,${0.05 + intensity*0.95})`;
-    return `<div class="hm-cell" style="background:${bg};" data-tip="${h}시: ${v}회"></div>`;
-  }).join("");
-
-  document.getElementById("hmLabels").innerHTML = hours.map((_,h)=>`
+function renderHeatmap(hours){
+  const map = {};
+  hours.forEach(({hour,cnt})=>map[hour]=cnt);
+  const arr = Array.from({length:24},(_,i)=>map[i]||0);
+  const max = Math.max(...arr, 1);
+  document.getElementById("heatmap").innerHTML = arr.map((v,h)=>`
+    <div class="hm-cell" style="background:rgba(108,99,255,${0.05+v/max*0.95});" data-tip="${h}시: ${v}회"></div>
+  `).join("");
+  document.getElementById("hmLabels").innerHTML = arr.map((_,h)=>`
     <div class="hm-label">${h%6===0?h+'시':''}</div>
   `).join("");
 }
 
-/* ============================================================
-   최근 피드
-   ============================================================ */
-function renderFeed(){
-  const raw = localStorage.getItem("fp6_recent_feed");
-  const feed = raw ? JSON.parse(raw) : [];
+function renderMealChart(meals){
+  const map = {};
+  (meals||[]).forEach(({meal,cnt})=>map[meal]=cnt);
+  renderBarChart("mealChart",[["🌅 아침",map.morning||0],["🌞 점심",map.lunch||0],["🌙 저녁",map.dinner||0],["🌛 야식",map.night||0]],["#FFD166","#FF6B6B","#4D96FF","#4ECDC4"]);
+}
+
+function renderSeasonChart(seasons){
+  const map = {};
+  (seasons||[]).forEach(({season,cnt})=>map[season]=cnt);
+  renderBarChart("seasonChart",[["🌸 봄",map.spring||0],["☀️ 여름",map.summer||0],["🍂 가을",map.autumn||0],["❄️ 겨울",map.winter||0]],["#FF9DB0","#4D96FF","#FF8C42","#4ECDC4"]);
+}
+
+function renderFeed(feed){
   document.getElementById("feedList").innerHTML = feed.length ? feed.slice(0,20).map(f=>`
     <div class="feed-item">
-      <span class="feed-time">${f.t?new Date(f.t).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):'-'}</span>
-      <span class="feed-emoji">${f.e||''}</span>
-      <span class="feed-name">${f.n||''}</span>
-      <span class="feed-cat">${CAT_KR[f.cat]||f.cat}</span>
+      <span class="feed-time">${f.date||'-'}</span>
+      <span class="feed-name">${f.menu||''}</span>
+      <span class="feed-cat">${CAT_KR[f.category]||f.category||''}</span>
     </div>
   `).join("") : `<div style="color:var(--text2);font-size:12px;text-align:center;padding:20px;">아직 추천 기록이 없어요</div>`;
 }
 
-/* ============================================================
-   월별 차트
-   ============================================================ */
-function renderMonthChart(){
-  const now = new Date();
-  const months = [];
-  for(let i=5;i>=0;i--){
-    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
-    const k=`fp6_m_${d.getFullYear()}${d.getMonth()+1}`;
-    months.push({
-      label:`${d.getMonth()+1}월`,
-      count:getNum(k)
-    });
+function renderMonthChart(monthData){
+  if(!monthData||!monthData.length){
+    document.getElementById("monthChart").innerHTML=`<div style="color:var(--text2);font-size:12px;text-align:center;padding:16px;">데이터 없음</div>`;
+    return;
   }
-  const max = Math.max(...months.map(m=>m.count), 1);
-  document.getElementById("monthChart").innerHTML = months.map((m,i)=>`
+  const max = Math.max(...monthData.map(m=>m.cnt), 1);
+  document.getElementById("monthChart").innerHTML = monthData.map(m=>`
     <div class="bar-row">
-      <div class="bar-label">${m.label}</div>
-      <div class="bar-wrap">
-        <div class="bar-fill" style="width:${Math.max((m.count/max)*100,3)}%;background:linear-gradient(90deg,var(--pr),var(--mint));"></div>
-      </div>
-      <div class="bar-val">${m.count}</div>
+      <div class="bar-label">${m.month}</div>
+      <div class="bar-wrap"><div class="bar-fill" style="width:${Math.max((m.cnt/max)*100,3)}%;background:linear-gradient(90deg,var(--pr),var(--mint));"></div></div>
+      <div class="bar-val">${m.cnt}</div>
     </div>
   `).join("");
 }
 
-/* ============================================================
-   데이터 초기화
-   ============================================================ */
 function resetData(){
   if(!confirm("정말 초기화할까요? 복구 불가능해요!")) return;
-  const keys = [];
-  for(let i=0;i<localStorage.length;i++) keys.push(localStorage.key(i));
-  keys.filter(k=>k.startsWith("fp6_")).forEach(k=>localStorage.removeItem(k));
-  renderAll();
-  alert("✅ 초기화 완료!");
+  fetch(`${API}/api/reset`, {method:'POST'})
+    .then(r=>r.json())
+    .then(()=>{ alert("✅ 초기화 완료!"); renderAll(); })
+    .catch(()=>alert("❌ 초기화 실패"));
 }
 </script>
 </body>
