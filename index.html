@@ -308,6 +308,15 @@ async function _sendStat(endpoint, data) {
 }
 window.addEventListener("load", () => _sendStat("api/visit", {device: /Mobi/.test(navigator.userAgent) ? "mobile" : "pc"}));
 </script>
+
+<script>
+async function _logMenu(menu, category, gender, age) {
+  try { await fetch('https://foodpicker.kr/api/log-menu', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({menu,category,gender,age})}); } catch(e) {}
+}
+async function _logClick(type, menu) {
+  try { await fetch('https://foodpicker.kr/api/log-click', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,menu})}); } catch(e) {}
+}
+</script>
 </head>
 </body>
 <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
