@@ -477,6 +477,16 @@ function renderAll(){
    KPI
    ============================================================ */
 function renderKPI(){
+  fetch('/api/stats').then(r=>r.json()).then(s=>{
+    document.getElementById("kToday").textContent = (s.todayVisits||0).toLocaleString();
+    document.getElementById("kMonth").textContent = (s.monthVisits||0).toLocaleString();
+    if(document.getElementById("kPC")) document.getElementById("kPC").textContent = (s.pcVisits||0).toLocaleString();
+    if(document.getElementById("kMobile")) document.getElementById("kMobile").textContent = (s.mobileVisits||0).toLocaleString();
+    document.getElementById("kTotal").textContent = (s.totalVisits||0).toLocaleString();
+    document.getElementById("kMenuTotal").textContent = (s.totalMenus||0).toLocaleString();
+    document.getElementById("kCoupang").textContent = (s.coupangClicks||0).toLocaleString();
+    document.getElementById("kMap").textContent = (s.mapClicks||0).toLocaleString();
+  });
   const today = getNum(`fp6_d_${getToday()}`);
   const month = getNum(`fp6_m_${getMonth()}`);
   const total = getNum(`fp6_total`);
@@ -485,14 +495,7 @@ function renderKPI(){
   const map = getNum(`fp6_click_map`);
   const share = getNum(`fp6_click_share`);
 
-  document.getElementById("kToday").textContent = today.toLocaleString();
-  document.getElementById("kMonth").textContent = month.toLocaleString();
- if(document.getElementById("kPC")) document.getElementById("kPC").textContent = (getNum('fp6_pc')||0).toLocaleString();
- if(document.getElementById("kMobile")) document.getElementById("kMobile").textContent = (getNum('fp6_mobile')||0).toLocaleString();
-  document.getElementById("kTotal").textContent = total.toLocaleString();
-  document.getElementById("kMenuTotal").textContent = menuTotal.toLocaleString();
-  document.getElementById("kCoupang").textContent = coupang.toLocaleString();
-  document.getElementById("kMap").textContent = map.toLocaleString();
+ 
 
   // 어제 대비
   const yd = new Date();yd.setDate(yd.getDate()-1);
