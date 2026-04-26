@@ -487,8 +487,8 @@ function renderKPI(){
 
   document.getElementById("kToday").textContent = today.toLocaleString();
   document.getElementById("kMonth").textContent = month.toLocaleString();
-  if(document.getElementById("kPC")) document.getElementById("kPC").textContent = (s.pcVisits||0).toLocaleString();
-  if(document.getElementById("kMobile")) document.getElementById("kMobile").textContent = (s.mobileVisits||0).toLocaleString();
+ if(document.getElementById("kPC")) document.getElementById("kPC").textContent = (getNum('fp6_pc')||0).toLocaleString();
+ if(document.getElementById("kMobile")) document.getElementById("kMobile").textContent = (getNum('fp6_mobile')||0).toLocaleString();
   document.getElementById("kTotal").textContent = total.toLocaleString();
   document.getElementById("kMenuTotal").textContent = menuTotal.toLocaleString();
   document.getElementById("kCoupang").textContent = coupang.toLocaleString();
