@@ -302,6 +302,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .fab.vis{opacity:1;pointer-events:auto;}
 .fab:hover{transform:scale(1.1);}
 </style>
+<script>
+async function _sendStat(endpoint, data) {
+  try { await fetch("https://foodpicker.kr/" + endpoint, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)}); } catch(e) {}
+}
+window.addEventListener("load", () => _sendStat("api/visit", {device: /Mobi/.test(navigator.userAgent) ? "mobile" : "pc"}));
+</script>
 </head>
 </body>
 <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
