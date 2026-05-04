@@ -436,6 +436,234 @@ body{
 .fab{position:fixed;bottom:24px;right:18px;z-index:200;width:50px;height:50px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--pr),var(--pr2));color:#fff;font-size:20px;cursor:pointer;box-shadow:0 8px 24px var(--pg);display:flex;align-items:center;justify-content:center;transition:all .2s;opacity:0;pointer-events:none;}
 .fab.vis{opacity:1;pointer-events:auto;}
 .fab:hover{transform:scale(1.1);box-shadow:0 12px 32px var(--pg);}
+
+/* ── HERO CTA — 랜덤 픽 직링 ── */
+.hero-cta{
+  width:100%;padding:18px 20px;border:none;border-radius:var(--r);
+  background:linear-gradient(135deg,#F2B441 0%,var(--pr) 100%);
+  color:#fff;font-family:'Black Han Sans',sans-serif;font-size:18px;
+  letter-spacing:.3px;cursor:pointer;
+  box-shadow:0 12px 28px rgba(255,107,53,.28);
+  margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:10px;
+  position:relative;overflow:hidden;transition:all .2s;
+}
+.hero-cta::after{content:'';position:absolute;top:-50%;left:-60%;width:40%;height:200%;background:rgba(255,255,255,.3);transform:skewX(-20deg);transition:left .55s;}
+.hero-cta:hover::after{left:120%;}
+.hero-cta:hover{transform:translateY(-3px);box-shadow:0 18px 38px rgba(255,107,53,.35);}
+.hero-cta-emoji{font-size:22px;animation:wiggle 2.4s ease-in-out infinite;display:inline-block;}
+@keyframes wiggle{0%,100%{transform:rotate(-8deg);}50%{transform:rotate(12deg);}}
+
+/* ── 컨디션/상황/예산 ── */
+.context-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px;align-items:center;}
+.context-row:last-child{margin-bottom:0;}
+.context-label{font-size:11px;font-weight:800;color:var(--text2);min-width:62px;letter-spacing:.3px;}
+.ctog{
+  flex:1;min-width:48px;padding:9px 6px;border-radius:50px;
+  border:1.5px solid var(--border);background:#fff;color:var(--text2);
+  font-size:11.5px;font-weight:700;cursor:pointer;text-align:center;
+  transition:all .15s;user-select:none;
+}
+.ctog:hover{border-color:var(--pr);color:var(--pr);}
+.ctog.cs-mood.on{background:#FFF4D2;border-color:#F2B441;color:#B47A0F;}
+.ctog.cs-occ.on{background:#FFE0EC;border-color:#E84B8E;color:#C8336E;}
+.ctog.cs-budget.on{background:#DDF1E1;border-color:var(--green);color:#2E7E47;}
+
+/* ── 영양정보 ── */
+.nutri-btn{
+  width:100%;padding:13px;border:1.5px solid #B7E5E2;border-radius:var(--rsm);
+  background:linear-gradient(135deg,#F4FBFA,#E8F7F5);
+  color:#1F8C82;font-size:13.5px;font-weight:800;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-bottom:10px;transition:all .18s;
+  box-shadow:0 4px 12px rgba(46,196,182,.14);
+}
+.nutri-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(46,196,182,.22);}
+.nutri-btn.loading{opacity:.7;cursor:wait;}
+.nutri-section{display:none;margin-bottom:10px;}
+.nutri-section.show{display:block;animation:slideUp .35s ease both;}
+.nutri-card{
+  background:linear-gradient(135deg,#F4FBFA,#FFF7EE);
+  border:1px solid #B7E5E2;border-radius:var(--rsm);padding:14px 15px;
+  box-shadow:var(--shadow-sm);
+}
+.nutri-head{display:flex;align-items:center;gap:8px;margin-bottom:11px;font-size:13px;font-weight:800;color:var(--text);}
+.nutri-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;}
+.nutri-cell{background:#fff;border:1px solid #E2F0EE;border-radius:var(--rxs);padding:9px 11px;}
+.nutri-cell .nk{font-size:10.5px;color:var(--text2);font-weight:700;letter-spacing:.3px;}
+.nutri-cell .nv{font-size:16px;color:var(--text);font-weight:800;font-family:'Black Han Sans',sans-serif;margin-top:2px;letter-spacing:-.3px;}
+.nutri-tags{display:flex;flex-wrap:wrap;gap:5px;}
+.nutri-tag{font-size:11px;padding:3px 9px;border-radius:50px;font-weight:700;background:#DDF1E1;color:#2E7E47;}
+.nutri-tag.warn{background:#FFE0DA;color:var(--red);}
+.nutri-note{font-size:11px;color:var(--text3);margin-top:9px;font-style:italic;line-height:1.5;}
+
+/* ── CPA (텐핑 다이어트) ── */
+.cpa-card{
+  display:flex;align-items:center;gap:11px;
+  padding:13px 14px;border-radius:var(--rsm);
+  background:linear-gradient(135deg,#F4FBF6,#E8F4ED);
+  border:1px solid #B7E0C5;
+  margin-bottom:10px;cursor:pointer;text-decoration:none;
+  transition:all .18s;box-shadow:var(--shadow-sm);
+  position:relative;overflow:hidden;
+}
+.cpa-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(76,175,125,.22);border-color:var(--green);}
+.cpa-icon{font-size:28px;flex-shrink:0;}
+.cpa-text{flex:1;min-width:0;}
+.cpa-title{font-size:13.5px;font-weight:800;color:#2E7E47;line-height:1.3;}
+.cpa-desc{font-size:11px;color:#4A6E58;margin-top:2px;line-height:1.45;}
+.cpa-tag{position:absolute;top:8px;right:42px;font-size:9.5px;padding:2px 6px;border-radius:50px;background:rgba(76,175,125,.18);color:#2E7E47;font-weight:800;letter-spacing:.3px;}
+.cpa-arrow{color:var(--green);font-size:20px;font-weight:800;flex-shrink:0;}
+
+/* ── 영양 스토리 / 인사이트 (lazy nutrition 확장) ── */
+.nutri-story{
+  background:#FFF7EE;border:1px solid #FFE3CC;
+  border-radius:var(--rxs);padding:11px 13px;margin-top:10px;
+  font-size:12.5px;color:#7A5A14;line-height:1.55;
+}
+.nutri-story::before{content:'📖 ';font-size:14px;}
+.nutri-story strong{color:#B47A0F;font-weight:800;}
+.nutri-insight{
+  background:linear-gradient(135deg,#FFF4D2,#FFFAE6);
+  border:1px solid #F5E2A8;border-radius:var(--rxs);
+  padding:11px 13px;margin-top:8px;
+  font-size:12.5px;color:#7A5A14;line-height:1.55;
+}
+.nutri-insight::before{content:'✨ ';font-size:14px;}
+.nutri-insight strong{color:var(--pr);font-weight:800;}
+
+/* ── 음식 궁합 분석 ── */
+.match-section{
+  background:linear-gradient(135deg,#FCF5FF,#F8F4FC);
+  border:1px solid #E1D4F5;border-radius:var(--rsm);
+  padding:14px 15px;margin-bottom:10px;box-shadow:var(--shadow-sm);
+}
+.match-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:13px;font-weight:800;color:#5A2DA8;}
+.match-input-row{display:flex;gap:8px;margin-bottom:9px;}
+.match-input{
+  flex:1;padding:10px 13px;border:1.5px solid #E1D4F5;
+  border-radius:var(--rsm);background:#fff;color:var(--text);
+  font-size:13px;outline:none;font-family:'Noto Sans KR',sans-serif;
+  transition:border-color .18s;
+}
+.match-input::placeholder{color:var(--text3);font-size:12px;}
+.match-input:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purpleg);}
+.match-go{
+  padding:10px 14px;border:none;border-radius:var(--rsm);
+  background:linear-gradient(135deg,var(--purple),#A78BFA);
+  color:#fff;font-weight:800;font-size:12.5px;cursor:pointer;
+  white-space:nowrap;box-shadow:0 4px 12px var(--purpleg);
+  transition:all .18s;flex-shrink:0;
+}
+.match-go:hover{transform:translateY(-2px);}
+.match-go:disabled{opacity:.5;cursor:wait;}
+.match-result{display:none;margin-top:10px;padding:12px 13px;background:#fff;border:1px solid #E1D4F5;border-radius:var(--rxs);}
+.match-result.show{display:block;animation:slideUp .35s ease both;}
+.match-score-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.match-score{font-family:'Black Han Sans',sans-serif;font-size:32px;color:#5A2DA8;line-height:1;}
+.match-score .max{font-size:14px;color:var(--text3);font-weight:600;font-family:inherit;}
+.match-verdict{font-size:14px;font-weight:800;padding:5px 13px;border-radius:50px;background:#E1D4F5;color:#5A2DA8;}
+.match-verdict.bad{background:#FFE0DA;color:var(--red);}
+.match-verdict.good{background:#DDF1E1;color:#2E7E47;}
+.match-line{font-size:12.5px;color:var(--text);line-height:1.55;margin-top:5px;}
+.match-line strong{color:#5A2DA8;font-weight:800;}
+
+/* ── SNS 공유 그리드 ── */
+.share-block{margin-top:4px;}
+.share-block-title{font-size:11px;font-weight:800;letter-spacing:1.2px;color:var(--text2);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.share-block-title::before{content:'📢';}
+.share-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.share-btn{
+  padding:12px 10px;border:none;border-radius:var(--rsm);
+  font-size:12.5px;font-weight:800;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:all .18s;text-decoration:none;
+}
+.share-btn:hover{transform:translateY(-2px);}
+.sb-kakao{background:var(--kakao);color:#3A1D00;box-shadow:0 4px 12px rgba(254,229,0,.4);}
+.sb-web{background:linear-gradient(135deg,var(--pr),#FF8E53);color:#fff;box-shadow:0 4px 12px var(--pg);}
+.sb-twitter{background:#000;color:#fff;}
+.sb-copy{background:#fff;color:#1F8C82;border:1.5px solid #B7E5E2;}
+
+/* ── 날씨 컨텍스트 배너 ── */
+.weather-banner{
+  display:none;
+  background:linear-gradient(135deg,#DCE8FF,#F0F6FF);
+  border:1px solid #B7CCEB;border-radius:var(--rsm);
+  padding:12px 15px;margin-bottom:10px;
+  font-size:13px;font-weight:700;color:#2D5BBF;line-height:1.45;
+  box-shadow:var(--shadow-sm);
+}
+.weather-banner.show{display:block;animation:slideDown .35s ease;}
+
+/* ── 카카오 채널 구독 ── */
+.channel-card{
+  background:linear-gradient(135deg,#FFF8C2,#FEF8A0);
+  border:1px solid #F5E07A;border-radius:var(--rsm);
+  padding:14px 15px;margin-bottom:12px;
+  display:flex;align-items:center;gap:11px;box-shadow:var(--shadow-sm);
+  transition:all .18s;
+}
+.channel-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
+.channel-icon{font-size:30px;flex-shrink:0;}
+.channel-text{flex:1;min-width:0;}
+.channel-title{font-size:13px;font-weight:800;color:#3A1D00;}
+.channel-desc{font-size:11.5px;color:#5A3A14;margin-top:2px;line-height:1.4;}
+.channel-btn{
+  padding:9px 15px;border-radius:50px;border:none;
+  background:#3A1D00;color:var(--kakao);
+  font-size:12px;font-weight:800;cursor:pointer;
+  text-decoration:none;flex-shrink:0;white-space:nowrap;
+  transition:all .18s;
+}
+.channel-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.3);}
+
+/* ── 식습관 리포트 ── */
+.report-trigger{
+  width:100%;padding:14px;border:1.5px solid var(--border-strong);
+  border-radius:var(--rsm);background:#fff;color:var(--text);
+  font-size:13.5px;font-weight:800;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-bottom:12px;transition:all .18s;
+  box-shadow:var(--shadow-sm);
+}
+.report-trigger:hover{border-color:var(--pr);color:var(--pr);transform:translateY(-2px);box-shadow:var(--shadow-md);}
+.report-overlay{
+  display:none;position:fixed;inset:0;z-index:600;
+  background:rgba(45,42,38,.65);backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  align-items:center;justify-content:center;padding:20px;
+}
+.report-overlay.show{display:flex;animation:fadeIn .3s ease;}
+.report-box{
+  background:#fff;border-radius:var(--r);padding:24px 22px;
+  width:100%;max-width:440px;max-height:84vh;overflow-y:auto;
+  position:relative;box-shadow:var(--shadow-xl);
+  border:1px solid var(--border-strong);
+}
+.report-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r) var(--r) 0 0;background:linear-gradient(90deg,var(--pr),var(--gold),var(--green));}
+.report-title{font-family:'Black Han Sans',sans-serif;font-size:20px;color:var(--pr);text-align:center;margin-bottom:18px;}
+.report-stat{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 13px;border-radius:var(--rxs);background:var(--bg2);
+  border:1px solid var(--border);margin-bottom:8px;font-size:13px;
+}
+.report-stat .l{color:var(--text2);font-weight:700;}
+.report-stat .v{font-family:'Black Han Sans',sans-serif;color:var(--pr);font-size:18px;}
+.report-section-title{font-size:11.5px;font-weight:800;color:var(--text2);margin:14px 0 8px;letter-spacing:.6px;text-transform:uppercase;}
+.report-bar{display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:5px;}
+.report-bar-label{min-width:78px;color:var(--text);font-weight:700;font-size:12px;}
+.report-bar-track{flex:1;height:14px;background:var(--bg2);border-radius:50px;overflow:hidden;border:1px solid var(--border);}
+.report-bar-fill{height:100%;background:linear-gradient(90deg,var(--pr),var(--gold));border-radius:50px;transition:width .8s ease;}
+.report-bar-cnt{min-width:32px;text-align:right;color:var(--text2);font-weight:700;font-size:11.5px;}
+.report-insight{
+  background:linear-gradient(135deg,#FFF4D2,#FFFAE6);
+  border:1px solid #F5E2A8;border-radius:var(--rxs);
+  padding:11px 13px;margin-top:14px;
+  font-size:12.5px;color:#7A5A14;line-height:1.55;
+}
+.report-insight strong{color:#B47A0F;font-weight:800;}
+.report-empty{text-align:center;color:var(--text2);padding:24px 16px;font-size:13.5px;line-height:1.6;}
+.report-close{width:100%;margin-top:14px;padding:13px;border:1px solid var(--border-strong);border-radius:var(--rsm);background:#fff;color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;}
 </style>
 <script>
 async function _sendStat(endpoint, data) {
@@ -479,6 +707,15 @@ async function _logClick(type, menu) {
 </div>
 
 <div class="wrap">
+  <!-- 0순위 CTA: 즉시 추천 (재방문자용) -->
+  <button class="hero-cta" onclick="quickPick()">
+    <span class="hero-cta-emoji">🎲</span>
+    <span>오늘 뭐 먹지? 지금 바로!</span>
+  </button>
+
+  <!-- 날씨 맥락 배너 (wxCode 기반 자동 카피) -->
+  <div class="weather-banner" id="weatherBanner"></div>
+
   <div style="text-align:center;padding:6px 0 10px;margin-bottom:4px;">
     <span style="font-size:10px;color:var(--text2);opacity:.6;">
       🔗 쿠팡 링크는 파트너스 제휴 링크입니다 (구매 시 소정의 수수료 발생)
@@ -544,6 +781,31 @@ async function _logClick(type, menu) {
     </div>
   </div>
 
+  <!-- ③+ 컨디션·상황·예산 (개인 맥락) -->
+  <div class="card">
+    <div class="sl">🎯 오늘의 컨디션 / 상황 / 예산</div>
+    <div class="context-row" id="moodRow">
+      <span class="context-label">😶 컨디션</span>
+      <div class="ctog cs-mood on" data-mood="평범" onclick="selMood(this)">평범</div>
+      <div class="ctog cs-mood" data-mood="피곤" onclick="selMood(this)">😴 피곤</div>
+      <div class="ctog cs-mood" data-mood="스트레스" onclick="selMood(this)">😤 스트</div>
+      <div class="ctog cs-mood" data-mood="기분좋음" onclick="selMood(this)">😊 기분</div>
+    </div>
+    <div class="context-row" id="occRow">
+      <span class="context-label">👥 상황</span>
+      <div class="ctog cs-occ on" data-occ="혼자" onclick="selOcc(this)">🍚 혼밥</div>
+      <div class="ctog cs-occ" data-occ="데이트" onclick="selOcc(this)">💕 데이트</div>
+      <div class="ctog cs-occ" data-occ="가족" onclick="selOcc(this)">👨‍👩‍👧 가족</div>
+      <div class="ctog cs-occ" data-occ="회식" onclick="selOcc(this)">🍻 회식</div>
+    </div>
+    <div class="context-row" id="bgtRow">
+      <span class="context-label">💰 예산</span>
+      <div class="ctog cs-budget" data-bg="저렴" onclick="selBudget(this)">💵 저렴</div>
+      <div class="ctog cs-budget on" data-bg="보통" onclick="selBudget(this)">💳 보통</div>
+      <div class="ctog cs-budget" data-bg="럭셔리" onclick="selBudget(this)">💎 럭셔리</div>
+    </div>
+  </div>
+
   <!-- ④ 카테고리 -->
   <div class="card">
     <div class="sl">🍱 카테고리</div>
@@ -590,15 +852,61 @@ async function _logClick(type, menu) {
     <div class="result-body">
       <div class="rtag-row" id="rTags"></div>
       <div class="tip-box" id="rTip">💡 <strong>꿀팁:</strong> 맛있게!</div>
+
+      <!-- 🛒 쿠팡 파트너스 — 결과카드 직하 배치 (수익 핵심 노출 위치) -->
+      <div class="related-section" style="margin-bottom:14px;">
+        <div class="related-title">🛒 밀키트 · 관련 상품 구매</div>
+        <div class="related-grid" id="relatedGrid"></div>
+      </div>
+
+      <!-- 영양정보 (lazy-load) -->
+      <button class="nutri-btn" id="nutriBtn" onclick="loadNutrition()">
+        🥗 칼로리·영양정보 보기
+      </button>
+      <div class="nutri-section" id="nutriSection">
+        <div class="nutri-card">
+          <div class="nutri-head"><span>🥗</span><span id="nutriTitle">영양 분석</span></div>
+          <div class="nutri-grid" id="nutriGrid"></div>
+          <div class="nutri-tags" id="nutriTags"></div>
+          <div class="nutri-note" id="nutriNote"></div>
+          <div class="nutri-story" id="nutriStory" style="display:none;"></div>
+          <div class="nutri-insight" id="nutriInsight" style="display:none;"></div>
+        </div>
+      </div>
+
+      <!-- 음식 궁합 분석 -->
+      <div class="match-section">
+        <div class="match-head">🤝 이 음식과 다른 메뉴, 잘 맞을까?</div>
+        <div class="match-input-row">
+          <input class="match-input" id="matchInput" type="text" placeholder="비교할 다른 메뉴 입력 (예: 떡볶이)" onkeydown="if(event.key==='Enter')runFoodMatch()">
+          <button class="match-go" id="matchGo" onclick="runFoodMatch()">분석</button>
+        </div>
+        <div class="match-result" id="matchResult">
+          <div class="match-score-row">
+            <div class="match-score"><span id="matchScore">-</span><span class="max">/10</span></div>
+            <div class="match-verdict" id="matchVerdict">-</div>
+          </div>
+          <div class="match-line"><strong>이유:</strong> <span id="matchReason">-</span></div>
+          <div class="match-line"><strong>균형:</strong> <span id="matchBalance">-</span></div>
+          <div class="match-line"><strong>주의:</strong> <span id="matchCaution">-</span></div>
+        </div>
+      </div>
+
+      <!-- 텐핑 다이어트 CPA (효능 기반 자연 연결) -->
+      <a class="cpa-card" id="cpaDiet" href="#TENPING_DIET_CPA_PLACEHOLDER" target="_blank" rel="noopener" onclick="_logCpa('diet')">
+        <div class="cpa-icon">💪</div>
+        <div class="cpa-text">
+          <div class="cpa-title" id="cpaTitle">이 음식, 다이어트엔 어떻게?</div>
+          <div class="cpa-desc">전문 영양사의 1:1 맞춤 식단으로 똑똑하게</div>
+        </div>
+        <span class="cpa-tag">AD</span>
+        <div class="cpa-arrow">→</div>
+      </a>
+
             <div class="main-actions">
 
-  <!-- ① 밀키트·관련상품 — 파트너스 수익 핵심: 최상단 배치 -->
-  <div class="related-section">
-    <div class="related-title">🛒 밀키트 · 관련 상품 구매</div>
-    <div class="related-grid" id="relatedGrid"></div>
-  </div>
-
-  <!-- ② 식재료 구매 — 파트너스 직결: 상품 카드 바로 아래 -->
+  <!-- 식재료 구매 (이전 ②) — 쿠팡 파트너스 grid는 result-body 최상단으로 이동 -->
+  <!-- 식재료 구매 -->
   <button onclick="openIngredients()" style="width:100%;padding:14px;border:1.5px solid #F5E2A8;border-radius:13px;background:linear-gradient(135deg,#FFFAE6,#FFF4D2);color:#B47A0F;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(242,180,65,.18);">
     🥬 이 레시피의 신선 식재료 구매
   </button>
@@ -619,6 +927,17 @@ async function _logClick(type, menu) {
     </button>
   </div>
 
+  <!-- 텐핑 쿠킹클래스 CPA — 레시피 흐름 자연 연결 -->
+  <a class="cpa-card" id="cpaCooking" href="#TENPING_COOKING_CPA_PLACEHOLDER" target="_blank" rel="noopener" onclick="_logCpa('cooking')" style="background:linear-gradient(135deg,#FFE5D6,#FFF4D2);border-color:#FFCFA8;">
+    <div class="cpa-icon">🍳</div>
+    <div class="cpa-text">
+      <div class="cpa-title" style="color:#B86F1A;">진짜 손맛은 셰프에게</div>
+      <div class="cpa-desc" style="color:#7A5A14;">전문 셰프와 함께 배우는 1:1 쿠킹클래스</div>
+    </div>
+    <span class="cpa-tag">AD</span>
+    <div class="cpa-arrow" style="color:#B86F1A;">→</div>
+  </a>
+
   <!-- ⑤ 외부 링크 — 축소 배치 -->
   <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:2px;">
     <p style="font-size:10px;color:var(--text2);text-align:center;margin-bottom:8px;letter-spacing:.5px;">— 외부에서 찾기 —</p>
@@ -638,10 +957,16 @@ async function _logClick(type, menu) {
     </div>
   </div>
 
-  <!-- ⑥ 링크 복사 -->
-  <button onclick="copyLink()" style="width:100%;padding:12px;border:1.5px solid #B7E5E2;border-radius:13px;background:#F4FBFA;color:#1F8C82;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;">
-    🔗 링크 복사 (친구에게 전달하기)
-  </button>
+  <!-- ⑥ SNS 공유 -->
+  <div class="share-block">
+    <div class="share-block-title">친구에게 알려주기</div>
+    <div class="share-grid">
+      <button class="share-btn sb-kakao" onclick="shareKakao()">💬 카카오톡</button>
+      <button class="share-btn sb-web" onclick="shareWebApi()">📤 SNS 공유</button>
+      <button class="share-btn sb-twitter" onclick="shareTwitter()">𝕏 트위터</button>
+      <button class="share-btn sb-copy" onclick="copyLink()">🔗 링크 복사</button>
+    </div>
+  </div>
 
       </div>
     </div>
@@ -660,6 +985,21 @@ async function _logClick(type, menu) {
       onmouseout="this.style.borderColor='#FFE3CC';this.style.color='#7A6E62'">
       ⬆️ 다시 선택하기
     </button>
+  </div>
+
+  <!-- ⑦+ 식습관 리포트 트리거 -->
+  <button class="report-trigger" onclick="openReport()">
+    📊 내 식습관 리포트 보기
+  </button>
+
+  <!-- ⑦++ 카카오 채널 구독 -->
+  <div class="channel-card">
+    <div class="channel-icon">📢</div>
+    <div class="channel-text">
+      <div class="channel-title">매일 추천을 카톡으로</div>
+      <div class="channel-desc">푸드피커 카카오 채널 추가 후 점심·저녁 알림 받기</div>
+    </div>
+    <a class="channel-btn" id="channelBtn" href="https://pf.kakao.com/_xgexjxbX/friend" target="_blank" rel="noopener" onclick="_logCpa('kakao_channel')">채널 추가</a>
   </div>
 
   <!-- ⑧ 히스토리 -->
@@ -705,6 +1045,15 @@ async function _logClick(type, menu) {
       <button class="admin-close" onclick="closeAdmin()">닫기</button>
       <button class="admin-logout" onclick="adminLogout()">로그아웃</button>
     </div>
+  </div>
+</div>
+
+<!-- 식습관 리포트 모달 -->
+<div class="report-overlay" id="reportOverlay" onclick="if(event.target===this)closeReport()">
+  <div class="report-box">
+    <div class="report-title">📊 내 식습관 리포트</div>
+    <div id="reportContent"></div>
+    <button class="report-close" onclick="closeReport()">닫기</button>
   </div>
 </div>
 
@@ -945,7 +1294,8 @@ async function fetchWeather(){
   try{
     if(_cfg.w==="YOUR_OWM_KEY"){
       const h=new Date().getHours();wxCode=h<6||h>21?"cold":"clear";
-      document.getElementById("wxTag").textContent=WX_LABELS[wxCode];return;
+      document.getElementById("wxTag").textContent=WX_LABELS[wxCode];
+      _updateWeatherBanner();return;
     }
     const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:5000}));
     const r=await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&appid=${_cfg.w}&units=metric`);
@@ -954,7 +1304,9 @@ async function fetchWeather(){
     wxCode=id>=200&&id<600?"rain":id>=600&&id<700?"snow":id>=800&&id<=801?"clear":"cloud";
     if(t>=28)wxCode="hot";if(t<=5)wxCode="cold";
     document.getElementById("wxTag").textContent=WX_LABELS[wxCode];
+    _updateWeatherBanner();
   }catch(e){document.getElementById("wxTag").textContent="🌤️ 날씨 정보 없음";}
+  _updateWeatherBanner();
 }
 fetchWeather();
 
@@ -1550,6 +1902,204 @@ function selG(el){document.querySelectorAll("#gRow .tog").forEach(t=>t.classList
 function selA(el){document.querySelectorAll("#aRow .tog").forEach(t=>t.classList.remove("sel-m","sel-f","sel-a"));el.classList.add("sel-a");selAgeV=el.dataset.a;snd("click");}
 function selCatF(el){document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));el.classList.add("active");selCatV=el.dataset.cat;snd("click");}
 
+/* 컨디션·상황·예산 (개인 맥락) */
+let selMoodV="평범",selOccV="혼자",selBudgetV="보통";
+function selMood(el){document.querySelectorAll("#moodRow .ctog").forEach(t=>t.classList.remove("on"));el.classList.add("on");selMoodV=el.dataset.mood;snd("click");}
+function selOcc(el){document.querySelectorAll("#occRow .ctog").forEach(t=>t.classList.remove("on"));el.classList.add("on");selOccV=el.dataset.occ;snd("click");}
+function selBudget(el){document.querySelectorAll("#bgtRow .ctog").forEach(t=>t.classList.remove("on"));el.classList.add("on");selBudgetV=el.dataset.bg;snd("click");}
+
+/* 즉시 추천 (랜덤 카테고리로 강제 + 결과로 스크롤) */
+function quickPick(){
+  selCatV="random";
+  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+  document.querySelector(".chip[data-cat='random']")?.classList.add("active");
+  pickMenu();
+  setTimeout(()=>{document.getElementById("resultCard")?.scrollIntoView({behavior:"smooth",block:"start"});},650);
+  if(typeof _ga==="function")_ga("quick_pick",{source:"hero_cta"});
+}
+
+/* 영양정보 lazy-load + 토글 */
+async function loadNutrition(){
+  if(!curMenu)return;
+  const btn=document.getElementById("nutriBtn");
+  const sec=document.getElementById("nutriSection");
+  if(sec.classList.contains("show")){
+    sec.classList.remove("show");
+    btn.textContent="🥗 칼로리·영양정보 보기";
+    return;
+  }
+  btn.classList.add("loading");
+  btn.textContent="⏳ 분석 중...";
+  try{
+    const r=await fetch("/api/nutrition",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({menuName:curMenu.n})
+    });
+    const j=await r.json();
+    if(!r.ok||!j.data)throw new Error(j.error||"실패");
+    const d=j.data;
+    document.getElementById("nutriTitle").textContent=`${curMenu.n} 영양 분석`;
+    document.getElementById("nutriGrid").innerHTML=`
+      <div class="nutri-cell"><div class="nk">칼로리</div><div class="nv">${d.kcal??"-"} kcal</div></div>
+      <div class="nutri-cell"><div class="nk">단백질</div><div class="nv">${d.protein??"-"} g</div></div>
+      <div class="nutri-cell"><div class="nk">탄수화물</div><div class="nv">${d.carb??"-"} g</div></div>
+      <div class="nutri-cell"><div class="nk">지방</div><div class="nv">${d.fat??"-"} g</div></div>`;
+    document.getElementById("nutriTags").innerHTML=(d.tags||[]).map(t=>{
+      const w=/주의|과다|높음|많음|excess|warn/i.test(t);
+      return `<span class="nutri-tag${w?' warn':''}">${t}</span>`;
+    }).join("");
+    document.getElementById("nutriNote").textContent=d.note||"※ 1인분 평균 추정치 (실제 양에 따라 차이)";
+    const storyEl=document.getElementById("nutriStory");
+    const insEl=document.getElementById("nutriInsight");
+    if(d.story){storyEl.innerHTML=`<strong>이야기.</strong> ${d.story}`;storyEl.style.display="block";}else{storyEl.style.display="none";}
+    if(d.insight){insEl.innerHTML=`<strong>몰랐던 사실!</strong> ${d.insight}`;insEl.style.display="block";}else{insEl.style.display="none";}
+    sec.classList.add("show");
+    btn.textContent="🔼 영양정보 닫기";
+    if(typeof _ga==="function")_ga("nutrition_view",{menu:curMenu.n,kcal:d.kcal});
+  }catch(e){
+    btn.textContent="❌ 영양정보를 불러오지 못했어요";
+    setTimeout(()=>{btn.textContent="🥗 칼로리·영양정보 보기";},2400);
+  }finally{
+    btn.classList.remove("loading");
+  }
+}
+function _resetNutrition(){
+  const sec=document.getElementById("nutriSection");
+  const btn=document.getElementById("nutriBtn");
+  if(sec)sec.classList.remove("show");
+  if(btn){btn.textContent="🥗 칼로리·영양정보 보기";btn.classList.remove("loading");}
+}
+
+/* 음식 궁합 분석 */
+async function runFoodMatch(){
+  if(!curMenu){toast("먼저 메뉴를 추천받아 주세요!");return;}
+  const inp=document.getElementById("matchInput");
+  const m2=(inp.value||"").trim();
+  if(!m2){inp.focus();return;}
+  const btn=document.getElementById("matchGo");
+  const resBox=document.getElementById("matchResult");
+  btn.disabled=true;btn.textContent="분석중";
+  try{
+    const r=await fetch("/api/food-match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({menu1:curMenu.n,menu2:m2})});
+    const j=await r.json();
+    if(!r.ok||!j.data)throw new Error(j.error||"실패");
+    const d=j.data;
+    document.getElementById("matchScore").textContent=d.score??"-";
+    const v=document.getElementById("matchVerdict");
+    v.textContent=`${d.emoji||""} ${d.verdict||"-"}`.trim();
+    v.className="match-verdict";
+    if(/충돌|나쁨|bad/i.test(d.verdict||""))v.classList.add("bad");
+    else if(/환상|좋음|good/i.test(d.verdict||""))v.classList.add("good");
+    document.getElementById("matchReason").textContent=d.reason||"-";
+    document.getElementById("matchBalance").textContent=d.balance||"-";
+    document.getElementById("matchCaution").textContent=d.caution||"-";
+    resBox.classList.add("show");
+    if(typeof _ga==="function")_ga("food_match",{m1:curMenu.n,m2,score:d.score});
+  }catch(e){toast("❌ 궁합 분석 실패. 잠시 후 다시 시도");}
+  finally{btn.disabled=false;btn.textContent="분석";}
+}
+function _resetFoodMatch(){
+  const r=document.getElementById("matchResult");
+  if(r)r.classList.remove("show");
+  const inp=document.getElementById("matchInput");
+  if(inp&&!inp.value&&typeof lastMeal==="string"&&lastMeal)inp.value=lastMeal;
+}
+
+/* SNS 공유 - Web Share API + Twitter */
+function shareWebApi(){
+  if(!curMenu){toast("먼저 메뉴를 추천받아 주세요!");return;}
+  snd("share");
+  const sc=parseInt(localStorage.getItem("fp6_click_share")||"0")+1;
+  localStorage.setItem("fp6_click_share",String(sc));
+  const text=`오늘 저녁은 ${curMenu.n} ${curMenu.e||""}으로 정했어! foodpicker.kr에서 추천받았어요 🍽️`;
+  if(navigator.share){
+    navigator.share({title:"오늘은 뭐 먹을까?",text,url:_cfg.u}).catch(()=>{});
+  }else{
+    navigator.clipboard?.writeText(`${text} ${_cfg.u}`).then(()=>toast("✅ 공유 텍스트 복사됨")).catch(()=>copyLink());
+  }
+}
+function shareTwitter(){
+  if(!curMenu){toast("먼저 메뉴를 추천받아 주세요!");return;}
+  snd("share");
+  const sc=parseInt(localStorage.getItem("fp6_click_share")||"0")+1;
+  localStorage.setItem("fp6_click_share",String(sc));
+  const text=`오늘 저녁은 ${curMenu.n} ${curMenu.e||""}으로 정했어! 🍽️\n#오늘뭐먹지 #${curMenu.n.replace(/\s/g,"")} #foodpicker`;
+  const url=`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(_cfg.u)}`;
+  window.open(url,"_blank","noopener");
+}
+
+/* 날씨 맥락 카피 (wxCode → 메시지) */
+const _WX_COPY={
+  rain: "🌧️ 비 오는 오늘, 따끈한 국물·얼큰한 매운맛 어떠세요?",
+  snow: "❄️ 추운 눈 오는 날, 든든한 한식·보양식이 제격!",
+  cold: "🥶 쌀쌀한 오늘, 뜨끈한 찌개·전골·국밥이 어울려요",
+  hot:  "🥵 더운 오늘은 시원한 냉면·콩국수·해산물 추천!",
+  clear:"☀️ 맑은 오늘, 가벼운 한 끼나 분위기 좋은 카페 어떠세요?",
+  cloud:"☁️ 흐린 날엔 따끈한 국밥·죽처럼 부드러운 메뉴 추천"
+};
+function _updateWeatherBanner(){
+  const b=document.getElementById("weatherBanner");
+  if(!b)return;
+  const c=typeof wxCode!=="undefined"?wxCode:null;
+  const txt=_WX_COPY[c];
+  if(txt){b.textContent=txt;b.classList.add("show");}
+  else b.classList.remove("show");
+}
+
+/* 식습관 리포트 (localStorage 데이터로 랜더) */
+const _CAT_LBL={korean:"🥢 한식",japanese:"🍣 일식",chinese:"🥟 중식",western:"🍝 양식",chicken:"🍗 치킨",pizza:"🍕 피자",cafe:"☕ 카페",snack:"🍢 분식",seafood:"🦞 해산물",health:"🥗 건강식",meat:"🥩 고기",noodle:"🍜 면",rice:"🍚 밥",season:"🌸 계절",random:"🎲 랜덤",etc:"기타"};
+const _MEAL_LBL={morning:"🌅 아침",lunch:"🌞 점심",dinner:"🌆 저녁",night:"🌙 야식"};
+function openReport(){
+  if(typeof _ga==="function")_ga("report_open",{});
+  const overlay=document.getElementById("reportOverlay");
+  const content=document.getElementById("reportContent");
+  const mc=JSON.parse(localStorage.getItem("fp6_menu_counts")||"{}");
+  const cc=JSON.parse(localStorage.getItem("fp6_cat_counts")||"{}");
+  const mealCnt=JSON.parse(localStorage.getItem("fp6_meal_counts")||"{}");
+  const rf=JSON.parse(localStorage.getItem("fp6_recent_feed")||"[]");
+  const total=rf.length;
+  if(total===0){
+    content.innerHTML='<div class="report-empty">아직 추천 기록이 없어요!<br>먼저 메뉴를 추천받아보세요 🍽️</div>';
+    overlay.classList.add("show");return;
+  }
+  const now=Date.now();
+  const week=rf.filter(r=>{try{return now-new Date(r.t).getTime()<=7*24*3600*1000;}catch(e){return false;}});
+  const top3=Object.entries(mc).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const catTotal=Object.values(cc).reduce((a,b)=>a+b,0)||1;
+  const catSorted=Object.entries(cc).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const mealTotal=Object.values(mealCnt).reduce((a,b)=>a+b,0)||1;
+  const topCat=catSorted[0];
+  const topPct=topCat?Math.round(topCat[1]/catTotal*100):0;
+  let insight;
+  if(topPct>=60)insight=`이번 주 <strong>${_CAT_LBL[topCat[0]]||topCat[0]}</strong>을 ${topPct}% 받으셨어요 — 다른 카테고리도 도전해보세요!`;
+  else if(total<3)insight="조금만 더 사용해보면 패턴이 보이기 시작해요!";
+  else if(mealTotal>0&&mealCnt.night>=mealTotal*0.4)insight="야식 비중이 높아요. 잘 자려면 가벼운 메뉴도 시도해보세요 😴";
+  else insight="다양한 카테고리를 골고루 추천받고 계시네요 👍";
+
+  content.innerHTML=`
+    <div class="report-stat"><span class="l">누적 추천</span><span class="v">${total}회</span></div>
+    <div class="report-stat"><span class="l">최근 7일</span><span class="v">${week.length}회</span></div>
+    <div class="report-stat"><span class="l">서로 다른 메뉴</span><span class="v">${Object.keys(mc).length}종</span></div>
+    <div class="report-section-title">🏆 자주 받은 메뉴 TOP 3</div>
+    ${top3.length?top3.map((t,i)=>`<div class="report-bar"><span class="report-bar-label">${i+1}위</span><span style="flex:1;font-size:12.5px;font-weight:700;color:var(--text);">${t[0]}</span><span class="report-bar-cnt">${t[1]}회</span></div>`).join(""):'<div style="font-size:12px;color:var(--text3);">데이터 부족</div>'}
+    <div class="report-section-title">📊 카테고리 분포</div>
+    ${catSorted.map(c=>{const pct=Math.round(c[1]/catTotal*100);return `<div class="report-bar"><span class="report-bar-label">${_CAT_LBL[c[0]]||c[0]}</span><span class="report-bar-track"><span class="report-bar-fill" style="width:${pct}%"></span></span><span class="report-bar-cnt">${pct}%</span></div>`;}).join("")}
+    ${mealTotal>1?`<div class="report-section-title">⏰ 식사시간 분포</div>${Object.entries(mealCnt).filter(m=>m[1]>0).map(m=>{const pct=Math.round(m[1]/mealTotal*100);return `<div class="report-bar"><span class="report-bar-label">${_MEAL_LBL[m[0]]||m[0]}</span><span class="report-bar-track"><span class="report-bar-fill" style="width:${pct}%"></span></span><span class="report-bar-cnt">${pct}%</span></div>`;}).join("")}`:""}
+    <div class="report-insight"><strong>💡 한줄 인사이트.</strong> ${insight}</div>
+  `;
+  overlay.classList.add("show");
+}
+function closeReport(){
+  document.getElementById("reportOverlay")?.classList.remove("show");
+}
+
+/* CPA 클릭 트래킹 */
+function _logCpa(type){
+  if(typeof _ga==="function")_ga("cpa_click",{type,menu:curMenu?.n||"",cat:curMenu?.cat||""});
+  fetch("/api/log-click",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:`cpa_${type}`,menu:curMenu?.n||""}),keepalive:true}).catch(()=>{});
+}
+
 /* ============================================================
    스코어
    ============================================================ */
@@ -1602,6 +2152,8 @@ function getPool(){
    ============================================================ */
 function pickMenu(){
   snd("pick");
+  _resetNutrition();
+  _resetFoodMatch();
   const btn=document.getElementById("pickBtn"),icon=document.getElementById("bicon");
   btn.classList.add("spin");icon.textContent="🌀";
   setTimeout(()=>{
