@@ -1015,6 +1015,13 @@ async function _logClick(type, menu) {
 
   <!-- ⑥ 결과 -->
   <div class="result-card" id="resultCard">
+    <!-- 광고 슬롯 1: 결과카드 최상단 (접시/포크 이미지 직전) -->
+    <div class="fp-ad-slot" id="fp-ad-slot-1" style="display:none; margin: 8px 0;">
+      <a id="fp-ad-link-1" href="#" target="_blank">
+        <img id="fp-ad-img-1" src="" alt="광고"
+             style="width:100%; border-radius:8px; display:block;">
+      </a>
+    </div>
     <div class="food-img-wrap" id="imgWrap">
       <img id="foodImg" src="" alt="" class="food-img" onerror="imgFallback()">
       <div class="food-img-overlay"></div>
@@ -2749,7 +2756,7 @@ async function toggleCpaDiet(){
         <div class="cpa-body-title">⚠️ 주의할 점</div>
         <div>${_escAt(d.avoid_for||"특별한 제한 없음")}</div>
       </div>
-      <a class="cpa-body-cta" href="#TENPING_DIET_CPA_PLACEHOLDER" onclick="_logCpa('diet')">💪 1:1 영양사 맞춤 식단 받기 →</a>
+      ${_fpAdInlineHtml(2)}
     `;
   }catch(e){
     body.innerHTML='<div class="err-state"><span class="err-state-msg">⚠️ 다이어트 분석을 불러오지 못했어요</span><button class="err-retry-btn" onclick="toggleCpaDiet();toggleCpaDiet();">↻ 재시도</button></div>';
@@ -2781,8 +2788,52 @@ function toggleCpaCooking(){
       <div class="cpa-body-title">🎬 유튜브 레시피 영상</div>
       <button onclick="event.stopPropagation();openYoutube();" style="display:block;width:100%;padding:11px;border:1.5px solid #F5C8C8;border-radius:10px;background:#FFF4F4;color:#C2392C;font-weight:800;font-size:13px;cursor:pointer;">▶ 유튜브에서 ${_escAt(curMenu.n)} 영상 보기</button>
     </div>
-    <a class="cpa-body-cta cooking" href="#TENPING_COOKING_CPA_PLACEHOLDER" onclick="_logCpa('cooking')">🍳 1:1 쿠킹클래스 받기 →</a>
+    ${_fpAdInlineHtml(3)}
   `;
+}
+
+/* ── foodpicker.kr 광고 배너 슬롯 (3종) ── */
+let _fpAdCache = null;
+async function loadFpAdSlots(){
+  try{
+    const r = await fetch('/api/foodpicker/banners/local');
+    if (!r.ok) return;
+    const j = await r.json();
+    _fpAdCache = Array.isArray(j.banners) ? j.banners : [];
+    _fpRenderStaticSlot(1);  // 슬롯 1만 정적 (결과카드 최상단). 2/3은 아코디언 펼칠 때 인라인 렌더
+  } catch(e){
+    console.warn('[fp-ad] load failed:', e && e.message);
+  }
+}
+function _fpRenderStaticSlot(slot){
+  const wrap = document.getElementById('fp-ad-slot-' + slot);
+  if (!wrap || !_fpAdCache) return;
+  const b = _fpAdCache.find(x => Number(x.slot) === slot);
+  if (b && b.img_url) {
+    const img = document.getElementById('fp-ad-img-' + slot);
+    const link = document.getElementById('fp-ad-link-' + slot);
+    if (img) { img.src = b.img_url; img.alt = b.title || '광고'; }
+    if (link) link.href = b.link_url || '#';
+    wrap.style.display = 'block';
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+function _fpAdInlineHtml(slot){
+  // 아코디언 본문 안에 인라인 삽입용 HTML 반환 (캐시 없거나 빈 슬롯이면 빈 문자열)
+  if (!_fpAdCache) return '';
+  const b = _fpAdCache.find(x => Number(x.slot) === slot);
+  if (!b || !b.img_url) return '';
+  const url = _escAt(b.link_url || '#');
+  const img = _escAt(b.img_url);
+  const alt = _escAt(b.title || '광고');
+  return `<a href="${url}" target="_blank" style="display:block;margin-top:14px;border-radius:8px;overflow:hidden;"><img src="${img}" alt="${alt}" style="width:100%;border-radius:8px;display:block;"></a>`;
+}
+// 페이지 로드 시 1회 호출 (캐시 + 슬롯 1 즉시 렌더)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadFpAdSlots);
+} else {
+  loadFpAdSlots();
 }
 
 /* ── 과일 궁합 펼치기 토글 표시 동기화 ── */
