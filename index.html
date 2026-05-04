@@ -967,9 +967,13 @@ async function _logClick(type, menu) {
         </div>
       </div>
 
-      <!-- 음식 궁합 분석 -->
+      <!-- 음식 궁합 분석 (collapsible — 기본 닫힘) -->
       <div class="match-section">
-        <div class="match-head">🤝 이 음식과 다른 메뉴, 잘 맞을까?</div>
+        <div class="match-head" onclick="toggleMatch()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:0;">
+          <span>🤝 이 음식과 다른 메뉴, 잘 맞을까?</span>
+          <span id="matchToggle" style="font-size:11px;color:#5A2DA8;font-weight:800;">펼치기 ▼</span>
+        </div>
+        <div id="matchBody" style="display:none;margin-top:11px;">
         <div class="match-input-row">
           <input class="match-input" id="matchInput" type="text" placeholder="비교할 다른 메뉴 입력 (예: 떡볶이)" onkeydown="if(event.key==='Enter')runFoodMatch()">
           <button class="match-go" id="matchGo" onclick="runFoodMatch()">분석</button>
@@ -986,6 +990,7 @@ async function _logClick(type, menu) {
           <div class="match-line"><strong>이유:</strong> <span id="matchReason">-</span></div>
           <div class="match-line"><strong>균형:</strong> <span id="matchBalance">-</span></div>
           <div class="match-line"><strong>주의:</strong> <span id="matchCaution">-</span></div>
+        </div>
         </div>
       </div>
 
@@ -1035,21 +1040,15 @@ async function _logClick(type, menu) {
     <div class="cpa-arrow" style="color:#B86F1A;">→</div>
   </a>
 
-  <!-- ⑤ 외부 링크 — 축소 배치 -->
+  <!-- ⑤ 외부 링크 — 핵심 2개로 축소 (카카오맵 + 배민) -->
   <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:2px;">
     <p style="font-size:10px;color:var(--text2);text-align:center;margin-bottom:8px;letter-spacing:.5px;">— 외부에서 찾기 —</p>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <button onclick="openMap()" style="flex:1;min-width:60px;padding:9px 6px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;">
-        📍 네이버 맛집
+    <div style="display:flex;gap:8px;">
+      <button onclick="openKakaoMap()" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;">
+        🗺️ 카카오맵 맛집
       </button>
-      <button onclick="openKakaoMap()" style="flex:1;min-width:60px;padding:9px 6px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;">
-        🗺️ 카카오맵
-      </button>
-      <button onclick="openCoupangEats()" style="flex:1;min-width:60px;padding:9px 6px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;">
-        🛵 쿠팡이츠
-      </button>
-      <button onclick="openBaemin()" style="flex:1;min-width:60px;padding:9px 6px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;">
-        🍀 배달의민족
+      <button onclick="openBaemin()" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;">
+        🍀 배민 주문
       </button>
     </div>
   </div>
@@ -1060,14 +1059,13 @@ async function _logClick(type, menu) {
     <div class="ai-alts-list" id="aiAltsList"></div>
   </div>
 
-  <!-- ⑥ SNS 공유 -->
+  <!-- ⑥ SNS 공유 (3종 — 한국 사용자 사용 빈도 기준 트위터 제거) -->
   <div class="share-block">
     <div class="share-block-title">친구에게 알려주기</div>
-    <div class="share-grid">
-      <button class="share-btn sb-kakao" onclick="shareKakao()">💬 카카오톡</button>
-      <button class="share-btn sb-web" onclick="shareWebApi()">📤 SNS 공유</button>
-      <button class="share-btn sb-twitter" onclick="shareTwitter()">𝕏 트위터</button>
-      <button class="share-btn sb-copy" onclick="copyLink()">🔗 링크 복사</button>
+    <div class="share-grid" style="grid-template-columns:repeat(3,1fr);">
+      <button class="share-btn sb-kakao" onclick="shareKakao()">💬 카톡</button>
+      <button class="share-btn sb-web" onclick="shareWebApi()">📤 공유</button>
+      <button class="share-btn sb-copy" onclick="copyLink()">🔗 복사</button>
     </div>
   </div>
 
@@ -2153,6 +2151,24 @@ function _resetFoodMatch(){
   if(r)r.classList.remove("show");
   const inp=document.getElementById("matchInput");
   if(inp&&!inp.value&&typeof lastMeal==="string"&&lastMeal)inp.value=lastMeal;
+  // 매번 새 결과 시 궁합 섹션 접음
+  const body=document.getElementById("matchBody");
+  const tog=document.getElementById("matchToggle");
+  if(body)body.style.display="none";
+  if(tog)tog.innerHTML="펼치기 ▼";
+}
+function toggleMatch(){
+  const body=document.getElementById("matchBody");
+  const tog=document.getElementById("matchToggle");
+  if(!body||!tog)return;
+  if(body.style.display==="none"||!body.style.display){
+    body.style.display="block";
+    tog.innerHTML="접기 ▲";
+    snd("click");
+  }else{
+    body.style.display="none";
+    tog.innerHTML="펼치기 ▼";
+  }
 }
 
 /* SNS 공유 - Web Share API + Twitter */
@@ -2279,12 +2295,13 @@ async function loadAiReason(){
     const alts=Array.isArray(j.data.alternatives)?j.data.alternatives:[];
     if(alts.length&&altsSec&&altsList){
       altsList.innerHTML=alts.map(a=>`
-        <div class="ai-alt-card">
+        <div class="ai-alt-card" data-name="${_escAt(a.name)}" onclick="quickPickAlt(this.dataset.name)" style="cursor:pointer;" title="이 메뉴로 바로 추천받기">
           <div class="ai-alt-emoji">${_escAt(a.emoji||"🍽️")}</div>
           <div class="ai-alt-content">
             <div class="ai-alt-name">${_escAt(a.name)}</div>
             <div class="ai-alt-reason">${_escAt(a.reason||"")}</div>
           </div>
+          <div style="color:var(--purple);font-size:18px;font-weight:800;flex-shrink:0;">→</div>
         </div>`).join("");
       altsSec.style.display="block";
     }
@@ -2299,6 +2316,14 @@ function _resetAiReason(){
   const a=document.getElementById("aiAltsSection");
   if(c)c.style.display="none";
   if(a)a.style.display="none";
+}
+function quickPickAlt(name){
+  if(!name)return;
+  const inp=document.getElementById("directInput");
+  if(inp)inp.value=name;
+  if(typeof _ga==="function")_ga("ai_alt_pick",{name});
+  if(typeof directPick==="function")directPick();
+  setTimeout(()=>{document.getElementById("resultCard")?.scrollIntoView({behavior:"smooth",block:"start"});},120);
 }
 
 /* CPA 클릭 트래킹 */
