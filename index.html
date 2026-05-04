@@ -664,6 +664,90 @@ body{
 .report-insight strong{color:#B47A0F;font-weight:800;}
 .report-empty{text-align:center;color:var(--text2);padding:24px 16px;font-size:13.5px;line-height:1.6;}
 .report-close{width:100%;margin-top:14px;padding:13px;border:1px solid var(--border-strong);border-radius:var(--rsm);background:#fff;color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;}
+
+/* ── AI 추천 이유 카드 ── */
+.ai-reason-card{
+  background:linear-gradient(135deg,#FCF5FF,#F8F4FC);
+  border:1px solid #E1D4F5;border-radius:var(--rsm);
+  padding:13px 14px;margin-bottom:14px;
+  box-shadow:var(--shadow-sm);
+}
+.ai-reason-head{font-size:12.5px;font-weight:800;color:#5A2DA8;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.ai-reason-body{font-size:13px;color:var(--text);line-height:1.55;}
+.ai-reason-body.loading{color:var(--text2);font-style:italic;}
+
+/* ── AI 대안 메뉴 ── */
+.ai-alts-section{margin-bottom:10px;}
+.ai-alts-title{font-size:12px;font-weight:800;letter-spacing:1.2px;color:#5A2DA8;text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:6px;}
+.ai-alts-title::before{content:'🎯';}
+.ai-alts-list{display:flex;flex-direction:column;gap:8px;}
+.ai-alt-card{
+  display:flex;align-items:center;gap:11px;
+  padding:11px 13px;border-radius:var(--rsm);
+  background:#fff;border:1.5px solid #E1D4F5;
+  transition:all .18s;
+}
+.ai-alt-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--purple);}
+.ai-alt-emoji{font-size:24px;flex-shrink:0;}
+.ai-alt-content{flex:1;min-width:0;}
+.ai-alt-name{font-size:13.5px;font-weight:800;color:var(--text);}
+.ai-alt-reason{font-size:11.5px;color:var(--text2);margin-top:2px;line-height:1.45;}
+
+/* ── 영양 매크로 비율 바 (탄단지) ── */
+.nutri-macro-bar{
+  display:flex;width:100%;height:24px;border-radius:50px;
+  overflow:hidden;border:1px solid var(--border);
+  margin-top:10px;background:var(--bg2);
+}
+.nm-segment{
+  display:flex;align-items:center;justify-content:center;
+  font-size:10.5px;font-weight:800;color:#fff;
+  white-space:nowrap;letter-spacing:.3px;
+  transition:width .8s ease;
+  text-shadow:0 1px 2px rgba(0,0,0,.2);
+}
+.nm-carb{background:linear-gradient(90deg,#F2B441,#FFD166);}
+.nm-protein{background:linear-gradient(90deg,#4CAF7D,#06D6A0);}
+.nm-fat{background:linear-gradient(90deg,#E84B8E,#FF6B9C);}
+.nutri-macro-legend{display:flex;justify-content:space-between;margin-top:5px;font-size:10.5px;color:var(--text2);font-weight:700;}
+.nutri-macro-legend .lg-c{color:#B47A0F;}
+.nutri-macro-legend .lg-p{color:#2E7E47;}
+.nutri-macro-legend .lg-f{color:#C8336E;}
+
+/* ── 좋은 사람/피해야 할 사람 ── */
+.nutri-people{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+@media (max-width:380px){.nutri-people{grid-template-columns:1fr;}}
+.np-card{padding:10px 11px;border-radius:var(--rxs);font-size:11.5px;line-height:1.5;}
+.np-good{background:#DDF1E1;border:1px solid #B7E0C5;color:#2E7E47;}
+.np-avoid{background:#FFE0DA;border:1px solid #F5C8C8;color:#C2392C;}
+.np-title{font-weight:800;font-size:11px;margin-bottom:4px;letter-spacing:.3px;}
+
+/* ── 음식 궁합 점수 게이지 ── */
+.match-gauge{margin-top:5px;margin-bottom:10px;}
+.match-gauge-bar{
+  height:14px;background:linear-gradient(90deg,#FFE0DA 0%,#FFF4D2 50%,#DDF1E1 100%);
+  border-radius:50px;border:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.match-gauge-fill{
+  position:absolute;left:0;top:0;bottom:0;
+  background:rgba(90,45,168,.85);
+  border-radius:50px;
+  transition:width .9s cubic-bezier(.34,1.56,.64,1);
+}
+.match-gauge-marks{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);font-weight:700;margin-top:3px;letter-spacing:.5px;}
+.match-gauge-marks .pt{color:var(--text2);}
+
+/* ── 슬롯 머신 효과 (메뉴 cycling) ── */
+.pick-btn.slot #btnTxt{
+  display:inline-block;
+  animation:slotShake .08s linear infinite;
+  letter-spacing:-.5px;
+}
+@keyframes slotShake{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-2px);}
+}
 </style>
 <script>
 async function _sendStat(endpoint, data) {
@@ -853,6 +937,12 @@ async function _logClick(type, menu) {
       <div class="rtag-row" id="rTags"></div>
       <div class="tip-box" id="rTip">💡 <strong>꿀팁:</strong> 맛있게!</div>
 
+      <!-- ✨ AI 추천 이유 (lazy-load, pickedMenu 모드) -->
+      <div class="ai-reason-card" id="aiReasonCard" style="display:none;">
+        <div class="ai-reason-head">✨ 왜 이 메뉴인가요?</div>
+        <div class="ai-reason-body" id="aiReasonText">분석 중...</div>
+      </div>
+
       <!-- 🛒 쿠팡 파트너스 — 결과카드 직하 배치 (수익 핵심 노출 위치) -->
       <div class="related-section" style="margin-bottom:14px;">
         <div class="related-title">🛒 밀키트 · 관련 상품 구매</div>
@@ -867,8 +957,11 @@ async function _logClick(type, menu) {
         <div class="nutri-card">
           <div class="nutri-head"><span>🥗</span><span id="nutriTitle">영양 분석</span></div>
           <div class="nutri-grid" id="nutriGrid"></div>
-          <div class="nutri-tags" id="nutriTags"></div>
+          <div class="nutri-macro-bar" id="nutriMacroBar" style="display:none;"></div>
+          <div class="nutri-macro-legend" id="nutriMacroLegend" style="display:none;"></div>
+          <div class="nutri-tags" id="nutriTags" style="margin-top:10px;"></div>
           <div class="nutri-note" id="nutriNote"></div>
+          <div class="nutri-people" id="nutriPeople" style="display:none;"></div>
           <div class="nutri-story" id="nutriStory" style="display:none;"></div>
           <div class="nutri-insight" id="nutriInsight" style="display:none;"></div>
         </div>
@@ -883,8 +976,12 @@ async function _logClick(type, menu) {
         </div>
         <div class="match-result" id="matchResult">
           <div class="match-score-row">
-            <div class="match-score"><span id="matchScore">-</span><span class="max">/10</span></div>
+            <div class="match-score"><span id="matchScore">-</span><span class="max">/100</span></div>
             <div class="match-verdict" id="matchVerdict">-</div>
+          </div>
+          <div class="match-gauge">
+            <div class="match-gauge-bar"><div class="match-gauge-fill" id="matchGaugeFill" style="width:0%;"></div></div>
+            <div class="match-gauge-marks"><span>0</span><span class="pt">충돌 ◉ 보통 ◉ 좋음 ◉ 환상</span><span>100</span></div>
           </div>
           <div class="match-line"><strong>이유:</strong> <span id="matchReason">-</span></div>
           <div class="match-line"><strong>균형:</strong> <span id="matchBalance">-</span></div>
@@ -955,6 +1052,12 @@ async function _logClick(type, menu) {
         🍀 배달의민족
       </button>
     </div>
+  </div>
+
+  <!-- 🎯 AI 대안 메뉴 (lazy-load) -->
+  <div class="ai-alts-section" id="aiAltsSection" style="display:none;">
+    <div class="ai-alts-title">다른 추천 메뉴 (AI)</div>
+    <div class="ai-alts-list" id="aiAltsList"></div>
   </div>
 
   <!-- ⑥ SNS 공유 -->
@@ -1950,6 +2053,40 @@ async function loadNutrition(){
       return `<span class="nutri-tag${w?' warn':''}">${t}</span>`;
     }).join("");
     document.getElementById("nutriNote").textContent=d.note||"※ 1인분 평균 추정치 (실제 양에 따라 차이)";
+    // 탄단지 비율 바 (kcal 기준 정규화)
+    const macroBar=document.getElementById("nutriMacroBar");
+    const macroLeg=document.getElementById("nutriMacroLegend");
+    const cKcal=(d.carb||0)*4, pKcal=(d.protein||0)*4, fKcal=(d.fat||0)*9;
+    const tot=cKcal+pKcal+fKcal;
+    if(tot>0){
+      let cP=Math.round(cKcal/tot*100), pP=Math.round(pKcal/tot*100), fP=100-cP-pP;
+      if(fP<0){fP=0;cP=Math.round(cKcal/tot*100);pP=100-cP-fP;}
+      macroBar.innerHTML=`
+        <div class="nm-segment nm-carb" style="width:${cP}%;">${cP>=10?`탄 ${cP}%`:''}</div>
+        <div class="nm-segment nm-protein" style="width:${pP}%;">${pP>=10?`단 ${pP}%`:''}</div>
+        <div class="nm-segment nm-fat" style="width:${fP}%;">${fP>=10?`지 ${fP}%`:''}</div>`;
+      macroLeg.innerHTML=`
+        <span class="lg-c">탄수 ${d.carb||0}g</span>
+        <span class="lg-p">단백 ${d.protein||0}g</span>
+        <span class="lg-f">지방 ${d.fat||0}g</span>`;
+      macroBar.style.display="flex";macroLeg.style.display="flex";
+    }else{macroBar.style.display="none";macroLeg.style.display="none";}
+    // 좋은 사람/피해야 할 사람
+    const peopleEl=document.getElementById("nutriPeople");
+    if(d.good_for||d.avoid_for){
+      const avoid=(d.avoid_for||"").trim();
+      const isNoLimit=/특별한 제한 없음|제한없음|없음$/.test(avoid);
+      peopleEl.innerHTML=`
+        <div class="np-card np-good">
+          <div class="np-title">👍 이런 분에게 좋아요</div>
+          <div>${d.good_for||"-"}</div>
+        </div>
+        <div class="np-card np-avoid">
+          <div class="np-title">⚠️ 이런 분은 주의</div>
+          <div>${isNoLimit?"😊 특별한 제한 없음":(avoid||"-")}</div>
+        </div>`;
+      peopleEl.style.display="grid";
+    }else{peopleEl.style.display="none";}
     const storyEl=document.getElementById("nutriStory");
     const insEl=document.getElementById("nutriInsight");
     if(d.story){storyEl.innerHTML=`<strong>이야기.</strong> ${d.story}`;storyEl.style.display="block";}else{storyEl.style.display="none";}
@@ -1985,12 +2122,24 @@ async function runFoodMatch(){
     const j=await r.json();
     if(!r.ok||!j.data)throw new Error(j.error||"실패");
     const d=j.data;
-    document.getElementById("matchScore").textContent=d.score??"-";
+    const score=Math.max(0,Math.min(100,parseInt(d.score,10)||0));
+    document.getElementById("matchScore").textContent=score;
     const v=document.getElementById("matchVerdict");
     v.textContent=`${d.emoji||""} ${d.verdict||"-"}`.trim();
     v.className="match-verdict";
     if(/충돌|나쁨|bad/i.test(d.verdict||""))v.classList.add("bad");
     else if(/환상|좋음|good/i.test(d.verdict||""))v.classList.add("good");
+    // 게이지 바 — 점수 비례 + verdict별 색상
+    const gauge=document.getElementById("matchGaugeFill");
+    if(gauge){
+      gauge.style.width=score+"%";
+      let color="rgba(90,45,168,.85)";
+      if(score>=80)color="rgba(46,126,71,.9)";
+      else if(score>=60)color="rgba(76,175,125,.85)";
+      else if(score>=40)color="rgba(242,180,65,.85)";
+      else color="rgba(230,57,70,.85)";
+      gauge.style.background=color;
+    }
     document.getElementById("matchReason").textContent=d.reason||"-";
     document.getElementById("matchBalance").textContent=d.balance||"-";
     document.getElementById("matchCaution").textContent=d.caution||"-";
@@ -2094,6 +2243,64 @@ function closeReport(){
   document.getElementById("reportOverlay")?.classList.remove("show");
 }
 
+/* AI 추천 이유 + 대안 lazy-load (pickedMenu 모드) */
+function _escAt(s){return String(s||"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function loadAiReason(){
+  if(!curMenu)return;
+  const card=document.getElementById("aiReasonCard");
+  const txt=document.getElementById("aiReasonText");
+  const altsSec=document.getElementById("aiAltsSection");
+  const altsList=document.getElementById("aiAltsList");
+  if(!card||!txt)return;
+  card.style.display="block";
+  txt.classList.add("loading");
+  txt.textContent="✨ AI가 분석 중...";
+  if(altsSec)altsSec.style.display="none";
+  try{
+    const r=await fetch("/api/recommend",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        pickedMenu:curMenu.n,
+        mood:typeof selMoodV!=="undefined"?selMoodV:"평범",
+        occasion:typeof selOccV!=="undefined"?selOccV:"혼자",
+        budget:typeof selBudgetV!=="undefined"?selBudgetV:"보통",
+        gender:typeof selGend!=="undefined"?selGend:"N",
+        age:typeof selAgeV!=="undefined"?selAgeV:"30",
+        category:typeof selCatV!=="undefined"?selCatV:"random",
+        weather:typeof wxCode!=="undefined"?wxCode:"clear",
+        mealTime:typeof mealTime!=="undefined"?mealTime:"lunch"
+      })
+    });
+    const j=await r.json();
+    if(!r.ok||!j.data)throw new Error(j.error||"실패");
+    txt.classList.remove("loading");
+    txt.textContent=j.data.primary?.reason||"이 메뉴가 사용자 컨텍스트에 잘 맞습니다.";
+    const alts=Array.isArray(j.data.alternatives)?j.data.alternatives:[];
+    if(alts.length&&altsSec&&altsList){
+      altsList.innerHTML=alts.map(a=>`
+        <div class="ai-alt-card">
+          <div class="ai-alt-emoji">${_escAt(a.emoji||"🍽️")}</div>
+          <div class="ai-alt-content">
+            <div class="ai-alt-name">${_escAt(a.name)}</div>
+            <div class="ai-alt-reason">${_escAt(a.reason||"")}</div>
+          </div>
+        </div>`).join("");
+      altsSec.style.display="block";
+    }
+    if(typeof _ga==="function")_ga("ai_reason_load",{menu:curMenu.n});
+  }catch(e){
+    if(card)card.style.display="none";
+    if(altsSec)altsSec.style.display="none";
+  }
+}
+function _resetAiReason(){
+  const c=document.getElementById("aiReasonCard");
+  const a=document.getElementById("aiAltsSection");
+  if(c)c.style.display="none";
+  if(a)a.style.display="none";
+}
+
 /* CPA 클릭 트래킹 */
 function _logCpa(type){
   if(typeof _ga==="function")_ga("cpa_click",{type,menu:curMenu?.n||"",cat:curMenu?.cat||""});
@@ -2154,17 +2361,33 @@ function pickMenu(){
   snd("pick");
   _resetNutrition();
   _resetFoodMatch();
-  const btn=document.getElementById("pickBtn"),icon=document.getElementById("bicon");
-  btn.classList.add("spin");icon.textContent="🌀";
+  _resetAiReason();
+  const btn=document.getElementById("pickBtn"),icon=document.getElementById("bicon"),btnTxt=document.getElementById("btnTxt");
+  btn.classList.add("spin","slot");icon.textContent="🌀";
+  // 슬롯머신 효과: 700ms 동안 메뉴 이름 cycling
+  const slotPool=getPool();
+  const slotItems=slotPool.length?slotPool.slice(0,Math.min(40,slotPool.length)):[{e:"🍽",n:"추천중"}];
+  const originalTxt=btnTxt?btnTxt.textContent:"메뉴 추천받기!";
+  let slotI=0;
+  const slotInterval=setInterval(()=>{
+    if(!btnTxt)return;
+    const m=slotItems[Math.floor(Math.random()*slotItems.length)];
+    btnTxt.textContent=`${m.e||"🍽"} ${m.n}`;
+    slotI++;
+  },65);
   setTimeout(()=>{
-    btn.classList.remove("spin");icon.textContent="🎯";
+    clearInterval(slotInterval);
+    btn.classList.remove("spin","slot");icon.textContent="🎯";
+    if(btnTxt)btnTxt.textContent=originalTxt;
     let pool=getPool().filter(m=>!used.includes(m.n));
     if(!pool.length||used.length>=40){used=[];localStorage.setItem("fp6_used","[]");pool=getPool();toast("🎉 40끼 달성! 메뉴 풀 리셋이에요");}
     const sorted=scoredPool(pool);
     const top=sorted[0],next=sorted.slice(1,4);
     used.push(top.n);localStorage.setItem("fp6_used",JSON.stringify(used));
     showResult(top,next);snd("success");
-  },480);
+    // 결과 표시 후 AI 추천 이유 lazy-load (지연 호출로 메인 UI 우선 렌더)
+    setTimeout(loadAiReason, 200);
+  },700);
 }
 function reroll(){pickMenu();}
 
