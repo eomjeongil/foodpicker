@@ -363,30 +363,8 @@ body{
 .bcopy{flex:1;padding:13px;border:1.5px solid var(--border);border-radius:var(--rsm);background:#fff;color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;}
 .bcopy:hover{border-color:var(--mint);color:var(--mint);}
 
-/* ── 다음 추천 ── */
-.next-card{display:none;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:12px;box-shadow:var(--shadow-sm);}
-.next-card.show{display:block;animation:slideUp .38s ease both;}
+/* slideUp keyframes — ai-alts·match-result에서 재사용 */
 @keyframes slideUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
-.next-hint{font-size:12px;color:var(--text2);margin-bottom:11px;}
-.next-grid{display:flex;flex-direction:column;gap:8px;}
-.ni{
-  display:flex;align-items:center;gap:11px;
-  padding:13px 14px;border-radius:var(--rsm);
-  background:var(--bg2);border:1.5px solid var(--border);
-  cursor:pointer;transition:all .18s;
-}
-.ni:hover{border-color:var(--pr);background:#FFF6F0;transform:translateX(3px);}
-.ni-rank{font-size:12px;padding:3px 8px;border-radius:50px;min-width:30px;text-align:center;font-weight:800;}
-.r2{background:#E8E8E8;color:#666;}
-.r3{background:#F4DDC2;color:#9C5F1F;}
-.r4{background:#DCE8FF;color:#2D5BBF;}
-.ni-e{font-size:25px;}
-.ni-info{flex:1;}
-.ni-name{font-weight:800;font-size:14px;color:var(--text);}
-.ni-meta{font-size:12px;color:var(--text2);margin-top:2px;display:flex;gap:6px;align-items:center;font-weight:600;}
-.ni-coupang{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:50px;background:#FFE0DA;color:var(--red);font-size:11px;font-weight:800;text-decoration:none;}
-.ni-arr{color:var(--text3);font-size:16px;transition:transform .18s;}
-.ni:hover .ni-arr{transform:translateX(3px);color:var(--pr);}
 
 /* ── 히스토리 ── */
 .hist-wrap{display:none;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:12px;box-shadow:var(--shadow-sm);}
@@ -676,22 +654,28 @@ body{
 .ai-reason-body{font-size:13px;color:var(--text);line-height:1.55;}
 .ai-reason-body.loading{color:var(--text2);font-style:italic;}
 
-/* ── AI 대안 메뉴 ── */
-.ai-alts-section{margin-bottom:10px;}
-.ai-alts-title{font-size:12px;font-weight:800;letter-spacing:1.2px;color:#5A2DA8;text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:6px;}
-.ai-alts-title::before{content:'🎯';}
-.ai-alts-list{display:flex;flex-direction:column;gap:8px;}
-.ai-alt-card{
-  display:flex;align-items:center;gap:11px;
-  padding:11px 13px;border-radius:var(--rsm);
-  background:#fff;border:1.5px solid #E1D4F5;
-  transition:all .18s;
+/* ── AI 대안 메뉴 (next-card 대체, 더 큰 카드 + 클릭 액션) ── */
+.ai-alts-section{margin:14px 0 12px;animation:slideUp .35s ease both;}
+.ai-alts-title{
+  font-size:13px;font-weight:800;letter-spacing:.5px;color:#5A2DA8;
+  margin-bottom:11px;display:flex;align-items:center;gap:6px;
 }
-.ai-alt-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--purple);}
-.ai-alt-emoji{font-size:24px;flex-shrink:0;}
+.ai-alts-title::before{content:'🎯';font-size:16px;}
+.ai-alts-list{display:flex;flex-direction:column;gap:9px;}
+.ai-alt-card{
+  display:flex;align-items:center;gap:13px;
+  padding:14px 16px;border-radius:var(--rsm);
+  background:linear-gradient(135deg,#fff,#FCF5FF);
+  border:1.5px solid #E1D4F5;
+  cursor:pointer;transition:all .2s;
+  box-shadow:var(--shadow-sm);
+}
+.ai-alt-card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(139,92,246,.18);border-color:var(--purple);}
+.ai-alt-card:active{transform:translateY(-1px);}
+.ai-alt-emoji{font-size:32px;flex-shrink:0;line-height:1;}
 .ai-alt-content{flex:1;min-width:0;}
-.ai-alt-name{font-size:13.5px;font-weight:800;color:var(--text);}
-.ai-alt-reason{font-size:11.5px;color:var(--text2);margin-top:2px;line-height:1.45;}
+.ai-alt-name{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.3px;}
+.ai-alt-reason{font-size:12.5px;color:var(--text2);margin-top:3px;line-height:1.45;}
 
 /* ── 영양 매크로 비율 바 (탄단지) ── */
 .nutri-macro-bar{
@@ -1040,6 +1024,12 @@ async function _logClick(type, menu) {
     <div class="cpa-arrow" style="color:#B86F1A;">→</div>
   </a>
 
+  <!-- 🎯 AI 대안 메뉴 (next-card 대체, 클릭 시 directPick) -->
+  <div class="ai-alts-section" id="aiAltsSection" style="display:none;">
+    <div class="ai-alts-title">다른 추천 메뉴 — 탭하면 바로 추천</div>
+    <div class="ai-alts-list" id="aiAltsList"></div>
+  </div>
+
   <!-- ⑤ 외부 링크 — 핵심 2개로 축소 (카카오맵 + 배민) -->
   <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:2px;">
     <p style="font-size:10px;color:var(--text2);text-align:center;margin-bottom:8px;letter-spacing:.5px;">— 외부에서 찾기 —</p>
@@ -1051,12 +1041,6 @@ async function _logClick(type, menu) {
         🍀 배민 주문
       </button>
     </div>
-  </div>
-
-  <!-- 🎯 AI 대안 메뉴 (lazy-load) -->
-  <div class="ai-alts-section" id="aiAltsSection" style="display:none;">
-    <div class="ai-alts-title">다른 추천 메뉴 (AI)</div>
-    <div class="ai-alts-list" id="aiAltsList"></div>
   </div>
 
   <!-- ⑥ SNS 공유 (3종 — 한국 사용자 사용 빈도 기준 트위터 제거) -->
@@ -1072,13 +1056,6 @@ async function _logClick(type, menu) {
       </div>
     </div>
   </div>
-  <!-- ⑦ 다음 추천 -->
-  <div class="next-card" id="nextCard">
-    <div class="sl">🥈 다음 추천 순위</div>
-    <p class="next-hint">탭하면 바로 결과로! 🛒 버튼으로 밀키트 바로 구매 가능</p>
-    <div class="next-grid" id="nextGrid"></div>
-  </div>
-
   <!-- 다시 선택하기 -->
   <div style="margin-bottom:12px;">
     <button onclick="scrollToTop()" style="width:100%;padding:15px;border:1.5px solid #FFE3CC;border-radius:13px;background:#fff;color:#7A6E62;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 2px 8px rgba(255,107,53,.06);"
@@ -2184,15 +2161,6 @@ function shareWebApi(){
     navigator.clipboard?.writeText(`${text} ${_cfg.u}`).then(()=>toast("✅ 공유 텍스트 복사됨")).catch(()=>copyLink());
   }
 }
-function shareTwitter(){
-  if(!curMenu){toast("먼저 메뉴를 추천받아 주세요!");return;}
-  snd("share");
-  const sc=parseInt(localStorage.getItem("fp6_click_share")||"0")+1;
-  localStorage.setItem("fp6_click_share",String(sc));
-  const text=`오늘 저녁은 ${curMenu.n} ${curMenu.e||""}으로 정했어! 🍽️\n#오늘뭐먹지 #${curMenu.n.replace(/\s/g,"")} #foodpicker`;
-  const url=`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(_cfg.u)}`;
-  window.open(url,"_blank","noopener");
-}
 
 /* 날씨 맥락 카피 (wxCode → 메시지) */
 const _WX_COPY={
@@ -2478,7 +2446,7 @@ function showResult(menu,nextMenus){
 
   const rc=document.getElementById("resultCard");
   rc.classList.remove("show");void rc.offsetWidth;rc.classList.add("show");
-  renderNext(nextMenus);addHist(menu);updateProg();
+  addHist(menu);updateProg();
 
   // GA4: 메뉴 추천 이벤트 전송
   _ga("menu_recommend", {
@@ -2506,34 +2474,7 @@ function imgFallback(){
   }
 }
 
-/* ============================================================
-   다음 추천
-   ============================================================ */
-const RCLS=["r2","r3","r4"],REMO=["🥈","🥉","4️⃣"];
-function renderNext(menus){
-  const nc=document.getElementById("nextCard");
-  if(!menus?.length){nc.classList.remove("show");return;}
-  nc.classList.add("show");
-  document.getElementById("nextGrid").innerHTML=menus.map((m,i)=>`
-    <div class="ni" onclick="pickNext('${m.n.replace(/'/g,"\\'")}');snd('next')">
-      <span class="ni-rank ${RCLS[i]}">${REMO[i]}</span>
-      <span class="ni-e">${m.e}</span>
-      <div class="ni-info">
-        <div class="ni-name">${m.n}</div>
-        <div class="ni-meta">
-          <span>${CAT_KR[m.cat]||""}</span>
-          <a class="ni-coupang" href="${_cu(m.q)}" target="_blank" onclick="event.stopPropagation();snd('coupang');localStorage.setItem('fp6_click_coupang',String(parseInt(localStorage.getItem('fp6_click_coupang')||'0')+1))">🛒 밀키트</a>
-        </div>
-      </div>
-      <span class="ni-arr">›</span>
-    </div>`).join("");
-}
-function pickNext(name){
-  const menu=DB.find(m=>m.n===name);if(!menu)return;
-  const pool=DB.filter(m=>m.n!==name&&!used.includes(m.n));
-  used.push(name);localStorage.setItem("fp6_used",JSON.stringify(used));
-  showResult(menu,scoredPool(pool).slice(0,3));snd("next");
-}
+/* (next-card 시스템 제거됨 — AI 대안 메뉴(ai-alts)가 대체) */
 
 /* ============================================================
    지도 / 공유 / 히스토리 / 진행률
@@ -2548,39 +2489,6 @@ function _logClick(type, menu){
       fetch('/api/log-click', { method:'POST', headers:{'Content-Type':'application/json'}, body: payload, keepalive: true }).catch(()=>{});
     }
   } catch(e){}
-}
-function openMap(){
-  if(!curMenu)return;
-  _logClick('map_naver', curMenu.n);
-  const mc=parseInt(localStorage.getItem("fp6_click_map")||"0")+1;
-  localStorage.setItem("fp6_click_map",String(mc));
-  _logClick('map_naver', curMenu.n);
-  const q=encodeURIComponent(curMenu.n+" 맛집");
-  const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  if(isMobile){
-    window.open(`https://m.search.naver.com/search.naver?query=${q}&where=place&sortBy=review`,"_blank");
-  }else{
-    window.open(`https://search.naver.com/search.naver?query=${q}&where=place&sortBy=review`,"_blank");
-  }
-  snd("map");
-}function openCoupangEats(){
-  if(!curMenu)return;
-  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
-  const isAndroid=/Android/.test(navigator.userAgent);
-  if(!isIOS&&!isAndroid){toast("📱 쿠팡이츠는 모바일에서 열립니다");return;}
-  const cc=parseInt(localStorage.getItem("fp6_click_coupang")||"0")+1;
-  localStorage.setItem("fp6_click_coupang",String(cc));
-  _logClick('coupang_eats', curMenu.n);
-  const q=encodeURIComponent(curMenu.n);
-  window.location.href=`coupangeats://search?keyword=${q}`;
-  setTimeout(()=>{
-    if(isIOS){
-      window.open(`https://apps.apple.com/kr/app/id1441782759`,"_blank");
-    }else{
-      window.open(`https://play.google.com/store/apps/details?id=com.coupangeats`,"_blank");
-    }
-  },1500);
-  snd("map");
 }
 function openBaemin(){
   if(!curMenu)return;
