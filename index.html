@@ -732,6 +732,75 @@ body{
   0%,100%{transform:translateY(0);}
   50%{transform:translateY(-2px);}
 }
+
+/* ── 스켈레톤 (로딩 placeholder) ── */
+.skel{
+  display:inline-block;width:100%;
+  background:linear-gradient(90deg,#F5EFE6 0%,#FAF4EC 50%,#F5EFE6 100%);
+  background-size:200% 100%;
+  animation:shimmer 1.4s ease-in-out infinite;
+  border-radius:6px;vertical-align:middle;
+}
+@keyframes shimmer{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
+.skel-line{height:13px;margin-bottom:6px;}
+.skel-line:last-child{margin-bottom:0;}
+.skel-line-w50{width:50%;}
+.skel-line-w70{width:70%;}
+.skel-line-w90{width:90%;}
+.skel-emoji{width:32px;height:32px;border-radius:50%;flex-shrink:0;}
+.ai-alt-card.skel-card{cursor:default;}
+.ai-alt-card.skel-card:hover{transform:none;box-shadow:var(--shadow-sm);border-color:#E1D4F5;}
+
+/* ── 스피너 (영양/궁합 로딩) ── */
+.spinner{
+  display:inline-block;width:14px;height:14px;
+  border:2.5px solid rgba(46,196,182,.22);
+  border-top-color:#1F8C82;
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+  vertical-align:-2px;margin-right:7px;
+}
+.spinner.sp-purple{border-color:rgba(139,92,246,.22);border-top-color:#5A2DA8;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── 에러 상태 + 재시도 ── */
+.err-state{
+  background:#FFE0DA;border:1px solid #F5C8C8;
+  border-radius:var(--rxs);padding:11px 13px;
+  font-size:12.5px;color:#C2392C;
+  display:flex;align-items:center;gap:10px;line-height:1.4;
+}
+.err-state-msg{flex:1;min-width:0;font-weight:700;}
+.err-retry-btn{
+  padding:7px 13px;border:1px solid #F5C8C8;border-radius:50px;
+  background:#fff;color:#C2392C;font-size:11.5px;font-weight:800;cursor:pointer;
+  flex-shrink:0;min-height:34px;transition:all .15s;
+}
+.err-retry-btn:hover{background:#FFE0DA;}
+
+/* ── 모바일 380px 이하 최적화 ── */
+@media (max-width:380px){
+  .nutri-people{grid-template-columns:1fr;}
+  .hero-cta{padding:16px 18px;font-size:17px;}
+  .hero-cta-emoji{font-size:20px;}
+  .ai-alt-card{padding:12px 13px;gap:11px;}
+  .ai-alt-emoji{font-size:28px;}
+  .ai-alt-name{font-size:14px;}
+  .ai-alt-reason{font-size:11.5px;}
+  .match-input-row{flex-direction:column;gap:8px;}
+  .match-go{width:100%;padding:11px;}
+  .nutri-grid{gap:6px;}
+  .nutri-cell{padding:8px 10px;}
+  .nutri-cell .nv{font-size:14px;}
+  .share-grid{grid-template-columns:repeat(3,1fr)!important;gap:6px;}
+  .share-btn{padding:11px 8px;font-size:11.5px;}
+  .chip{padding:8px 12px;font-size:12px;}
+  .ctog{padding:9px 6px;font-size:11px;min-height:36px;}
+  .tog{min-height:38px;}
+  .related-grid{gap:7px;}
+  .rel-btn{padding:11px 10px;}
+  .rel-label{font-size:12.5px;}
+}
 </style>
 <script>
 async function _sendStat(endpoint, data) {
@@ -2007,7 +2076,7 @@ async function loadNutrition(){
     return;
   }
   btn.classList.add("loading");
-  btn.textContent="⏳ 분석 중...";
+  btn.innerHTML='<span class="spinner"></span>영양 분석 중...';
   try{
     const r=await fetch("/api/nutrition",{
       method:"POST",
@@ -2070,8 +2139,8 @@ async function loadNutrition(){
     btn.textContent="🔼 영양정보 닫기";
     if(typeof _ga==="function")_ga("nutrition_view",{menu:curMenu.n,kcal:d.kcal});
   }catch(e){
-    btn.textContent="❌ 영양정보를 불러오지 못했어요";
-    setTimeout(()=>{btn.textContent="🥗 칼로리·영양정보 보기";},2400);
+    btn.innerHTML='⚠️ 영양정보를 불러오지 못했어요. <span style="text-decoration:underline;">다시 누르기</span>';
+    setTimeout(()=>{btn.textContent="🥗 칼로리·영양정보 보기";},2800);
   }finally{
     btn.classList.remove("loading");
   }
@@ -2091,7 +2160,8 @@ async function runFoodMatch(){
   if(!m2){inp.focus();return;}
   const btn=document.getElementById("matchGo");
   const resBox=document.getElementById("matchResult");
-  btn.disabled=true;btn.textContent="분석중";
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner sp-purple"></span>분석 중';
   try{
     const r=await fetch("/api/food-match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({menu1:curMenu.n,menu2:m2})});
     const j=await r.json();
@@ -2120,7 +2190,16 @@ async function runFoodMatch(){
     document.getElementById("matchCaution").textContent=d.caution||"-";
     resBox.classList.add("show");
     if(typeof _ga==="function")_ga("food_match",{m1:curMenu.n,m2,score:d.score});
-  }catch(e){toast("❌ 궁합 분석 실패. 잠시 후 다시 시도");}
+  }catch(e){
+    toast("❌ 궁합 분석 실패. 잠시 후 다시 시도");
+    const resBox=document.getElementById("matchResult");
+    if(resBox){
+      // 결과 영역에 에러 메시지 + 재시도 버튼
+      resBox.classList.add("show");
+      const reasonEl=document.getElementById("matchReason");
+      if(reasonEl)reasonEl.parentElement.parentElement.innerHTML='<div class="err-state"><span class="err-state-msg">⚠️ 궁합 분석을 불러오지 못했어요</span><button class="err-retry-btn" onclick="runFoodMatch()">↻ 재시도</button></div>';
+    }
+  }
   finally{btn.disabled=false;btn.textContent="분석";}
 }
 function _resetFoodMatch(){
@@ -2227,19 +2306,35 @@ function closeReport(){
   document.getElementById("reportOverlay")?.classList.remove("show");
 }
 
-/* AI 추천 이유 + 대안 lazy-load (pickedMenu 모드) */
+/* AI 추천 이유 + 대안 lazy-load (pickedMenu 모드) — 스켈레톤·에러·재시도 포함 */
 function _escAt(s){return String(s||"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-async function loadAiReason(){
-  if(!curMenu)return;
+function _aiShowSkeleton(){
   const card=document.getElementById("aiReasonCard");
   const txt=document.getElementById("aiReasonText");
   const altsSec=document.getElementById("aiAltsSection");
   const altsList=document.getElementById("aiAltsList");
-  if(!card||!txt)return;
-  card.style.display="block";
-  txt.classList.add("loading");
-  txt.textContent="✨ AI가 분석 중...";
-  if(altsSec)altsSec.style.display="none";
+  if(card)card.style.display="block";
+  if(txt)txt.innerHTML='<span class="skel skel-line skel-line-w90"></span><span class="skel skel-line skel-line-w70"></span>';
+  if(altsSec)altsSec.style.display="block";
+  if(altsList)altsList.innerHTML=[1,2,3].map(()=>`
+    <div class="ai-alt-card skel-card">
+      <span class="skel skel-emoji"></span>
+      <div class="ai-alt-content" style="flex:1;">
+        <span class="skel skel-line skel-line-w50"></span>
+        <span class="skel skel-line skel-line-w90"></span>
+      </div>
+    </div>`).join("");
+}
+function _aiShowError(){
+  const txt=document.getElementById("aiReasonText");
+  const altsList=document.getElementById("aiAltsList");
+  if(txt)txt.innerHTML='<div class="err-state"><span class="err-state-msg">⚠️ AI 분석을 불러오지 못했어요</span><button class="err-retry-btn" onclick="loadAiReason()">↻ 재시도</button></div>';
+  if(altsList)altsList.innerHTML='<div class="err-state"><span class="err-state-msg">⚠️ 다른 추천을 불러오지 못했어요</span><button class="err-retry-btn" onclick="loadAiReason()">↻ 재시도</button></div>';
+}
+async function loadAiReason(){
+  if(!curMenu)return;
+  // 호출 시 항상 스켈레톤 먼저 (재시도 시에도)
+  _aiShowSkeleton();
   try{
     const r=await fetch("/api/recommend",{
       method:"POST",
@@ -2258,10 +2353,10 @@ async function loadAiReason(){
     });
     const j=await r.json();
     if(!r.ok||!j.data)throw new Error(j.error||"실패");
-    txt.classList.remove("loading");
-    txt.textContent=j.data.primary?.reason||"이 메뉴가 사용자 컨텍스트에 잘 맞습니다.";
+    document.getElementById("aiReasonText").textContent=j.data.primary?.reason||"이 메뉴가 사용자 컨텍스트에 잘 맞습니다.";
     const alts=Array.isArray(j.data.alternatives)?j.data.alternatives:[];
-    if(alts.length&&altsSec&&altsList){
+    const altsList=document.getElementById("aiAltsList");
+    if(alts.length&&altsList){
       altsList.innerHTML=alts.map(a=>`
         <div class="ai-alt-card" data-name="${_escAt(a.name)}" onclick="quickPickAlt(this.dataset.name)" style="cursor:pointer;" title="이 메뉴로 바로 추천받기">
           <div class="ai-alt-emoji">${_escAt(a.emoji||"🍽️")}</div>
@@ -2271,19 +2366,15 @@ async function loadAiReason(){
           </div>
           <div style="color:var(--purple);font-size:18px;font-weight:800;flex-shrink:0;">→</div>
         </div>`).join("");
-      altsSec.style.display="block";
     }
     if(typeof _ga==="function")_ga("ai_reason_load",{menu:curMenu.n});
   }catch(e){
-    if(card)card.style.display="none";
-    if(altsSec)altsSec.style.display="none";
+    _aiShowError();
   }
 }
 function _resetAiReason(){
-  const c=document.getElementById("aiReasonCard");
-  const a=document.getElementById("aiAltsSection");
-  if(c)c.style.display="none";
-  if(a)a.style.display="none";
+  // pickMenu 호출 직후 — 스켈레톤 즉시 표시 (이전 결과 잔영 방지)
+  _aiShowSkeleton();
 }
 function quickPickAlt(name){
   if(!name)return;
@@ -2352,9 +2443,7 @@ function getPool(){
    ============================================================ */
 function pickMenu(){
   snd("pick");
-  _resetNutrition();
-  _resetFoodMatch();
-  _resetAiReason();
+  // reset 및 AI 호출은 showResult로 일원화 (directPick·quickPickAlt 경로도 동일하게 적용)
   const btn=document.getElementById("pickBtn"),icon=document.getElementById("bicon"),btnTxt=document.getElementById("btnTxt");
   btn.classList.add("spin","slot");icon.textContent="🌀";
   // 슬롯머신 효과: 700ms 동안 메뉴 이름 cycling
@@ -2378,8 +2467,7 @@ function pickMenu(){
     const top=sorted[0],next=sorted.slice(1,4);
     used.push(top.n);localStorage.setItem("fp6_used",JSON.stringify(used));
     showResult(top,next);snd("success");
-    // 결과 표시 후 AI 추천 이유 lazy-load (지연 호출로 메인 UI 우선 렌더)
-    setTimeout(loadAiReason, 200);
+    // (AI 추천 이유 호출은 showResult가 자체적으로 200ms 지연 후 실행)
   },700);
 }
 function reroll(){pickMenu();}
@@ -2403,6 +2491,10 @@ function directPick(){
    ============================================================ */
 function showResult(menu,nextMenus){
   curMenu=menu;
+  // 새 결과 표시 — AI/영양/궁합 모두 reset (이전 결과 잔영 방지). 모든 호출 경로 공통.
+  _resetAiReason();
+  _resetNutrition();
+  _resetFoodMatch();
   // 이미지
   const img=document.getElementById("foodImg"),wrap=document.getElementById("imgWrap");
   const prev=wrap.querySelector(".fb-e");if(prev)prev.remove();
@@ -2447,6 +2539,9 @@ function showResult(menu,nextMenus){
   const rc=document.getElementById("resultCard");
   rc.classList.remove("show");void rc.offsetWidth;rc.classList.add("show");
   addHist(menu);updateProg();
+  // AI 추천 이유 lazy-load (200ms 지연 — 메인 UI 우선 렌더)
+  // 호출 순서: recommend 먼저 트리거. nutrition·food-match는 사용자가 명시적으로 누를 때만.
+  setTimeout(loadAiReason, 200);
 
   // GA4: 메뉴 추천 이벤트 전송
   _ga("menu_recommend", {
