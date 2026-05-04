@@ -8,10 +8,23 @@ function _fruitUrl(q) {
   return `https://www.coupang.com/np/search?q=${encodeURIComponent(q)}&channel=user&partner=${_cfg.p}&subId=${_cfg.s}_fruit`;
 }
 
-/* ── 과일 카드 클릭 카운팅 ─────────────────────── */
-function _trackFruitClick() {
+/* ── 과일 카드 클릭 카운팅 (서버 + localStorage) ─── */
+function _trackFruitClick(fruitName) {
   const cc = parseInt(localStorage.getItem("fp6_click_coupang") || "0") + 1;
   localStorage.setItem("fp6_click_coupang", String(cc));
+  try {
+    const payload = JSON.stringify({ type: 'coupang', menu: fruitName || '' });
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon('/api/log-click', new Blob([payload], { type: 'application/json' }));
+    } else {
+      fetch('/api/log-click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload,
+        keepalive: true
+      }).catch(() => {});
+    }
+  } catch(e) {}
 }
 
 /* ── 로딩 표시 ─────────────────────────────────── */
@@ -28,78 +41,84 @@ function _showFruitLoading() {
     </div>`;
 }
 
-/* ── 과일 카드 HTML 생성 ────────────────────────── */
+/* ── 과일 카드 HTML 생성 (XSS 차단: createElement + textContent) ── */
 function _renderFruitCard(menuName, data) {
   const wrap = document.getElementById("fruitCardWrap");
   if (!wrap) return;
 
-  const fruitsHTML = data.fruits.map((f, i) => `
-    <a href="${_fruitUrl(f.q || FRUIT_SEARCH[f.name] || f.name + ' 신선')}"
-       target="_blank"
-       onclick="_trackFruitClick()"
-       style="display:flex;align-items:center;gap:12px;padding:12px 14px;
-              background:var(--card2);border-radius:12px;text-decoration:none;
-              border:1px solid rgba(255,255,255,.08);transition:all .18s;
-              cursor:pointer;"
-       onmouseover="this.style.borderColor='rgba(137,233,0,.4)'"
-       onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
-      <span style="font-size:28px;flex-shrink:0;">${f.emoji}</span>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;">${f.name}</div>
-        <div style="font-size:11px;color:#89E900;line-height:1.6;letter-spacing:-.2px;">${f.reason}</div>
-      </div>
-      <div style="flex-shrink:0;font-size:11px;font-weight:700;
-                  color:#89E900;background:rgba(137,233,0,.1);
-                  padding:4px 10px;border-radius:50px;white-space:nowrap;">
-        🛒 보러가기
-      </div>
-    </a>`).join("");
-
-  const avoidHTML = data.avoid && data.avoid !== "없음" ? `
-    <div style="margin-top:12px;padding:10px 14px;background:rgba(232,0,61,.08);
-                border:1px solid rgba(232,0,61,.2);border-radius:10px;
-                font-size:12px;color:rgba(255,100,100,.9);">
-      ⚠️ <strong>피해야 할 과일:</strong> ${data.avoid}
-    </div>` : "";
-
+  // 정적 골격만 innerHTML (사용자/AI 데이터 없음)
   wrap.innerHTML = `
     <div style="background:var(--card);border-radius:16px;padding:16px;
                 border:1px solid rgba(137,233,0,.2);
                 box-shadow:0 4px 20px rgba(137,233,0,.08);">
-
-      <!-- 헤더 -->
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
         <span style="font-size:20px;">🍎</span>
         <div>
-          <div style="font-size:13px;font-weight:800;color:#89E900;letter-spacing:-.3px;">
-            ${menuName}과 궁합 과일
-          </div>
-          <div style="font-size:11px;color:var(--text2);margin-top:1px;">
-            영양 시너지 · 소화 촉진 · 건강 보완
-          </div>
+          <div data-slot="title" style="font-size:13px;font-weight:800;color:#1A237E;letter-spacing:-.3px;"></div>
+          <div style="font-size:11px;color:var(--text2);margin-top:1px;">영양 시너지 · 소화 촉진 · 건강 보완</div>
         </div>
       </div>
-
-      <!-- 리스크 -->
       <div style="padding:8px 12px;background:rgba(255,209,102,.06);
                   border:1px solid rgba(255,209,102,.15);border-radius:10px;
                   font-size:11px;color:#9A7A10;margin-bottom:12px;line-height:1.6;">
-        ⚡ <strong>이 음식의 주의점:</strong> ${data.risk}
+        ⚡ <strong>이 음식의 주의점:</strong> <span data-slot="risk"></span>
       </div>
-
-      <!-- 궁합 과일 목록 -->
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        ${fruitsHTML}
+      <div data-slot="fruits" style="display:flex;flex-direction:column;gap:8px;"></div>
+      <div data-slot="avoid-wrap" style="display:none;margin-top:12px;padding:10px 14px;
+                  background:rgba(232,0,61,.08);border:1px solid rgba(232,0,61,.2);
+                  border-radius:10px;font-size:12px;color:rgba(255,100,100,.9);">
+        ⚠️ <strong>피해야 할 과일:</strong> <span data-slot="avoid"></span>
       </div>
-
-      ${avoidHTML}
-
-      <!-- 하단 -->
       <div style="margin-top:12px;text-align:center;font-size:10px;color:var(--text2);
                   padding-top:10px;border-top:1px solid rgba(255,255,255,.06);">
         🛒 쿠팡 파트너스 링크 · 클릭 시 수수료 발생 가능
       </div>
     </div>`;
+
+  // 사용자/AI 데이터는 textContent로 안전 주입
+  wrap.querySelector('[data-slot="title"]').textContent = (menuName || '') + '과 궁합 과일';
+  wrap.querySelector('[data-slot="risk"]').textContent = data.risk || '';
+
+  // 과일 카드 리스트
+  const fruitsContainer = wrap.querySelector('[data-slot="fruits"]');
+  data.fruits.forEach(f => {
+    const a = document.createElement('a');
+    a.href = _fruitUrl(f.q || (typeof FRUIT_SEARCH !== 'undefined' && FRUIT_SEARCH[f.name]) || (f.name + ' 신선'));
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card2);border-radius:12px;text-decoration:none;border:1px solid rgba(255,255,255,.08);transition:all .18s;cursor:pointer;';
+    a.addEventListener('click', function() { _trackFruitClick(f.name); });
+
+    const emojiSpan = document.createElement('span');
+    emojiSpan.style.cssText = 'font-size:28px;flex-shrink:0;';
+    emojiSpan.textContent = f.emoji || '';
+
+    const infoDiv = document.createElement('div');
+    infoDiv.style.cssText = 'flex:1;min-width:0;';
+    const nameDiv = document.createElement('div');
+    nameDiv.style.cssText = 'font-size:15px;font-weight:800;color:#1A237E;margin-bottom:4px;';
+    nameDiv.textContent = f.name || '';
+    const reasonDiv = document.createElement('div');
+    reasonDiv.style.cssText = 'font-size:12px;font-weight:700;color:#1A237E;line-height:1.6;letter-spacing:-.2px;';
+    reasonDiv.textContent = f.reason || '';
+    infoDiv.appendChild(nameDiv);
+    infoDiv.appendChild(reasonDiv);
+
+    const cta = document.createElement('div');
+    cta.style.cssText = 'flex-shrink:0;font-size:11.5px;font-weight:800;color:#1A237E;background:rgba(26,35,126,.1);padding:5px 11px;border-radius:50px;white-space:nowrap;';
+    cta.textContent = '🛒 보러가기';
+
+    a.appendChild(emojiSpan);
+    a.appendChild(infoDiv);
+    a.appendChild(cta);
+    fruitsContainer.appendChild(a);
+  });
+
+  // 피해야 할 과일
+  if (data.avoid && data.avoid !== '없음') {
+    wrap.querySelector('[data-slot="avoid-wrap"]').style.display = 'block';
+    wrap.querySelector('[data-slot="avoid"]').textContent = data.avoid;
+  }
 }
 
 /* ── AI API 호출 (DB 미등록 메뉴) ───────────────── */
