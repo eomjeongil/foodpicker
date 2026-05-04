@@ -875,7 +875,7 @@ async function _logClick(type, menu) {
   <h1>오늘은 뭐 먹을까?</h1>
   <p class="hero-sub">성별·연령·날씨·계절·시간대 맞춤 AI 메뉴 추천</p>
   <div class="badge-row">
-    <span class="badge b-gold">🗂️ 550개 메뉴 DB</span>
+    <span class="badge b-gold" id="menuCountBadge">🗂️ 1073개 메뉴 DB</span>
     <span class="badge b-mint">📡 날씨·계절 연동</span>
     <span class="badge b-green">🛍️ 연관상품 직링크</span>
   </div>
@@ -1514,6 +1514,9 @@ const _dbLoadPromise = fetch(DB_URL, { cache: 'force-cache' })
   .then(d => {
     DB = Array.isArray(d) ? d : [];
     _dbReady = true;
+    // 메뉴 카운트 배지 동적 업데이트 (DB 추가/감소에 자동 반영)
+    const badge = document.getElementById('menuCountBadge');
+    if (badge) badge.textContent = `🗂️ ${DB.length.toLocaleString()}개 메뉴 DB`;
     console.log('[DB] loaded', DB.length, 'menus from', DB_URL);
   })
   .catch(e => {
