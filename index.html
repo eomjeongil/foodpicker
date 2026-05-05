@@ -882,12 +882,6 @@ async function _logClick(type, menu) {
 </div>
 
 <div class="wrap">
-  <!-- 0순위 CTA: 즉시 추천 (재방문자용) -->
-  <button class="hero-cta" onclick="quickPick()">
-    <span class="hero-cta-emoji">🎲</span>
-    <span>오늘 뭐 먹지? 지금 바로!</span>
-  </button>
-
   <!-- 날씨 맥락 배너 (wxCode 기반 자동 카피) -->
   <div class="weather-banner" id="weatherBanner"></div>
 
@@ -1041,15 +1035,24 @@ async function _logClick(type, menu) {
         <div class="ai-reason-body" id="aiReasonText">분석 중...</div>
       </div>
 
+      <!-- 다시 선택하기 (ai-reason-card 바로 아래로 이동) -->
+      <div style="margin-bottom:12px;">
+        <button onclick="scrollToTop()" style="width:100%;padding:15px;border:1.5px solid #FFE3CC;border-radius:13px;background:#fff;color:#7A6E62;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 2px 8px rgba(255,107,53,.06);"
+          onmouseover="this.style.borderColor='#FF6B35';this.style.color='#FF6B35'"
+          onmouseout="this.style.borderColor='#FFE3CC';this.style.color='#7A6E62'">
+          ⬆️ 다시 선택하기
+        </button>
+      </div>
+
       <!-- 🛒 쿠팡 파트너스 — 결과카드 직하 배치 (수익 핵심 노출 위치) -->
       <div class="related-section" style="margin-bottom:14px;">
         <div class="related-title">🛒 밀키트 · 관련 상품 구매</div>
         <div class="related-grid" id="relatedGrid"></div>
       </div>
 
-      <!-- 영양정보 (lazy-load) -->
+      <!-- 영양정보 (lazy-load) — 칼로리·탄단지·good_for·avoid_for까지 -->
       <button class="nutri-btn" id="nutriBtn" onclick="loadNutrition()">
-        🥗 칼로리·영양정보 보기
+        🥗 영양정보 보기, 추천과 주의 보기
       </button>
       <div class="nutri-section" id="nutriSection">
         <div class="nutri-card">
@@ -1060,20 +1063,28 @@ async function _logClick(type, menu) {
           <div class="nutri-tags" id="nutriTags" style="margin-top:10px;"></div>
           <div class="nutri-note" id="nutriNote"></div>
           <div class="nutri-people" id="nutriPeople" style="display:none;"></div>
+        </div>
+      </div>
+
+      <!-- 이 음식 이야기 (story / insight 아코디언) -->
+      <button class="nutri-btn" id="storyBtn" onclick="loadStory()" style="margin-top:8px;">
+        📖 이 음식 이야기
+      </button>
+      <div class="nutri-section" id="storySection">
+        <div class="nutri-card">
           <div class="nutri-story" id="nutriStory" style="display:none;"></div>
           <div class="nutri-insight" id="nutriInsight" style="display:none;"></div>
         </div>
       </div>
 
-      <!-- 음식 궁합 분석 (collapsible — 기본 닫힘) -->
+      <!-- 음식 궁합 분석 (항상 노출) -->
       <div class="match-section">
-        <div class="match-head" onclick="toggleMatch()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:0;">
-          <span>🤝 이 음식과 다른 메뉴, 잘 맞을까?</span>
-          <span id="matchToggle" style="font-size:11px;color:#5A2DA8;font-weight:800;">펼치기 ▼</span>
+        <div class="match-head" style="display:flex;align-items:center;margin-bottom:0;">
+          <span>🤝 이 음식과 함께 먹으려는 음식의 궁합은?</span>
         </div>
-        <div id="matchBody" style="display:none;margin-top:11px;">
+        <div id="matchBody" style="display:block;margin-top:11px;">
         <div class="match-input-row">
-          <input class="match-input" id="matchInput" type="text" placeholder="비교할 다른 메뉴 입력 (예: 떡볶이)" onkeydown="if(event.key==='Enter')runFoodMatch()">
+          <input class="match-input" id="matchInput" type="text" placeholder="지금 함께 먹으려는 메뉴 입력 (예: 떡볶이)" onkeydown="if(event.key==='Enter')runFoodMatch()">
           <button class="match-go" id="matchGo" onclick="runFoodMatch()">분석</button>
         </div>
         <div class="match-result" id="matchResult">
@@ -1092,25 +1103,14 @@ async function _logClick(type, menu) {
         </div>
       </div>
 
-      <!-- 텐핑 다이어트 CPA — 아코디언 펼치기 (good_for/avoid_for AI 분석 표시) -->
-      <div class="cpa-card" id="cpaDiet" onclick="toggleCpaDiet()" style="cursor:pointer;">
-        <div class="cpa-icon">💪</div>
-        <div class="cpa-text">
-          <div class="cpa-title" id="cpaTitle">이 음식, 다이어트엔 어떻게?</div>
-          <div class="cpa-desc">탭하면 AI가 칼로리·다이어트 효과·주의점을 알려드려요</div>
-        </div>
-        <span class="cpa-tag">AD</span>
-        <div class="cpa-arrow" id="cpaDietArrow">▼</div>
+      <!-- 광고 슬롯 2 (이전: 다이어트 CPA 위치) -->
+      <div class="fp-ad-slot" id="fp-ad-slot-2" style="display:none; margin:8px 0;">
+        <a id="fp-ad-link-2" href="#" target="_blank">
+          <img id="fp-ad-img-2" src="" alt="광고" style="width:100%;border-radius:8px;display:block;">
+        </a>
       </div>
-      <div class="cpa-body" id="cpaDietBody"></div>
 
             <div class="main-actions">
-
-  <!-- 식재료 구매 (이전 ②) — 쿠팡 파트너스 grid는 result-body 최상단으로 이동 -->
-  <!-- 식재료 구매 -->
-  <button onclick="openIngredients()" style="width:100%;padding:14px;border:1.5px solid #F5E2A8;border-radius:13px;background:linear-gradient(135deg,#FFFAE6,#FFF4D2);color:#B47A0F;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(242,180,65,.18);">
-    🥬 이 레시피의 신선 식재료 구매
-  </button>
 
   <!-- ③ 궁합 과일 — 가독성 보강 + 펼치기 토글 표시 -->
   <button id="fruitMatchBtn" onclick="openFruitMatch()" style="width:100%;padding:15px;border:1.5px solid #B7E0C5;border-radius:13px;background:linear-gradient(135deg,#DDF1E1 0%,#D6F0EE 100%);color:#1A237E;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:all .18s;margin-bottom:0;box-shadow:0 4px 14px rgba(76,175,125,.18);">
@@ -1129,17 +1129,17 @@ async function _logClick(type, menu) {
     </button>
   </div>
 
-  <!-- 텐핑 쿠킹클래스 CPA — 아코디언 펼치기 -->
-  <div class="cpa-card" id="cpaCooking" onclick="toggleCpaCooking()" style="background:linear-gradient(135deg,#FFE5D6,#FFF4D2);border-color:#FFCFA8;cursor:pointer;">
-    <div class="cpa-icon">🍳</div>
-    <div class="cpa-text">
-      <div class="cpa-title" style="color:#8B4A0A;font-weight:900;">진짜 손맛은 셰프에게</div>
-      <div class="cpa-desc" style="color:#5A3A0A;font-weight:600;">탭하면 직접 만드는 법·레시피 영상까지</div>
-    </div>
-    <span class="cpa-tag">AD</span>
-    <div class="cpa-arrow" id="cpaCookingArrow" style="color:#8B4A0A;">▼</div>
+  <!-- 신선 식재료 구매 (네이버/유튜브 바로 아래로 이동) -->
+  <button onclick="openIngredients()" style="width:100%;padding:14px;border:1.5px solid #F5E2A8;border-radius:13px;background:linear-gradient(135deg,#FFFAE6,#FFF4D2);color:#B47A0F;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(242,180,65,.18);">
+    🥬 이 레시피의 신선 식재료 구매
+  </button>
+
+  <!-- 광고 슬롯 3 (이전: 쿠킹 CPA 위치) -->
+  <div class="fp-ad-slot" id="fp-ad-slot-3" style="display:none; margin:8px 0;">
+    <a id="fp-ad-link-3" href="#" target="_blank">
+      <img id="fp-ad-img-3" src="" alt="광고" style="width:100%;border-radius:8px;display:block;">
+    </a>
   </div>
-  <div class="cpa-body" id="cpaCookingBody"></div>
 
   <!-- 🎯 AI 대안 메뉴 (next-card 대체, 클릭 시 directPick) -->
   <div class="ai-alts-section" id="aiAltsSection" style="display:none;">
@@ -1171,15 +1171,6 @@ async function _logClick(type, menu) {
       </div>
     </div>
   </div>
-  <!-- 다시 선택하기 -->
-  <div style="margin-bottom:12px;">
-    <button onclick="scrollToTop()" style="width:100%;padding:15px;border:1.5px solid #FFE3CC;border-radius:13px;background:#fff;color:#7A6E62;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 2px 8px rgba(255,107,53,.06);"
-      onmouseover="this.style.borderColor='#FF6B35';this.style.color='#FF6B35'"
-      onmouseout="this.style.borderColor='#FFE3CC';this.style.color='#7A6E62'">
-      ⬆️ 다시 선택하기
-    </button>
-  </div>
-
   <!-- ⑦+ 식습관 리포트 트리거 -->
   <button class="report-trigger" onclick="openReport()">
     📊 내 식습관 리포트 보기
@@ -1575,14 +1566,15 @@ function quickPick(){
   if(typeof _ga==="function")_ga("quick_pick",{source:"hero_cta"});
 }
 
-/* 영양정보 lazy-load + 토글 */
+/* 영양정보 lazy-load + 토글 (story/insight 캐시 보관) */
+let _nutriCache=null;
 async function loadNutrition(){
   if(!curMenu)return;
   const btn=document.getElementById("nutriBtn");
   const sec=document.getElementById("nutriSection");
   if(sec.classList.contains("show")){
     sec.classList.remove("show");
-    btn.textContent="🥗 칼로리·영양정보 보기";
+    btn.textContent="🥗 영양정보 보기, 추천과 주의 보기";
     return;
   }
   btn.classList.add("loading");
@@ -1596,6 +1588,7 @@ async function loadNutrition(){
     const j=await r.json();
     if(!r.ok||!j.data)throw new Error(j.error||"실패");
     const d=j.data;
+    _nutriCache=d;
     document.getElementById("nutriTitle").textContent=`${curMenu.n} 영양 분석`;
     document.getElementById("nutriGrid").innerHTML=`
       <div class="nutri-cell"><div class="nk">칼로리</div><div class="nv">${d.kcal??"-"} kcal</div></div>
@@ -1641,16 +1634,12 @@ async function loadNutrition(){
         </div>`;
       peopleEl.style.display="grid";
     }else{peopleEl.style.display="none";}
-    const storyEl=document.getElementById("nutriStory");
-    const insEl=document.getElementById("nutriInsight");
-    if(d.story){storyEl.innerHTML=`<strong>이야기.</strong> ${d.story}`;storyEl.style.display="block";}else{storyEl.style.display="none";}
-    if(d.insight){insEl.innerHTML=`<strong>몰랐던 사실!</strong> ${d.insight}`;insEl.style.display="block";}else{insEl.style.display="none";}
     sec.classList.add("show");
     btn.textContent="🔼 영양정보 닫기";
     if(typeof _ga==="function")_ga("nutrition_view",{menu:curMenu.n,kcal:d.kcal});
   }catch(e){
     btn.innerHTML='⚠️ 영양정보를 불러오지 못했어요. <span style="text-decoration:underline;">다시 누르기</span>';
-    setTimeout(()=>{btn.textContent="🥗 칼로리·영양정보 보기";},2800);
+    setTimeout(()=>{btn.textContent="🥗 영양정보 보기, 추천과 주의 보기";},2800);
   }finally{
     btn.classList.remove("loading");
   }
@@ -1659,7 +1648,49 @@ function _resetNutrition(){
   const sec=document.getElementById("nutriSection");
   const btn=document.getElementById("nutriBtn");
   if(sec)sec.classList.remove("show");
-  if(btn){btn.textContent="🥗 칼로리·영양정보 보기";btn.classList.remove("loading");}
+  if(btn){btn.textContent="🥗 영양정보 보기, 추천과 주의 보기";btn.classList.remove("loading");}
+  _nutriCache=null;
+  const stSec=document.getElementById("storySection");
+  const stBtn=document.getElementById("storyBtn");
+  if(stSec)stSec.classList.remove("show");
+  if(stBtn){stBtn.textContent="📖 이 음식 이야기";stBtn.classList.remove("loading");}
+}
+
+/* 이 음식 이야기 — story / insight 별도 아코디언 */
+async function loadStory(){
+  if(!curMenu)return;
+  const btn=document.getElementById("storyBtn");
+  const sec=document.getElementById("storySection");
+  if(sec.classList.contains("show")){
+    sec.classList.remove("show");
+    btn.textContent="📖 이 음식 이야기";
+    return;
+  }
+  // 영양정보 응답에 story/insight가 같이 옴 → 캐시 활용, 없으면 가져오기
+  let d=_nutriCache;
+  if(!d){
+    btn.classList.add("loading");
+    btn.innerHTML='<span class="spinner"></span>이야기 불러오는 중...';
+    try{
+      const r=await fetch("/api/nutrition",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({menuName:curMenu.n})});
+      const j=await r.json();
+      if(!r.ok||!j.data)throw new Error(j.error||"실패");
+      d=j.data;_nutriCache=d;
+    }catch(e){
+      btn.innerHTML='⚠️ 이야기를 불러오지 못했어요. <span style="text-decoration:underline;">다시 누르기</span>';
+      setTimeout(()=>{btn.textContent="📖 이 음식 이야기";},2800);
+      btn.classList.remove("loading");
+      return;
+    }
+    btn.classList.remove("loading");
+  }
+  const storyEl=document.getElementById("nutriStory");
+  const insEl=document.getElementById("nutriInsight");
+  if(d.story){storyEl.innerHTML=`<strong>이야기.</strong> ${d.story}`;storyEl.style.display="block";}else{storyEl.style.display="none";}
+  if(d.insight){insEl.innerHTML=`<strong>몰랐던 사실!</strong> ${d.insight}`;insEl.style.display="block";}else{insEl.style.display="none";}
+  sec.classList.add("show");
+  btn.textContent="🔼 이야기 닫기";
+  if(typeof _ga==="function")_ga("story_view",{menu:curMenu.n});
 }
 
 /* 음식 궁합 분석 */
@@ -1717,24 +1748,7 @@ function _resetFoodMatch(){
   if(r)r.classList.remove("show");
   const inp=document.getElementById("matchInput");
   if(inp&&!inp.value&&typeof lastMeal==="string"&&lastMeal)inp.value=lastMeal;
-  // 매번 새 결과 시 궁합 섹션 접음
-  const body=document.getElementById("matchBody");
-  const tog=document.getElementById("matchToggle");
-  if(body)body.style.display="none";
-  if(tog)tog.innerHTML="펼치기 ▼";
-}
-function toggleMatch(){
-  const body=document.getElementById("matchBody");
-  const tog=document.getElementById("matchToggle");
-  if(!body||!tog)return;
-  if(body.style.display==="none"||!body.style.display){
-    body.style.display="block";
-    tog.innerHTML="접기 ▲";
-    snd("click");
-  }else{
-    body.style.display="none";
-    tog.innerHTML="펼치기 ▼";
-  }
+  // 음식 궁합 섹션은 항상 노출 — 입력 결과만 초기화
 }
 
 /* SNS 공유 - Web Share API + Twitter */
@@ -2193,76 +2207,7 @@ function openYoutube(){
   snd("click");
 }
 
-/* ── 다이어트 CPA 아코디언 — 펼치면 nutrition AI 분석 표시 ── */
-async function toggleCpaDiet(){
-  const card=document.getElementById("cpaDiet");
-  const body=document.getElementById("cpaDietBody");
-  const arrow=document.getElementById("cpaDietArrow");
-  if(!body||!curMenu)return;
-  if(body.classList.contains("show")){
-    body.classList.remove("show");
-    if(card)card.classList.remove("open");
-    if(arrow)arrow.textContent="▼";
-    return;
-  }
-  body.classList.add("show");
-  if(card)card.classList.add("open");
-  if(arrow)arrow.textContent="▲";
-  body.innerHTML='<div style="text-align:center;padding:14px;color:var(--text2);"><span class="spinner"></span>다이어트 분석 중...</div>';
-  if(typeof _ga==="function")_ga("cpa_expand",{type:"diet",menu:curMenu.n});
-  try{
-    const r=await fetch("/api/nutrition",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({menuName:curMenu.n})});
-    const j=await r.json();
-    if(!r.ok||!j.data)throw new Error(j.error||"실패");
-    const d=j.data;
-    body.innerHTML=`
-      <div class="cpa-body-section">
-        <div class="cpa-body-title">📊 칼로리·영양</div>
-        <div>${d.kcal||"-"} kcal · 단백질 ${d.protein||"-"}g · 탄수 ${d.carb||"-"}g · 지방 ${d.fat||"-"}g</div>
-      </div>
-      <div class="cpa-body-section">
-        <div class="cpa-body-title">👍 다이어트엔 이렇게 좋아요</div>
-        <div>${_escAt(d.good_for||"균형 잡힌 식사로 적당히 즐기기 좋아요.")}</div>
-      </div>
-      <div class="cpa-body-section">
-        <div class="cpa-body-title">⚠️ 주의할 점</div>
-        <div>${_escAt(d.avoid_for||"특별한 제한 없음")}</div>
-      </div>
-      ${_fpAdInlineHtml(2)}
-    `;
-  }catch(e){
-    body.innerHTML='<div class="err-state"><span class="err-state-msg">⚠️ 다이어트 분석을 불러오지 못했어요</span><button class="err-retry-btn" onclick="toggleCpaDiet();toggleCpaDiet();">↻ 재시도</button></div>';
-  }
-}
-
-/* ── 쿠킹 CPA 아코디언 — 펼치면 직접 만들기 안내 + 유튜브 + 텐핑 CPA ── */
-function toggleCpaCooking(){
-  const card=document.getElementById("cpaCooking");
-  const body=document.getElementById("cpaCookingBody");
-  const arrow=document.getElementById("cpaCookingArrow");
-  if(!body||!curMenu)return;
-  if(body.classList.contains("show")){
-    body.classList.remove("show");
-    if(card)card.classList.remove("open");
-    if(arrow)arrow.textContent="▼";
-    return;
-  }
-  body.classList.add("show");
-  if(card)card.classList.add("open");
-  if(arrow)arrow.textContent="▲";
-  if(typeof _ga==="function")_ga("cpa_expand",{type:"cooking",menu:curMenu.n});
-  body.innerHTML=`
-    <div class="cpa-body-section">
-      <div class="cpa-body-title">🍳 ${_escAt(curMenu.n)} 직접 만들기</div>
-      <div>${_escAt(curMenu.t||"전문가의 손맛이 담긴 레시피로 차근차근 따라 해보세요. 처음이라도 괜찮아요!")}</div>
-    </div>
-    <div class="cpa-body-section">
-      <div class="cpa-body-title">🎬 유튜브 레시피 영상</div>
-      <button onclick="event.stopPropagation();openYoutube();" style="display:block;width:100%;padding:11px;border:1.5px solid #F5C8C8;border-radius:10px;background:#FFF4F4;color:#C2392C;font-weight:800;font-size:13px;cursor:pointer;">▶ 유튜브에서 ${_escAt(curMenu.n)} 영상 보기</button>
-    </div>
-    ${_fpAdInlineHtml(3)}
-  `;
-}
+/* (다이어트/쿠킹 CPA 아코디언 제거 — fp-ad-slot-2/3 으로 대체) */
 
 /* ── foodpicker.kr 광고 배너 슬롯 (3종) ── */
 let _fpAdCache = null;
@@ -2272,7 +2217,9 @@ async function loadFpAdSlots(){
     if (!r.ok) return;
     const j = await r.json();
     _fpAdCache = Array.isArray(j.banners) ? j.banners : [];
-    _fpRenderStaticSlot(1);  // 슬롯 1만 정적 (결과카드 최상단). 2/3은 아코디언 펼칠 때 인라인 렌더
+    _fpRenderStaticSlot(1);  // 결과카드 최상단
+    _fpRenderStaticSlot(2);  // 음식궁합 아래 (이전 다이어트 CPA 자리)
+    _fpRenderStaticSlot(3);  // 신선 식재료 아래 (이전 쿠킹 CPA 자리)
   } catch(e){
     console.warn('[fp-ad] load failed:', e && e.message);
   }
@@ -2291,17 +2238,7 @@ function _fpRenderStaticSlot(slot){
     wrap.style.display = 'none';
   }
 }
-function _fpAdInlineHtml(slot){
-  // 아코디언 본문 안에 인라인 삽입용 HTML 반환 (캐시 없거나 빈 슬롯이면 빈 문자열)
-  if (!_fpAdCache) return '';
-  const b = _fpAdCache.find(x => Number(x.slot) === slot);
-  if (!b || !b.img_url) return '';
-  const url = _escAt(b.link_url || '#');
-  const img = _escAt(b.img_url);
-  const alt = _escAt(b.title || '광고');
-  return `<a href="${url}" target="_blank" style="display:block;margin-top:14px;border-radius:8px;overflow:hidden;"><img src="${img}" alt="${alt}" style="width:100%;border-radius:8px;display:block;"></a>`;
-}
-// 페이지 로드 시 1회 호출 (캐시 + 슬롯 1 즉시 렌더)
+// 페이지 로드 시 1회 호출 (캐시 + 슬롯 1/2/3 정적 렌더)
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', loadFpAdSlots);
 } else {
