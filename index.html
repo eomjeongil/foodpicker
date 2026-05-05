@@ -295,6 +295,22 @@ body{
 .rt-per{background:#FFF4D2;color:#B47A0F;}
 .rt-time{background:#D6F0EE;color:#1F8C82;}
 .rt-wx{background:#DCE8FF;color:#2D5BBF;}
+
+/* ── 건강 배지 (결과 카드 상단 태그 영역) ── */
+.health-badge{
+  font-size:11.5px;padding:4px 11px;border-radius:50px;
+  font-weight:800;letter-spacing:.2px;
+  display:inline-flex;align-items:center;gap:3px;
+  border:1px solid transparent;
+}
+.hb-bp{background:#FFE0DA;color:#C2392C;border-color:#F5C8C8;}
+.hb-glucose{background:#FFE5D6;color:#B45F0F;border-color:#FFCFA8;}
+.hb-chol{background:#FFF4D2;color:#8A6612;border-color:#F5E2A8;}
+.hb-weight{background:#DDF1E1;color:#2E7E47;border-color:#B7E0C5;}
+.hb-muscle{background:#DCE8FF;color:#2D5BBF;border-color:#B7CCEB;}
+.hb-balanced{background:#F4E6FF;color:#5A2DA8;border-color:#E1D4F5;}
+.hb-allergy{background:#F0E6E0;color:#7A4A2C;border-color:#D9C7B8;}
+.hb-bmi{background:#D6F0EE;color:#1F8C82;border-color:#B7E5E2;}
 .tip-box{
   background:linear-gradient(135deg,#FFF4D2,#FFFAE6);
   border:1px solid #F5E2A8;border-radius:var(--rsm);
@@ -446,6 +462,76 @@ body{
 .ctog.cs-occ.on{background:#FFE0EC;border-color:#E84B8E;color:#C8336E;}
 .ctog.cs-budget.on{background:#DDF1E1;border-color:var(--green);color:#2E7E47;}
 
+/* ── 건강정보 입력 (선택) — 접이식 ── */
+.health-card{padding:0;overflow:hidden;}
+.health-toggle{
+  width:100%;display:flex;align-items:center;justify-content:space-between;
+  padding:16px 18px;background:linear-gradient(135deg,#FFFAF0,#FFF6E8);
+  border:none;cursor:pointer;font-family:inherit;color:var(--text);
+  transition:background .18s;
+}
+.health-toggle:hover{background:linear-gradient(135deg,#FFF6E8,#FFEFD9);}
+.health-toggle-left{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:800;color:var(--pr);letter-spacing:.3px;}
+.health-toggle-arrow{font-size:13px;color:var(--text2);font-weight:800;transition:transform .25s;}
+.health-card.open .health-toggle-arrow{transform:rotate(180deg);}
+.health-body{display:none;padding:14px 18px 18px;border-top:1px solid var(--border);}
+.health-card.open .health-body{display:block;animation:slideDown .35s ease;}
+.health-notice{
+  background:linear-gradient(135deg,#FFF7EE,#FFFAE6);
+  border:1px solid #F5E2A8;border-radius:var(--rxs);
+  padding:10px 12px;margin-bottom:14px;
+  font-size:11.5px;color:#7A5A14;line-height:1.55;font-weight:600;
+}
+.health-notice strong{color:#B47A0F;font-weight:800;}
+.h-row{margin-bottom:13px;}
+.h-row:last-child{margin-bottom:0;}
+.h-label{
+  display:block;font-size:11.5px;font-weight:800;color:var(--text2);
+  letter-spacing:.4px;margin-bottom:7px;
+}
+.h-num-row{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap;}
+.h-num-input{
+  flex:1;min-width:90px;padding:10px 12px;
+  border:1.5px solid var(--border);border-radius:var(--rsm);
+  background:#fff;color:var(--text);font-size:14px;outline:none;
+  font-family:inherit;transition:border-color .18s,box-shadow .18s;
+}
+.h-num-input::placeholder{color:var(--text3);font-size:13px;}
+.h-num-input:focus{border-color:var(--pr);box-shadow:0 0 0 3px var(--pg);}
+.h-bmi-display{
+  flex:0 0 auto;min-width:120px;padding:8px 12px;
+  border:1.5px dashed var(--border);border-radius:var(--rsm);
+  background:#fff;display:flex;align-items:center;gap:7px;
+  font-size:12.5px;color:var(--text2);font-weight:700;
+}
+.h-bmi-num{font-family:'Black Han Sans',sans-serif;color:var(--text);font-size:18px;letter-spacing:-.3px;}
+.h-bmi-badge{font-size:10.5px;padding:3px 9px;border-radius:50px;font-weight:800;letter-spacing:.3px;}
+.h-bmi-low{background:#DCE8FF;color:#2D5BBF;}
+.h-bmi-normal{background:#DDF1E1;color:#2E7E47;}
+.h-bmi-over{background:#FFF4D2;color:#B47A0F;}
+.h-bmi-obese{background:#FFE0DA;color:#C2392C;}
+.h-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.h-chip{
+  padding:7px 12px;border-radius:50px;
+  border:1.5px solid var(--border);background:#fff;
+  font-size:11.5px;font-weight:700;cursor:pointer;color:var(--text2);
+  transition:all .15s;user-select:none;
+}
+.h-chip:hover{border-color:var(--pr);color:var(--pr);}
+/* 단일선택 — 카테고리별 활성 컬러 */
+.h-chip.bp.on{background:#FFE0DA;border-color:var(--red);color:#C2392C;}
+.h-chip.glu.on{background:#FFE5D6;border-color:var(--orange);color:#B47A0F;}
+.h-chip.chol.on{background:#FFF4D2;border-color:var(--gold);color:#B47A0F;}
+.h-chip.goal.on{background:#DDF1E1;border-color:var(--green);color:#2E7E47;}
+/* 다중선택 — 가족력 / 알레르기 */
+.h-chip.fam.on{background:#FCE2E8;border-color:#E63988;color:#A8235E;}
+.h-chip.alg.on{background:#F4E6FF;border-color:var(--purple);color:#5A2DA8;}
+.h-clear{
+  margin-top:4px;font-size:11px;color:var(--text3);
+  background:none;border:none;cursor:pointer;text-decoration:underline;
+}
+.h-clear:hover{color:var(--pr);}
+
 /* ── 영양정보 ── */
 .nutri-btn{
   width:100%;padding:13px;border:1.5px solid #B7E5E2;border-radius:var(--rsm);
@@ -546,6 +632,54 @@ body{
 }
 .nutri-insight::before{content:'✨ ';font-size:14px;}
 .nutri-insight strong{color:var(--pr);font-weight:800;}
+
+/* ── 이 음식 이야기 6항목 카드 ── */
+.story-grid{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.story-card{
+  border:1px solid var(--border);border-radius:var(--rxs);
+  padding:11px 13px;font-size:12.5px;line-height:1.55;
+  background:#fff;color:var(--text);
+}
+.story-card.empty{display:none;}
+.story-card-head{
+  font-size:11.5px;font-weight:800;letter-spacing:.3px;
+  margin-bottom:5px;display:flex;align-items:center;gap:6px;
+}
+.sc-origin   {background:linear-gradient(135deg,#FFF7EE,#FFFAF0);border-color:#FFE3CC;}
+.sc-origin   .story-card-head{color:#B47A0F;}
+.sc-regional {background:linear-gradient(135deg,#F4FBF6,#E8F4ED);border-color:#B7E0C5;}
+.sc-regional .story-card-head{color:#2E7E47;}
+.sc-season   {background:linear-gradient(135deg,#FCF5FF,#F8F4FC);border-color:#E1D4F5;}
+.sc-season   .story-card-head{color:#5A2DA8;}
+.sc-funfact  {background:linear-gradient(135deg,#FFF4D2,#FFFAE6);border-color:#F5E2A8;}
+.sc-funfact  .story-card-head{color:var(--pr);}
+.sc-world    {background:linear-gradient(135deg,#DCE8FF,#F0F6FF);border-color:#B7CCEB;}
+.sc-world    .story-card-head{color:#2D5BBF;}
+.sc-trend    {background:linear-gradient(135deg,#FCE2E8,#FFF0F5);border-color:#F5C8D5;}
+.sc-trend    .story-card-head{color:#C8336E;}
+
+/* ── 칼로리 운동 소모 카드 ── */
+.nutri-exercise{
+  margin-top:12px;padding-top:12px;border-top:1px dashed var(--border);
+}
+.nutri-exercise-head{
+  font-size:11.5px;font-weight:800;color:var(--text);
+  letter-spacing:.3px;margin-bottom:8px;display:flex;align-items:center;gap:6px;
+}
+.nutri-ex-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+@media (max-width:380px){.nutri-ex-list{grid-template-columns:1fr;}}
+.nutri-ex-item{
+  background:#fff;border:1px solid #B7E5E2;border-radius:var(--rxs);
+  padding:10px 11px;display:flex;align-items:center;gap:10px;
+  box-shadow:var(--shadow-sm);
+}
+.nutri-ex-emoji{font-size:24px;line-height:1;flex-shrink:0;}
+.nutri-ex-text{flex:1;min-width:0;}
+.nutri-ex-name{font-size:12px;font-weight:800;color:var(--text);}
+.nutri-ex-min{font-size:13px;font-weight:700;color:#1F8C82;margin-top:2px;font-family:'Black Han Sans',sans-serif;letter-spacing:-.2px;}
+.nutri-ex-foot{
+  font-size:10.5px;color:var(--text3);margin-top:7px;font-style:italic;
+}
 
 /* ── 음식 궁합 분석 ── */
 .match-section{
@@ -950,6 +1084,103 @@ async function _logClick(type, menu) {
     </div>
   </div>
 
+  <!-- ③½ 건강정보 (선택 · 접이식) -->
+  <div class="card health-card" id="healthCard">
+    <button type="button" class="health-toggle" onclick="toggleHealth()">
+      <span class="health-toggle-left">🩺 건강정보 입력 <span style="font-size:10.5px;font-weight:700;color:var(--text3);">(선택)</span></span>
+      <span class="health-toggle-arrow" id="healthToggleArrow">▼</span>
+    </button>
+    <div class="health-body">
+      <div class="health-notice">
+        <strong>🔒 입력 정보는 저장되지 않아요.</strong><br>
+        건강 정보를 넣으면 나에게 딱 맞는 메뉴를 추천해드려요. (선택사항)
+      </div>
+
+      <!-- 키 / 몸무게 / BMI -->
+      <div class="h-row">
+        <span class="h-label">📏 키 / 몸무게</span>
+        <div class="h-num-row">
+          <input class="h-num-input" id="hHeight" type="number" inputmode="decimal" min="100" max="230" step="0.1" placeholder="키 (cm)" oninput="onHealthInput()">
+          <input class="h-num-input" id="hWeight" type="number" inputmode="decimal" min="25" max="200" step="0.1" placeholder="몸무게 (kg)" oninput="onHealthInput()">
+        </div>
+        <div class="h-bmi-display" id="hBmiDisplay" style="margin-top:8px;display:none;">
+          <span>BMI</span>
+          <span class="h-bmi-num" id="hBmiNum">—</span>
+          <span class="h-bmi-badge" id="hBmiBadge">—</span>
+        </div>
+      </div>
+
+      <!-- 혈압 -->
+      <div class="h-row">
+        <span class="h-label">❤️ 혈압</span>
+        <div class="h-chips" id="hBpChips">
+          <div class="h-chip bp" data-v="정상" onclick="selHealthSingle(this,'bp')">정상</div>
+          <div class="h-chip bp" data-v="경계" onclick="selHealthSingle(this,'bp')">경계 (130–139)</div>
+          <div class="h-chip bp" data-v="고혈압" onclick="selHealthSingle(this,'bp')">고혈압 (140+)</div>
+        </div>
+      </div>
+
+      <!-- 혈당 / 당뇨 -->
+      <div class="h-row">
+        <span class="h-label">🩸 혈당 / 당뇨</span>
+        <div class="h-chips" id="hGluChips">
+          <div class="h-chip glu" data-v="정상" onclick="selHealthSingle(this,'glu')">정상</div>
+          <div class="h-chip glu" data-v="전단계" onclick="selHealthSingle(this,'glu')">전단계</div>
+          <div class="h-chip glu" data-v="당뇨" onclick="selHealthSingle(this,'glu')">당뇨</div>
+        </div>
+      </div>
+
+      <!-- 콜레스테롤 -->
+      <div class="h-row">
+        <span class="h-label">🥛 콜레스테롤</span>
+        <div class="h-chips" id="hCholChips">
+          <div class="h-chip chol" data-v="정상" onclick="selHealthSingle(this,'chol')">정상</div>
+          <div class="h-chip chol" data-v="경계" onclick="selHealthSingle(this,'chol')">경계</div>
+          <div class="h-chip chol" data-v="높음" onclick="selHealthSingle(this,'chol')">높음</div>
+        </div>
+      </div>
+
+      <!-- 가족력 (다중) -->
+      <div class="h-row">
+        <span class="h-label">👨‍👩‍👧 가족력 (중복 선택)</span>
+        <div class="h-chips" id="hFamChips">
+          <div class="h-chip fam" data-v="심혈관질환" onclick="selHealthMulti(this,'fam')">심혈관질환</div>
+          <div class="h-chip fam" data-v="당뇨" onclick="selHealthMulti(this,'fam')">당뇨</div>
+          <div class="h-chip fam" data-v="암" onclick="selHealthMulti(this,'fam')">암</div>
+          <div class="h-chip fam" data-v="고혈압" onclick="selHealthMulti(this,'fam')">고혈압</div>
+          <div class="h-chip fam" data-v="없음" onclick="selHealthMulti(this,'fam',true)">없음</div>
+        </div>
+      </div>
+
+      <!-- 알레르기 / 기피 (다중) -->
+      <div class="h-row">
+        <span class="h-label">🚫 알레르기 / 기피 식재료 (중복 선택)</span>
+        <div class="h-chips" id="hAlgChips">
+          <div class="h-chip alg" data-v="견과류" onclick="selHealthMulti(this,'alg')">🥜 견과류</div>
+          <div class="h-chip alg" data-v="갑각류" onclick="selHealthMulti(this,'alg')">🦐 갑각류</div>
+          <div class="h-chip alg" data-v="유제품" onclick="selHealthMulti(this,'alg')">🥛 유제품</div>
+          <div class="h-chip alg" data-v="돼지고기" onclick="selHealthMulti(this,'alg')">🐖 돼지고기</div>
+          <div class="h-chip alg" data-v="소고기" onclick="selHealthMulti(this,'alg')">🐄 소고기</div>
+          <div class="h-chip alg" data-v="날것" onclick="selHealthMulti(this,'alg')">🍣 날것</div>
+        </div>
+      </div>
+
+      <!-- 건강목표 -->
+      <div class="h-row">
+        <span class="h-label">🎯 건강 목표</span>
+        <div class="h-chips" id="hGoalChips">
+          <div class="h-chip goal" data-v="체중감량" onclick="selHealthSingle(this,'goal')">체중감량</div>
+          <div class="h-chip goal" data-v="혈압관리" onclick="selHealthSingle(this,'goal')">혈압관리</div>
+          <div class="h-chip goal" data-v="혈당관리" onclick="selHealthSingle(this,'goal')">혈당관리</div>
+          <div class="h-chip goal" data-v="근육증가" onclick="selHealthSingle(this,'goal')">근육증가</div>
+          <div class="h-chip goal" data-v="균형식단" onclick="selHealthSingle(this,'goal')">균형식단</div>
+        </div>
+      </div>
+
+      <button type="button" class="h-clear" onclick="clearHealth()">건강정보 모두 지우기</button>
+    </div>
+  </div>
+
   <!-- ③+ 컨디션·상황·예산 (개인 맥락) -->
   <div class="card">
     <div class="sl">🎯 오늘의 컨디션 / 상황 / 예산</div>
@@ -1063,17 +1294,22 @@ async function _logClick(type, menu) {
           <div class="nutri-tags" id="nutriTags" style="margin-top:10px;"></div>
           <div class="nutri-note" id="nutriNote"></div>
           <div class="nutri-people" id="nutriPeople" style="display:none;"></div>
+          <div class="nutri-exercise" id="nutriExercise" style="display:none;">
+            <div class="nutri-exercise-head">🔥 이 칼로리, 운동으로 얼마나?</div>
+            <div class="nutri-ex-list" id="nutriExList"></div>
+            <div class="nutri-ex-foot" id="nutriExFoot"></div>
+          </div>
         </div>
       </div>
 
-      <!-- 이 음식 이야기 (story / insight 아코디언) -->
+      <!-- 이 음식 이야기 (6항목 카드 — 유래/지역/제철/사실/세계/트렌드) -->
       <button class="nutri-btn" id="storyBtn" onclick="loadStory()" style="margin-top:8px;">
         📖 이 음식 이야기
       </button>
       <div class="nutri-section" id="storySection">
-        <div class="nutri-card">
-          <div class="nutri-story" id="nutriStory" style="display:none;"></div>
-          <div class="nutri-insight" id="nutriInsight" style="display:none;"></div>
+        <div class="nutri-card" style="background:linear-gradient(135deg,#FFFAF5,#FFF7EE);border-color:#FFE3CC;">
+          <div class="nutri-head"><span>📖</span><span id="storyTitle">이 음식 이야기</span></div>
+          <div class="story-grid" id="storyGrid"></div>
         </div>
       </div>
 
@@ -1556,6 +1792,156 @@ function selMood(el){document.querySelectorAll("#moodRow .ctog").forEach(t=>t.cl
 function selOcc(el){document.querySelectorAll("#occRow .ctog").forEach(t=>t.classList.remove("on"));el.classList.add("on");selOccV=el.dataset.occ;snd("click");}
 function selBudget(el){document.querySelectorAll("#bgtRow .ctog").forEach(t=>t.classList.remove("on"));el.classList.add("on");selBudgetV=el.dataset.bg;snd("click");}
 
+/* ============================================================
+   🩺 건강정보 (선택 · localStorage 자동 저장 / 서버에는 전송만)
+   ============================================================ */
+const HEALTH_LS_KEY="fp6_health_v1";
+let selHealth={
+  height:null,weight:null,
+  bp:null,glu:null,chol:null,goal:null,
+  fam:[],alg:[]
+};
+function _bmiCategory(bmi){
+  if(bmi<18.5)return{label:"저체중",cls:"h-bmi-low"};
+  if(bmi<23)  return{label:"정상",  cls:"h-bmi-normal"};
+  if(bmi<25)  return{label:"과체중",cls:"h-bmi-over"};
+  return{label:"비만",cls:"h-bmi-obese"};
+}
+function _calcBmi(h,w){
+  if(!h||!w||h<100||w<25)return null;
+  const m=h/100;
+  return +(w/(m*m)).toFixed(1);
+}
+function onHealthInput(){
+  const h=parseFloat(document.getElementById("hHeight").value)||null;
+  const w=parseFloat(document.getElementById("hWeight").value)||null;
+  selHealth.height=h;selHealth.weight=w;
+  const disp=document.getElementById("hBmiDisplay");
+  const bmi=_calcBmi(h,w);
+  if(bmi){
+    const cat=_bmiCategory(bmi);
+    document.getElementById("hBmiNum").textContent=bmi;
+    const badge=document.getElementById("hBmiBadge");
+    badge.textContent=cat.label;
+    badge.className="h-bmi-badge "+cat.cls;
+    disp.style.display="flex";
+  }else{
+    disp.style.display="none";
+  }
+  saveHealth();
+}
+function selHealthSingle(el,key){
+  const wrap=el.parentElement;
+  const v=el.dataset.v;
+  const wasOn=el.classList.contains("on");
+  wrap.querySelectorAll(".h-chip").forEach(c=>c.classList.remove("on"));
+  if(!wasOn){el.classList.add("on");selHealth[key]=v;}
+  else{selHealth[key]=null;}
+  snd("click");saveHealth();
+}
+function selHealthMulti(el,key,exclusive){
+  const wrap=el.parentElement;
+  const v=el.dataset.v;
+  if(exclusive){
+    // "없음" 버튼 — 다른 항목 모두 끄고 단독 토글
+    const wasOn=el.classList.contains("on");
+    wrap.querySelectorAll(".h-chip").forEach(c=>c.classList.remove("on"));
+    if(!wasOn){el.classList.add("on");selHealth[key]=[v];}
+    else{selHealth[key]=[];}
+  }else{
+    // "없음" 버튼이 켜져 있다면 끔
+    wrap.querySelectorAll(".h-chip").forEach(c=>{
+      if(c.dataset.v==="없음")c.classList.remove("on");
+    });
+    el.classList.toggle("on");
+    const list=Array.from(wrap.querySelectorAll(".h-chip.on"))
+      .map(c=>c.dataset.v).filter(v=>v!=="없음");
+    selHealth[key]=list;
+  }
+  snd("click");saveHealth();
+}
+function saveHealth(){
+  try{localStorage.setItem(HEALTH_LS_KEY,JSON.stringify(selHealth));}catch(e){}
+}
+function loadHealth(){
+  try{
+    const raw=localStorage.getItem(HEALTH_LS_KEY);
+    if(!raw)return;
+    const d=JSON.parse(raw);
+    if(!d||typeof d!=="object")return;
+    selHealth={
+      height:d.height||null,weight:d.weight||null,
+      bp:d.bp||null,glu:d.glu||null,chol:d.chol||null,goal:d.goal||null,
+      fam:Array.isArray(d.fam)?d.fam:[],
+      alg:Array.isArray(d.alg)?d.alg:[]
+    };
+    if(selHealth.height)document.getElementById("hHeight").value=selHealth.height;
+    if(selHealth.weight)document.getElementById("hWeight").value=selHealth.weight;
+    onHealthInput();
+    // 칩 활성화 복원
+    const restoreSingle=(rowId,val)=>{
+      if(!val)return;
+      document.querySelectorAll(`#${rowId} .h-chip`).forEach(c=>{
+        if(c.dataset.v===val)c.classList.add("on");
+      });
+    };
+    const restoreMulti=(rowId,arr)=>{
+      if(!arr||!arr.length)return;
+      document.querySelectorAll(`#${rowId} .h-chip`).forEach(c=>{
+        if(arr.includes(c.dataset.v))c.classList.add("on");
+      });
+    };
+    restoreSingle("hBpChips",selHealth.bp);
+    restoreSingle("hGluChips",selHealth.glu);
+    restoreSingle("hCholChips",selHealth.chol);
+    restoreSingle("hGoalChips",selHealth.goal);
+    restoreMulti("hFamChips",selHealth.fam);
+    restoreMulti("hAlgChips",selHealth.alg);
+    // 저장된 값이 있으면 자동으로 펼침
+    if(getHealthInfo()){
+      document.getElementById("healthCard").classList.add("open");
+    }
+  }catch(e){}
+}
+function clearHealth(){
+  selHealth={height:null,weight:null,bp:null,glu:null,chol:null,goal:null,fam:[],alg:[]};
+  document.getElementById("hHeight").value="";
+  document.getElementById("hWeight").value="";
+  document.getElementById("hBmiDisplay").style.display="none";
+  document.querySelectorAll("#healthCard .h-chip.on").forEach(c=>c.classList.remove("on"));
+  try{localStorage.removeItem(HEALTH_LS_KEY);}catch(e){}
+  toast("건강정보를 모두 지웠어요");
+}
+function toggleHealth(){
+  const card=document.getElementById("healthCard");
+  card.classList.toggle("open");
+  snd("click");
+}
+function getHealthInfo(){
+  const h=selHealth;
+  const bmi=_calcBmi(h.height,h.weight);
+  const has=h.height||h.weight||h.bp||h.glu||h.chol||h.goal||(h.fam&&h.fam.length)||(h.alg&&h.alg.length);
+  if(!has)return null;
+  return{
+    height:h.height||null,
+    weight:h.weight||null,
+    bmi:bmi,
+    bmiCategory:bmi?_bmiCategory(bmi).label:null,
+    bp:h.bp||null,
+    glucose:h.glu||null,
+    cholesterol:h.chol||null,
+    goal:h.goal||null,
+    family:Array.isArray(h.fam)?h.fam:[],
+    allergy:Array.isArray(h.alg)?h.alg:[]
+  };
+}
+// 페이지 로드 후 자동 복원
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadHealth);
+} else {
+  setTimeout(loadHealth, 0);
+}
+
 /* 즉시 추천 (랜덤 카테고리로 강제 + 결과로 스크롤) */
 function quickPick(){
   selCatV="random";
@@ -1580,10 +1966,11 @@ async function loadNutrition(){
   btn.classList.add("loading");
   btn.innerHTML='<span class="spinner"></span>영양 분석 중...';
   try{
+    const health=(typeof getHealthInfo==="function")?getHealthInfo():null;
     const r=await fetch("/api/nutrition",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({menuName:curMenu.n})
+      body:JSON.stringify({menuName:curMenu.n, weight: health?.weight||null})
     });
     const j=await r.json();
     if(!r.ok||!j.data)throw new Error(j.error||"실패");
@@ -1634,6 +2021,29 @@ async function loadNutrition(){
         </div>`;
       peopleEl.style.display="grid";
     }else{peopleEl.style.display="none";}
+    // 칼로리 운동 소모 예시 (서버가 weight 기준으로 계산해서 줌)
+    const exEl=document.getElementById("nutriExercise");
+    const exList=document.getElementById("nutriExList");
+    const exFoot=document.getElementById("nutriExFoot");
+    const exArr=Array.isArray(d.exercise)?d.exercise:[];
+    if(exArr.length&&exEl&&exList){
+      exList.innerHTML=exArr.map(e=>`
+        <div class="nutri-ex-item">
+          <span class="nutri-ex-emoji">${_escAt(e.emoji||"🏃")}</span>
+          <div class="nutri-ex-text">
+            <div class="nutri-ex-name">${_escAt(e.name||"")}</div>
+            <div class="nutri-ex-min">→ 약 ${parseInt(e.minutes,10)||0}분</div>
+          </div>
+        </div>`).join("");
+      const w=parseFloat(d.exerciseWeight)||65;
+      const usedMine=health&&health.weight;
+      exFoot.textContent = usedMine
+        ? `※ 입력하신 몸무게 ${w}kg 기준 추정치`
+        : `※ 성인 평균 ${w}kg 기준 추정치 (건강정보에 몸무게 입력 시 정확도 ↑)`;
+      exEl.style.display="block";
+    }else if(exEl){
+      exEl.style.display="none";
+    }
     sec.classList.add("show");
     btn.textContent="🔼 영양정보 닫기";
     if(typeof _ga==="function")_ga("nutrition_view",{menu:curMenu.n,kcal:d.kcal});
@@ -1656,7 +2066,15 @@ function _resetNutrition(){
   if(stBtn){stBtn.textContent="📖 이 음식 이야기";stBtn.classList.remove("loading");}
 }
 
-/* 이 음식 이야기 — story / insight 별도 아코디언 */
+/* 이 음식 이야기 — 6항목 카드 (유래 / 지역 / 제철 / 사실 / 세계 / 트렌드) */
+const _STORY_FIELDS=[
+  {key:"origin",   icon:"📜", label:"유래/역사",      cls:"sc-origin"},
+  {key:"regional", icon:"🗺️", label:"지역별 차이",   cls:"sc-regional"},
+  {key:"season",   icon:"🌿", label:"제철 정보",      cls:"sc-season"},
+  {key:"funfact",  icon:"💡", label:"몰랐던 사실",    cls:"sc-funfact"},
+  {key:"world",    icon:"🌍", label:"세계 속 이 음식", cls:"sc-world"},
+  {key:"trend",    icon:"📱", label:"요즘 트렌드",    cls:"sc-trend"}
+];
 async function loadStory(){
   if(!curMenu)return;
   const btn=document.getElementById("storyBtn");
@@ -1666,13 +2084,14 @@ async function loadStory(){
     btn.textContent="📖 이 음식 이야기";
     return;
   }
-  // 영양정보 응답에 story/insight가 같이 옴 → 캐시 활용, 없으면 가져오기
+  // 영양정보 응답에 6항목 같이 옴 → 캐시 활용, 없으면 가져오기
   let d=_nutriCache;
   if(!d){
     btn.classList.add("loading");
     btn.innerHTML='<span class="spinner"></span>이야기 불러오는 중...';
     try{
-      const r=await fetch("/api/nutrition",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({menuName:curMenu.n})});
+      const health=(typeof getHealthInfo==="function")?getHealthInfo():null;
+      const r=await fetch("/api/nutrition",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({menuName:curMenu.n,weight:health?.weight||null})});
       const j=await r.json();
       if(!r.ok||!j.data)throw new Error(j.error||"실패");
       d=j.data;_nutriCache=d;
@@ -1684,10 +2103,25 @@ async function loadStory(){
     }
     btn.classList.remove("loading");
   }
-  const storyEl=document.getElementById("nutriStory");
-  const insEl=document.getElementById("nutriInsight");
-  if(d.story){storyEl.innerHTML=`<strong>이야기.</strong> ${d.story}`;storyEl.style.display="block";}else{storyEl.style.display="none";}
-  if(d.insight){insEl.innerHTML=`<strong>몰랐던 사실!</strong> ${d.insight}`;insEl.style.display="block";}else{insEl.style.display="none";}
+  document.getElementById("storyTitle").textContent=`${curMenu.n} 이야기`;
+  const grid=document.getElementById("storyGrid");
+  // 6항목 렌더 — 누락된 필드는 카드 자체를 숨김 (구버전 캐시 호환을 위해 story/insight도 fallback)
+  const fallback={
+    origin: d.origin || d.story || "",
+    regional: d.regional || "",
+    season: d.season || "",
+    funfact: d.funfact || d.insight || "",
+    world: d.world || "",
+    trend: d.trend || ""
+  };
+  grid.innerHTML=_STORY_FIELDS.map(f=>{
+    const v=(fallback[f.key]||"").trim();
+    if(!v)return "";
+    return `<div class="story-card ${f.cls}">
+      <div class="story-card-head"><span>${f.icon}</span><span>${f.label}</span></div>
+      <div>${_escAt(v)}</div>
+    </div>`;
+  }).join("");
   sec.classList.add("show");
   btn.textContent="🔼 이야기 닫기";
   if(typeof _ga==="function")_ga("story_view",{menu:curMenu.n});
@@ -1860,6 +2294,7 @@ async function loadAiReason(){
   // 호출 시 항상 스켈레톤 먼저 (재시도 시에도)
   _aiShowSkeleton();
   try{
+    const health=(typeof getHealthInfo==="function")?getHealthInfo():null;
     const r=await fetch("/api/recommend",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
@@ -1872,12 +2307,24 @@ async function loadAiReason(){
         age:typeof selAgeV!=="undefined"?selAgeV:"30",
         category:typeof selCatV!=="undefined"?selCatV:"random",
         weather:typeof wxCode!=="undefined"?wxCode:"clear",
-        mealTime:typeof mealTime!=="undefined"?mealTime:"lunch"
+        mealTime:typeof mealTime!=="undefined"?mealTime:"lunch",
+        health:health
       })
     });
     const j=await r.json();
     if(!r.ok||!j.data)throw new Error(j.error||"실패");
-    document.getElementById("aiReasonText").textContent=j.data.primary?.reason||"이 메뉴가 사용자 컨텍스트에 잘 맞습니다.";
+    // 추천 이유 + (건강정보 있을 때) 조리법 팁 + 면책 고지
+    const txtEl=document.getElementById("aiReasonText");
+    const reason=j.data.primary?.reason||"이 메뉴가 사용자 컨텍스트에 잘 맞습니다.";
+    const tip=j.data.primary?.tip||"";
+    const disclaimer=j.data.primary?.disclaimer||"";
+    let html=`<div>${_escAt(reason)}</div>`;
+    if(tip)html+=`<div style="margin-top:8px;padding:8px 11px;background:#FFF7EE;border:1px solid #FFE3CC;border-radius:8px;font-size:12px;color:#7A5A14;">👨‍🍳 <strong>조리법 팁.</strong> ${_escAt(tip)}</div>`;
+    if(disclaimer)html+=`<div style="margin-top:8px;font-size:11px;color:var(--text3);font-style:italic;letter-spacing:.2px;">${_escAt(disclaimer)}</div>`;
+    txtEl.innerHTML=html;
+    // 건강 배지를 결과 카드 상단 태그 영역에 추가 렌더 (기존 태그 유지)
+    const badges=Array.isArray(j.data.healthBadges)?j.data.healthBadges:[];
+    _renderHealthBadges(badges);
     const alts=Array.isArray(j.data.alternatives)?j.data.alternatives:[];
     const altsList=document.getElementById("aiAltsList");
     if(alts.length&&altsList){
@@ -1891,14 +2338,29 @@ async function loadAiReason(){
           <div style="color:var(--purple);font-size:18px;font-weight:800;flex-shrink:0;">→</div>
         </div>`).join("");
     }
-    if(typeof _ga==="function")_ga("ai_reason_load",{menu:curMenu.n});
+    if(typeof _ga==="function")_ga("ai_reason_load",{menu:curMenu.n,health:health?1:0});
   }catch(e){
     _aiShowError();
   }
 }
+function _renderHealthBadges(badges){
+  const row=document.getElementById("rTags");
+  if(!row)return;
+  // 기존 health-badge만 정리 후 새로 추가 (rt-* 기본 태그는 유지)
+  row.querySelectorAll(".health-badge").forEach(b=>b.remove());
+  if(!badges||!badges.length)return;
+  const html=badges.map(b=>{
+    const cls=String(b.cls||"").replace(/[^a-zA-Z0-9-]/g,"");
+    return `<span class="health-badge ${cls}">${_escAt(b.text||"")}</span>`;
+  }).join("");
+  row.insertAdjacentHTML("beforeend",html);
+}
 function _resetAiReason(){
   // pickMenu 호출 직후 — 스켈레톤 즉시 표시 (이전 결과 잔영 방지)
   _aiShowSkeleton();
+  // 결과 카드 상단의 이전 건강 배지도 함께 정리
+  const row=document.getElementById("rTags");
+  if(row)row.querySelectorAll(".health-badge").forEach(b=>b.remove());
 }
 function quickPickAlt(name){
   if(!name)return;
