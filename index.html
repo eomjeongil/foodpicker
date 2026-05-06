@@ -221,8 +221,11 @@ body{
 .sel-f{background:#FFE0EC!important;border-color:#E84B8E!important;color:#C8336E!important;}
 .sel-a{background:#D6F0EE!important;border-color:var(--mint)!important;color:#1F8C82!important;}
 
-/* ── CHIPS — 카테고리별 파스텔 ── */
+/* ── CHIPS — 5개 그룹 카테고리 ── */
 .chips{display:flex;flex-wrap:wrap;gap:7px;}
+.chips-grid5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;}
+.chips-grid5 .chip{padding:10px 6px;text-align:center;font-size:12.5px;}
+@media (max-width:380px){.chips-grid5 .chip{padding:9px 4px;font-size:11.5px;}}
 .chip{
   padding:8px 14px;border-radius:50px;
   border:1.5px solid var(--border);
@@ -232,23 +235,12 @@ body{
 }
 .chip:hover{border-color:var(--pr);color:var(--pr);transform:translateY(-1px);}
 .chip.active{background:var(--pr);border-color:var(--pr);color:#fff;box-shadow:0 6px 16px var(--pg);transform:scale(1.06);}
-/* 카테고리별 활성 컬러 */
-.chip[data-cat="random"].active{background:#F2B441;border-color:#F2B441;box-shadow:0 6px 16px var(--goldg);}
-.chip[data-cat="korean"].active{background:#E63946;border-color:#E63946;box-shadow:0 6px 16px var(--redg);}
-.chip[data-cat="japanese"].active{background:#E84B8E;border-color:#E84B8E;box-shadow:0 6px 16px rgba(232,75,142,.22);}
-.chip[data-cat="chinese"].active{background:#D9742E;border-color:#D9742E;box-shadow:0 6px 16px rgba(217,116,46,.22);}
-.chip[data-cat="western"].active{background:#A8865B;border-color:#A8865B;box-shadow:0 6px 16px rgba(168,134,91,.22);}
-.chip[data-cat="chicken"].active{background:#E58B2C;border-color:#E58B2C;box-shadow:0 6px 16px rgba(229,139,44,.22);}
-.chip[data-cat="pizza"].active{background:#D94B4B;border-color:#D94B4B;box-shadow:0 6px 16px rgba(217,75,75,.22);}
-.chip[data-cat="cafe"].active{background:#8B6F47;border-color:#8B6F47;box-shadow:0 6px 16px rgba(139,111,71,.22);}
-.chip[data-cat="snack"].active{background:#E07337;border-color:#E07337;box-shadow:0 6px 16px rgba(224,115,55,.22);}
-.chip[data-cat="seafood"].active{background:#3B95A8;border-color:#3B95A8;box-shadow:0 6px 16px rgba(59,149,168,.22);}
+/* 5개 그룹 활성 컬러 */
+.chip[data-cat="kfood"].active {background:#E63946;border-color:#E63946;box-shadow:0 6px 16px var(--redg);}
+.chip[data-cat="asian"].active {background:#D9742E;border-color:#D9742E;box-shadow:0 6px 16px rgba(217,116,46,.22);}
+.chip[data-cat="wfood"].active {background:#A8865B;border-color:#A8865B;box-shadow:0 6px 16px rgba(168,134,91,.22);}
 .chip[data-cat="health"].active{background:var(--green);border-color:var(--green);box-shadow:0 6px 16px var(--greeng);}
-.chip[data-cat="meat"].active{background:#B85952;border-color:#B85952;box-shadow:0 6px 16px rgba(184,89,82,.22);}
-.chip[data-cat="noodle"].active{background:#C28A2D;border-color:#C28A2D;box-shadow:0 6px 16px rgba(194,138,45,.22);}
-.chip[data-cat="rice"].active{background:#9C8552;border-color:#9C8552;box-shadow:0 6px 16px rgba(156,133,82,.22);}
-.chip.season-chip{border-color:#FFCFA8;color:#C2691A;background:#FFF1E1;}
-.chip.season-chip.active{background:#FF9F45;border-color:#FF9F45;color:#fff;box-shadow:0 6px 16px var(--orangeg);}
+.chip[data-cat="cafe"].active  {background:#8B6F47;border-color:#8B6F47;box-shadow:0 6px 16px rgba(139,111,71,.22);}
 
 /* ── PICK BTN — CTA ── */
 .pick-btn{
@@ -446,21 +438,6 @@ body{
 .hero-cta:hover{transform:translateY(-3px);box-shadow:0 18px 38px rgba(255,107,53,.35);}
 .hero-cta-emoji{font-size:22px;animation:wiggle 2.4s ease-in-out infinite;display:inline-block;}
 @keyframes wiggle{0%,100%{transform:rotate(-8deg);}50%{transform:rotate(12deg);}}
-
-/* ── 컨디션/상황/예산 ── */
-.context-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px;align-items:center;}
-.context-row:last-child{margin-bottom:0;}
-.context-label{font-size:11px;font-weight:800;color:var(--text2);min-width:62px;letter-spacing:.3px;}
-.ctog{
-  flex:1;min-width:48px;padding:9px 6px;border-radius:50px;
-  border:1.5px solid var(--border);background:#fff;color:var(--text2);
-  font-size:11.5px;font-weight:700;cursor:pointer;text-align:center;
-  transition:all .15s;user-select:none;
-}
-.ctog:hover{border-color:var(--pr);color:var(--pr);}
-.ctog.cs-mood.on{background:#FFF4D2;border-color:#F2B441;color:#B47A0F;}
-.ctog.cs-occ.on{background:#FFE0EC;border-color:#E84B8E;color:#C8336E;}
-.ctog.cs-budget.on{background:#DDF1E1;border-color:var(--green);color:#2E7E47;}
 
 /* ── 건강정보 입력 (선택) — 접이식 ── */
 .health-card{padding:0;overflow:visible;border:none;background:transparent;box-shadow:none;}
@@ -1241,31 +1218,6 @@ async function _logClick(type, menu) {
     </div>
   </div>
 
-  <!-- ③+ 컨디션·상황·예산 (개인 맥락) -->
-  <div class="card">
-    <div class="sl">🎯 오늘의 컨디션 / 상황 / 예산</div>
-    <div class="context-row" id="moodRow">
-      <span class="context-label">😶 컨디션</span>
-      <div class="ctog cs-mood on" data-mood="평범" onclick="selMood(this)">평범</div>
-      <div class="ctog cs-mood" data-mood="피곤" onclick="selMood(this)">😴 피곤</div>
-      <div class="ctog cs-mood" data-mood="스트레스" onclick="selMood(this)">😤 스트</div>
-      <div class="ctog cs-mood" data-mood="기분좋음" onclick="selMood(this)">😊 기분</div>
-    </div>
-    <div class="context-row" id="occRow">
-      <span class="context-label">👥 상황</span>
-      <div class="ctog cs-occ on" data-occ="혼자" onclick="selOcc(this)">🍚 혼밥</div>
-      <div class="ctog cs-occ" data-occ="데이트" onclick="selOcc(this)">💕 데이트</div>
-      <div class="ctog cs-occ" data-occ="가족" onclick="selOcc(this)">👨‍👩‍👧 가족</div>
-      <div class="ctog cs-occ" data-occ="회식" onclick="selOcc(this)">🍻 회식</div>
-    </div>
-    <div class="context-row" id="bgtRow">
-      <span class="context-label">💰 예산</span>
-      <div class="ctog cs-budget" data-bg="저렴" onclick="selBudget(this)">💵 저렴</div>
-      <div class="ctog cs-budget on" data-bg="보통" onclick="selBudget(this)">💳 보통</div>
-      <div class="ctog cs-budget" data-bg="럭셔리" onclick="selBudget(this)">💎 럭셔리</div>
-    </div>
-  </div>
-
   <!-- ③++ 직전 식사 (선택 · 추천 영양 균형 반영) -->
   <div class="card last-meal-card">
     <div class="sl" style="color:#FF6B35;font-weight:700;">🍽️ 직전 식사가 뭐였나요? <span style="font-size:11px;color:var(--text3);font-weight:700;margin-left:4px;">(선택사항)</span></div>
@@ -1281,25 +1233,15 @@ async function _logClick(type, menu) {
     </div>
   </div>
 
-  <!-- ④ 카테고리 -->
-  <div class="card">
+  <!-- ④ 카테고리 (5개 그룹 · 미선택이 기본) -->
+  <div class="card" id="catCard">
     <div class="sl">🍱 카테고리</div>
-    <div class="chips" id="chips">
-      <div class="chip active" data-cat="random"   onclick="selCatF(this)">🎲 랜덤</div>
-      <div class="chip" data-cat="korean"          onclick="selCatF(this)">🥢 한식</div>
-      <div class="chip" data-cat="japanese"        onclick="selCatF(this)">🍣 일식</div>
-      <div class="chip" data-cat="chinese"         onclick="selCatF(this)">🥟 중식</div>
-      <div class="chip" data-cat="western"         onclick="selCatF(this)">🍝 양식</div>
-      <div class="chip" data-cat="chicken"         onclick="selCatF(this)">🍗 치킨</div>
-      <div class="chip" data-cat="pizza"           onclick="selCatF(this)">🍕 피자/버거</div>
-      <div class="chip" data-cat="cafe"            onclick="selCatF(this)">☕ 카페/브런치</div>
-      <div class="chip" data-cat="snack"           onclick="selCatF(this)">🍢 분식</div>
-      <div class="chip" data-cat="seafood"         onclick="selCatF(this)">🦞 해산물</div>
-      <div class="chip" data-cat="health"          onclick="selCatF(this)">🥗 건강식</div>
-      <div class="chip" data-cat="meat"            onclick="selCatF(this)">🥩 고기/구이</div>
-      <div class="chip" data-cat="noodle"          onclick="selCatF(this)">🍜 면류</div>
-      <div class="chip" data-cat="rice"            onclick="selCatF(this)">🍚 밥/덮밥</div>
-      <div class="chip season-chip" data-cat="season" onclick="selCatF(this)">🌸 계절메뉴</div>
+    <div class="chips chips-grid5" id="chips">
+      <div class="chip" data-cat="kfood"  onclick="selCatF(this)">🥢 한식</div>
+      <div class="chip" data-cat="asian"  onclick="selCatF(this)">🌏 아시안</div>
+      <div class="chip" data-cat="wfood"  onclick="selCatF(this)">🍝 양식</div>
+      <div class="chip" data-cat="health" onclick="selCatF(this)">🥗 건강식</div>
+      <div class="chip" data-cat="cafe"   onclick="selCatF(this)">☕ 간식/음료</div>
     </div>
   </div>
 
@@ -1906,8 +1848,17 @@ const _dbLoadPromise = fetch(DB_URL, { cache: 'force-cache' })
    상태
    ============================================================ */
 const CAT_KR={korean:"한식",japanese:"일식",chinese:"중식",western:"양식",chicken:"치킨",pizza:"피자/버거",cafe:"카페/브런치",snack:"분식",seafood:"해산물",health:"건강식",meat:"고기/구이",noodle:"면류",rice:"밥/덮밥",season:"계절메뉴",random:"랜덤",custom:"직접입력"};
+// 5개 그룹 카테고리 → DB의 베이스 카테고리 집합 매핑
+const CAT_GROUP_MAP={
+  kfood: ["korean","snack","meat","seafood","rice","season"],
+  asian: ["japanese","chinese"],
+  wfood: ["western","pizza"],
+  health:["health"],
+  cafe:  ["cafe"]
+};
+const CAT_GROUP_KR={kfood:"한식",asian:"아시안",wfood:"양식",health:"건강식",cafe:"간식/음료"};
 const TAG_CLS={HOT:"tag-hot",NEW:"tag-new",SALE:"tag-sale"};
-let selGend="N",selAgeV="30",selCatV="random",curMenu=null;
+let selGend="N",selAgeV="30",selCatV="",curMenu=null;
 let used=JSON.parse(localStorage.getItem("fp6_used")||"[]");
 let hist=JSON.parse(localStorage.getItem("fp6_hist")||"[]");
 
@@ -1936,12 +1887,6 @@ function snd(t){
 function selG(el){document.querySelectorAll("#gRow .tog").forEach(t=>t.classList.remove("sel-m","sel-f","sel-a"));const g=el.dataset.g;el.classList.add(g==="M"?"sel-m":g==="F"?"sel-f":"sel-a");selGend=g;snd("click");}
 function selA(el){document.querySelectorAll("#aRow .tog").forEach(t=>t.classList.remove("sel-m","sel-f","sel-a"));el.classList.add("sel-a");selAgeV=el.dataset.a;snd("click");}
 function selCatF(el){document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));el.classList.add("active");selCatV=el.dataset.cat;snd("click");}
-
-/* 컨디션·상황·예산 (개인 맥락) */
-let selMoodV="평범",selOccV="혼자",selBudgetV="보통";
-function selMood(el){document.querySelectorAll("#moodRow .ctog").forEach(t=>t.classList.remove("on"));el.classList.add("on");selMoodV=el.dataset.mood;snd("click");}
-function selOcc(el){document.querySelectorAll("#occRow .ctog").forEach(t=>t.classList.remove("on"));el.classList.add("on");selOccV=el.dataset.occ;snd("click");}
-function selBudget(el){document.querySelectorAll("#bgtRow .ctog").forEach(t=>t.classList.remove("on"));el.classList.add("on");selBudgetV=el.dataset.bg;snd("click");}
 
 /* ── 직전 식사 (lastMeal) — 추천 영양 균형 보조 컨텍스트 ── */
 // 시간대 자동 판단 — 6시 이전은 '어제 야식', 그 외는 아침/점심/저녁/간식
@@ -2289,16 +2234,6 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', loadHealth);
 } else {
   setTimeout(loadHealth, 0);
-}
-
-/* 즉시 추천 (랜덤 카테고리로 강제 + 결과로 스크롤) */
-function quickPick(){
-  selCatV="random";
-  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
-  document.querySelector(".chip[data-cat='random']")?.classList.add("active");
-  pickMenu();
-  setTimeout(()=>{document.getElementById("resultCard")?.scrollIntoView({behavior:"smooth",block:"start"});},650);
-  if(typeof _ga==="function")_ga("quick_pick",{source:"hero_cta"});
 }
 
 /* 영양정보 lazy-load + 토글 (story/insight 캐시 보관) */
@@ -2959,9 +2894,6 @@ async function loadAiReason(){
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
         pickedMenu:curMenu.n,
-        mood:typeof selMoodV!=="undefined"?selMoodV:"평범",
-        occasion:typeof selOccV!=="undefined"?selOccV:"혼자",
-        budget:typeof selBudgetV!=="undefined"?selBudgetV:"보통",
         gender:typeof selGend!=="undefined"?selGend:"N",
         age:typeof selAgeV!=="undefined"?selAgeV:"30",
         category:typeof selCatV!=="undefined"?selCatV:"random",
@@ -3425,9 +3357,11 @@ sc+=(Math.random()-.5)*1.2;
   }).sort((a,b)=>b.score-a.score);
 }
 function getPool(){
-  if(selCatV==="random")return DB;
-  if(selCatV==="season")return DB.filter(m=>m.cat==="season");
-  return DB.filter(m=>m.cat===selCatV);
+  // 미선택 시는 전체 (가드는 pickMenu에서 차단)
+  if(!selCatV)return DB;
+  const baseCats=CAT_GROUP_MAP[selCatV];
+  if(!baseCats||!baseCats.length)return DB;
+  return DB.filter(m=>baseCats.includes(m.cat));
 }
 
 /* ============================================================
@@ -3436,6 +3370,13 @@ function getPool(){
 function pickMenu(){
   if (!_dbReady || !DB.length) {
     if (typeof toast === 'function') toast('⏳ 메뉴 DB 로드 중...');
+    return;
+  }
+  // 카테고리 미선택 시 가드 — 토스트 + 스크롤
+  if(!selCatV){
+    if(typeof toast==="function")toast("카테고리를 선택해주세요 🍽️");
+    const card=document.getElementById("catCard");
+    if(card)card.scrollIntoView({behavior:"smooth",block:"center"});
     return;
   }
   snd("pick");
@@ -3493,26 +3434,9 @@ function resetAll(){
     t.classList.remove("sel-m","sel-f","sel-a");
     if(t.dataset.a==="30")t.classList.add("sel-a");
   });
-  selMoodV="평범";
-  document.querySelectorAll("#moodRow .ctog").forEach(t=>{
-    t.classList.remove("on");
-    if(t.dataset.mood==="평범")t.classList.add("on");
-  });
-  selOccV="혼자";
-  document.querySelectorAll("#occRow .ctog").forEach(t=>{
-    t.classList.remove("on");
-    if(t.dataset.occ==="혼자")t.classList.add("on");
-  });
-  selBudgetV="보통";
-  document.querySelectorAll("#bgtRow .ctog").forEach(t=>{
-    t.classList.remove("on");
-    if(t.dataset.bg==="보통")t.classList.add("on");
-  });
-  // 2) 카테고리 → 랜덤
-  selCatV="random";
+  // 2) 카테고리 → 미선택 (사용자가 다시 선택)
+  selCatV="";
   document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
-  const randomChip=document.querySelector('.chip[data-cat="random"]');
-  if(randomChip)randomChip.classList.add("active");
   // 3) 직전 식사 — 입력창 + localStorage + 룰 기반 전역
   if(typeof clearLastMeal==="function"){
     // clearLastMeal은 토스트를 띄우므로 직접 inline (조용히 정리)
