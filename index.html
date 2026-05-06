@@ -371,7 +371,7 @@ body{
 .bcopy{flex:1;padding:13px;border:1.5px solid var(--border);border-radius:var(--rsm);background:#fff;color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;}
 .bcopy:hover{border-color:var(--mint);color:var(--mint);}
 
-/* slideUp keyframes — ai-alts·match-result에서 재사용 */
+/* slideUp keyframes — ai-alts·match-recomm-card에서 재사용 */
 @keyframes slideUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
 
 /* ── 히스토리 ── */
@@ -608,7 +608,6 @@ body{
 .tip-box strong{color:#7A4A0F;}
 .nutri-note{color:var(--text2);font-weight:600;}
 .report-stat .l{color:var(--text);font-weight:700;}
-.match-line{color:var(--text);}
 .share-block-title{color:var(--text);font-weight:800;}
 .crown-label{font-weight:900;}
 .next-hint{color:var(--text);font-weight:600;}
@@ -678,41 +677,53 @@ body{
   font-size:10.5px;color:var(--text3);margin-top:7px;font-style:italic;
 }
 
-/* ── 음식 궁합 분석 ── */
+/* ── 함께 먹으면 좋은 음식 (자동 추천) ── */
 .match-section{
-  background:linear-gradient(135deg,#FCF5FF,#F8F4FC);
-  border:1px solid #E1D4F5;border-radius:var(--rsm);
+  background:linear-gradient(135deg,#F6FBF8,#EFF8F2);
+  border:1px solid #C8E6D5;border-radius:var(--rsm);
   padding:14px 15px;margin-bottom:10px;box-shadow:var(--shadow-sm);
 }
-.match-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:13px;font-weight:800;color:#5A2DA8;}
-.match-input-row{display:flex;gap:8px;margin-bottom:9px;}
-.match-input{
-  flex:1;padding:10px 13px;border:1.5px solid #E1D4F5;
-  border-radius:var(--rsm);background:#fff;color:var(--text);
-  font-size:13px;outline:none;font-family:'Noto Sans KR',sans-serif;
-  transition:border-color .18s;
+.match-title{display:flex;align-items:center;gap:8px;margin-bottom:11px;font-size:13.5px;font-weight:800;color:#2E7E47;}
+.match-recomm-list{display:flex;flex-direction:column;gap:8px;}
+.match-recomm-card{
+  background:#fff;border:1px solid #E0F0E8;border-left:4px solid #4CAF7D;
+  border-radius:12px;padding:12px 14px;
+  animation:slideUp .35s ease both;
 }
-.match-input::placeholder{color:var(--text3);font-size:12px;}
-.match-input:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purpleg);}
-.match-go{
-  padding:10px 14px;border:none;border-radius:var(--rsm);
-  background:linear-gradient(135deg,var(--purple),#A78BFA);
-  color:#fff;font-weight:800;font-size:12.5px;cursor:pointer;
-  white-space:nowrap;box-shadow:0 4px 12px var(--purpleg);
-  transition:all .18s;flex-shrink:0;
+.match-card-head{display:flex;align-items:center;gap:9px;}
+.match-rank-badge{font-size:11px;font-weight:800;padding:3px 9px;border-radius:10px;flex-shrink:0;letter-spacing:.2px;}
+.rank-1{background:#FF6B35;color:#fff;}
+.rank-2{background:#4CAF7D;color:#fff;}
+.rank-3{background:#7B1FA2;color:#fff;}
+.match-food-emoji{font-size:22px;flex-shrink:0;}
+.match-food-name{font-size:14px;font-weight:800;color:var(--text);}
+.match-short-reason{font-size:12px;color:#666;font-style:italic;margin:5px 0 7px 0;line-height:1.45;}
+.match-detail-btn{
+  font-size:12px;color:#FF6B35;background:none;border:none;cursor:pointer;
+  font-weight:800;padding:0;letter-spacing:.2px;
 }
-.match-go:hover{transform:translateY(-2px);}
-.match-go:disabled{opacity:.5;cursor:wait;}
-.match-result{display:none;margin-top:10px;padding:12px 13px;background:#fff;border:1px solid #E1D4F5;border-radius:var(--rxs);}
-.match-result.show{display:block;animation:slideUp .35s ease both;}
-.match-score-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-.match-score{font-family:'Black Han Sans',sans-serif;font-size:32px;color:#5A2DA8;line-height:1;}
-.match-score .max{font-size:14px;color:var(--text3);font-weight:600;font-family:inherit;}
-.match-verdict{font-size:14px;font-weight:800;padding:5px 13px;border-radius:50px;background:#E1D4F5;color:#5A2DA8;}
-.match-verdict.bad{background:#FFE0DA;color:var(--red);}
-.match-verdict.good{background:#DDF1E1;color:#2E7E47;}
-.match-line{font-size:12.5px;color:var(--text);line-height:1.55;margin-top:5px;}
-.match-line strong{color:#5A2DA8;font-weight:800;}
+.match-detail-btn:hover{text-decoration:underline;}
+.match-detail-body{
+  display:none;background:#F9FFF9;border-radius:8px;
+  padding:11px 12px;margin-top:9px;font-size:12.5px;line-height:1.6;color:var(--text);
+}
+.match-detail-body.show{display:block;animation:slideUp .25s ease both;}
+.match-evidence{font-size:11px;color:#888;margin-top:6px;line-height:1.45;}
+.match-kcal-balance{font-size:11.5px;color:#2E7E47;margin-top:5px;font-weight:700;}
+.match-buy-btn{
+  display:block;margin-top:10px;padding:9px 14px;
+  background:linear-gradient(135deg,#FF6B35,#FF8C42);
+  color:#fff;border-radius:8px;font-size:12.5px;font-weight:800;
+  text-decoration:none;text-align:center;
+  box-shadow:0 4px 12px rgba(255,107,53,.25);
+}
+.match-buy-btn:hover{transform:translateY(-1px);}
+.match-skel-card{
+  background:#fff;border:1px solid #E0F0E8;border-left:4px solid #C8E6D5;
+  border-radius:12px;padding:14px;
+}
+.match-err{padding:14px;color:var(--text2);font-size:12.5px;text-align:center;}
+.match-err button{margin-left:6px;background:none;border:none;color:#FF6B35;font-weight:800;cursor:pointer;text-decoration:underline;}
 
 /* ── SNS 공유 그리드 ── */
 .share-block{margin-top:4px;}
@@ -915,22 +926,6 @@ body{
 .np-avoid{background:#FFE0DA;border:1px solid #F5C8C8;color:#C2392C;}
 .np-title{font-weight:800;font-size:11px;margin-bottom:4px;letter-spacing:.3px;}
 
-/* ── 음식 궁합 점수 게이지 ── */
-.match-gauge{margin-top:5px;margin-bottom:10px;}
-.match-gauge-bar{
-  height:14px;background:linear-gradient(90deg,#FFE0DA 0%,#FFF4D2 50%,#DDF1E1 100%);
-  border-radius:50px;border:1px solid var(--border);
-  position:relative;overflow:hidden;
-}
-.match-gauge-fill{
-  position:absolute;left:0;top:0;bottom:0;
-  background:rgba(90,45,168,.85);
-  border-radius:50px;
-  transition:width .9s cubic-bezier(.34,1.56,.64,1);
-}
-.match-gauge-marks{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);font-weight:700;margin-top:3px;letter-spacing:.5px;}
-.match-gauge-marks .pt{color:var(--text2);}
-
 /* ── 슬롯 머신 효과 (메뉴 cycling) ── */
 .pick-btn.slot #btnTxt{
   display:inline-block;
@@ -996,8 +991,6 @@ body{
   .ai-alt-emoji{font-size:28px;}
   .ai-alt-name{font-size:14px;}
   .ai-alt-reason{font-size:11.5px;}
-  .match-input-row{flex-direction:column;gap:8px;}
-  .match-go{width:100%;padding:11px;}
   .nutri-grid{gap:6px;}
   .nutri-cell{padding:8px 10px;}
   .nutri-cell .nv{font-size:14px;}
@@ -1344,30 +1337,10 @@ async function _logClick(type, menu) {
         </div>
       </div>
 
-      <!-- 음식 궁합 분석 (항상 노출) -->
+      <!-- 함께 먹으면 좋은 음식 — 메뉴 추천 시 자동 표시 -->
       <div class="match-section">
-        <div class="match-head" style="display:flex;align-items:center;margin-bottom:0;">
-          <span>🤝 이 음식과 함께 먹으려는 음식의 궁합은?</span>
-        </div>
-        <div id="matchBody" style="display:block;margin-top:11px;">
-        <div class="match-input-row">
-          <input class="match-input" id="matchInput" type="text" placeholder="지금 함께 먹으려는 메뉴 입력 (예: 떡볶이)" onkeydown="if(event.key==='Enter')runFoodMatch()">
-          <button class="match-go" id="matchGo" onclick="runFoodMatch()">분석</button>
-        </div>
-        <div class="match-result" id="matchResult">
-          <div class="match-score-row">
-            <div class="match-score"><span id="matchScore">-</span><span class="max">/100</span></div>
-            <div class="match-verdict" id="matchVerdict">-</div>
-          </div>
-          <div class="match-gauge">
-            <div class="match-gauge-bar"><div class="match-gauge-fill" id="matchGaugeFill" style="width:0%;"></div></div>
-            <div class="match-gauge-marks"><span>0</span><span class="pt">충돌 ◉ 보통 ◉ 좋음 ◉ 환상</span><span>100</span></div>
-          </div>
-          <div class="match-line"><strong>이유:</strong> <span id="matchReason">-</span></div>
-          <div class="match-line"><strong>균형:</strong> <span id="matchBalance">-</span></div>
-          <div class="match-line"><strong>주의:</strong> <span id="matchCaution">-</span></div>
-        </div>
-        </div>
+        <div class="match-title">🤝 이 음식과 함께 먹으면 좋은 음식</div>
+        <div id="matchRecommList" class="match-recomm-list"></div>
       </div>
 
       <!-- 광고 슬롯 2 (이전: 다이어트 CPA 위치) -->
@@ -2403,63 +2376,72 @@ async function loadStory(){
   if(typeof _ga==="function")_ga("story_view",{menu:curMenu.n});
 }
 
-/* 음식 궁합 분석 */
-async function runFoodMatch(){
-  if(!curMenu){toast("먼저 메뉴를 추천받아 주세요!");return;}
-  const inp=document.getElementById("matchInput");
-  const m2=(inp.value||"").trim();
-  if(!m2){inp.focus();return;}
-  const btn=document.getElementById("matchGo");
-  const resBox=document.getElementById("matchResult");
-  btn.disabled=true;
-  btn.innerHTML='<span class="spinner sp-purple"></span>분석 중';
-  try{
-    const r=await fetch("/api/food-match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({menu1:curMenu.n,menu2:m2})});
-    const j=await r.json();
-    if(!r.ok||!j.data)throw new Error(j.error||"실패");
-    const d=j.data;
-    const score=Math.max(0,Math.min(100,parseInt(d.score,10)||0));
-    document.getElementById("matchScore").textContent=score;
-    const v=document.getElementById("matchVerdict");
-    v.textContent=`${d.emoji||""} ${d.verdict||"-"}`.trim();
-    v.className="match-verdict";
-    if(/충돌|나쁨|bad/i.test(d.verdict||""))v.classList.add("bad");
-    else if(/환상|좋음|good/i.test(d.verdict||""))v.classList.add("good");
-    // 게이지 바 — 점수 비례 + verdict별 색상
-    const gauge=document.getElementById("matchGaugeFill");
-    if(gauge){
-      gauge.style.width=score+"%";
-      let color="rgba(90,45,168,.85)";
-      if(score>=80)color="rgba(46,126,71,.9)";
-      else if(score>=60)color="rgba(76,175,125,.85)";
-      else if(score>=40)color="rgba(242,180,65,.85)";
-      else color="rgba(230,57,70,.85)";
-      gauge.style.background=color;
-    }
-    document.getElementById("matchReason").textContent=d.reason||"-";
-    document.getElementById("matchBalance").textContent=d.balance||"-";
-    document.getElementById("matchCaution").textContent=d.caution||"-";
-    resBox.classList.add("show");
-    if(typeof _ga==="function")_ga("food_match",{m1:curMenu.n,m2,score:d.score});
-  }catch(e){
-    toast("❌ 궁합 분석 실패. 잠시 후 다시 시도");
-    const resBox=document.getElementById("matchResult");
-    if(resBox){
-      // 결과 영역에 에러 메시지 + 재시도 버튼
-      resBox.classList.add("show");
-      const reasonEl=document.getElementById("matchReason");
-      if(reasonEl)reasonEl.parentElement.parentElement.innerHTML='<div class="err-state"><span class="err-state-msg">⚠️ 궁합 분석을 불러오지 못했어요</span><button class="err-retry-btn" onclick="runFoodMatch()">↻ 재시도</button></div>';
-    }
-  }
-  finally{btn.disabled=false;btn.textContent="분석";}
+/* 함께 먹으면 좋은 음식 — showResult에서 자동 호출 */
+let _companionCache=null;
+function _matchSkeleton(){
+  return [1,2,3].map(()=>`
+    <div class="match-skel-card">
+      <span class="skel skel-line skel-line-w50"></span>
+      <span class="skel skel-line skel-line-w90"></span>
+      <span class="skel skel-line skel-line-w70"></span>
+    </div>`).join("");
 }
-function _resetFoodMatch(){
-  const r=document.getElementById("matchResult");
-  if(r)r.classList.remove("show");
-  // 음식 궁합 입력창은 항상 빈 값으로 초기화 — 직전 식사(lmInput)와 분리
-  const inp=document.getElementById("matchInput");
-  if(inp)inp.value="";
-  // 음식 궁합 섹션은 항상 노출 — 입력 결과만 초기화
+function _resetFoodCompanion(){
+  _companionCache=null;
+  const list=document.getElementById("matchRecommList");
+  if(list)list.innerHTML=_matchSkeleton();
+}
+async function loadFoodCompanion(){
+  if(!curMenu)return;
+  const list=document.getElementById("matchRecommList");
+  if(!list)return;
+  list.innerHTML=_matchSkeleton();
+  try{
+    const health=(typeof getHealthInfo==="function")?getHealthInfo():null;
+    const r=await fetch("/api/food-companion",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({menuName:curMenu.n, menuCategory:curMenu.cat||"", healthInfo:health})
+    });
+    const j=await r.json();
+    if(!r.ok||!j.data||!Array.isArray(j.data.companions)||!j.data.companions.length)throw new Error(j.error||"실패");
+    _companionCache=j.data.companions;
+    list.innerHTML=_companionCache.map((c,i)=>_renderMatchCard(c,i)).join("");
+    if(typeof _ga==="function")_ga("food_companion_load",{menu:curMenu.n,source:j.source||"ai"});
+  }catch(e){
+    list.innerHTML=`<div class="match-err">⚠️ 궁합 음식을 불러오지 못했어요. <button onclick="loadFoodCompanion()">↻ 재시도</button></div>`;
+  }
+}
+function _renderMatchCard(c, i){
+  const rank=parseInt(c.rank,10)||(i+1);
+  const rankCls=`rank-${Math.min(3,Math.max(1,rank))}`;
+  const rankLabel=`${rank}순위`;
+  const detailId=`matchDetail_${i}`;
+  return `
+    <div class="match-recomm-card">
+      <div class="match-card-head">
+        <span class="match-rank-badge ${rankCls}">${rankLabel}</span>
+        <span class="match-food-emoji">${_escAt(c.emoji||"🍽️")}</span>
+        <span class="match-food-name">${_escAt(c.name||"-")}</span>
+      </div>
+      <div class="match-short-reason">${_escAt(c.shortReason||"")}</div>
+      <button class="match-detail-btn" onclick="toggleMatchDetail(${i})">상세 분석 ▼</button>
+      <div class="match-detail-body" id="${detailId}">
+        <div>${_escAt(c.detailReason||"")}</div>
+        ${c.kcalBalance?`<div class="match-kcal-balance">⚖️ ${_escAt(c.kcalBalance)}</div>`:''}
+        ${c.evidence?`<div class="match-evidence">📚 ${_escAt(c.evidence)}</div>`:''}
+        ${c.coupangKeyword?`<a class="match-buy-btn" href="${_cu(c.coupangKeyword,`${_cfg.s}_companion_${i+1}`)}" target="_blank" rel="noopener" onclick="_logCpa('food_companion')">🛒 ${_escAt(c.name||"")} 바로 구매</a>`:''}
+      </div>
+    </div>`;
+}
+function toggleMatchDetail(i){
+  const body=document.getElementById(`matchDetail_${i}`);
+  if(!body)return;
+  const open=body.classList.toggle("show");
+  // 버튼 화살표 갱신
+  const card=body.closest(".match-recomm-card");
+  const btn=card?.querySelector(".match-detail-btn");
+  if(btn)btn.innerHTML=open?"상세 분석 ▲":"상세 분석 ▼";
 }
 
 /* SNS 공유 - Web Share API + Twitter */
@@ -3503,7 +3485,7 @@ function showResult(menu,nextMenus){
   // 새 결과 표시 — AI/영양/궁합 모두 reset (이전 결과 잔영 방지). 모든 호출 경로 공통.
   _resetAiReason();
   _resetNutrition();
-  _resetFoodMatch();
+  _resetFoodCompanion();
   // 이미지
   const img=document.getElementById("foodImg"),wrap=document.getElementById("imgWrap");
   const prev=wrap.querySelector(".fb-e");if(prev)prev.remove();
@@ -3548,9 +3530,10 @@ function showResult(menu,nextMenus){
   const rc=document.getElementById("resultCard");
   rc.classList.remove("show");void rc.offsetWidth;rc.classList.add("show");
   addHist(menu);updateProg();
-  // AI 추천 이유 즉시 호출 (스켈레톤은 _resetAiReason()이 이미 표시 중)
-  // 호출 순서: recommend 먼저. nutrition·food-match·cpa-body는 사용자가 명시적으로 펼칠 때만.
+  // AI 추천 이유 + 함께 먹으면 좋은 음식 — 결과 표시 시 자동 호출
+  // 호출 순서: recommend 먼저, food-companion 병렬. nutrition·story는 사용자가 명시적으로 펼칠 때만.
   loadAiReason();
+  loadFoodCompanion();
 
   // GA4: 메뉴 추천 이벤트 전송
   _ga("menu_recommend", {
