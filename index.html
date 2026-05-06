@@ -2625,8 +2625,9 @@ async function runFoodMatch(){
 function _resetFoodMatch(){
   const r=document.getElementById("matchResult");
   if(r)r.classList.remove("show");
+  // 음식 궁합 입력창은 항상 빈 값으로 초기화 — 직전 식사(lmInput)와 분리
   const inp=document.getElementById("matchInput");
-  if(inp&&!inp.value&&typeof lastMeal==="string"&&lastMeal)inp.value=lastMeal;
+  if(inp)inp.value="";
   // 음식 궁합 섹션은 항상 노출 — 입력 결과만 초기화
 }
 
