@@ -729,6 +729,8 @@ body{
   background:#fff;border:1px solid #E0F0E8;border-left:4px solid #C8E6D5;
   border-radius:12px;padding:14px;
 }
+.match-loading-text{font-size:12px;color:#2E7E47;font-weight:700;margin-bottom:6px;letter-spacing:.2px;}
+.match-fallback-note{font-size:11px;color:#888;margin-top:6px;text-align:right;letter-spacing:.2px;}
 .match-err{padding:14px;color:var(--text2);font-size:12.5px;text-align:center;}
 .match-err button{margin-left:6px;background:none;border:none;color:#FF6B35;font-weight:800;cursor:pointer;text-decoration:underline;}
 
@@ -2259,12 +2261,16 @@ async function loadNutrition(){
   }
   btn.classList.add("loading");
   btn.innerHTML='<span class="spinner"></span>영양 분석 중...';
+  // 15초 타임아웃 (서버 캐시 히트는 즉시 응답, AI 호출은 보통 3~5초)
+  const nutCtrl=new AbortController();
+  const nutTm=setTimeout(()=>nutCtrl.abort(),15000);
   try{
     const health=(typeof getHealthInfo==="function")?getHealthInfo():null;
     const r=await fetch("/api/nutrition",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({menuName:curMenu.n, weight: health?.weight||null})
+      body:JSON.stringify({menuName:curMenu.n, weight: health?.weight||null}),
+      signal:nutCtrl.signal
     });
     const j=await r.json();
     if(!r.ok||!j.data)throw new Error(j.error||"실패");
@@ -2345,6 +2351,7 @@ async function loadNutrition(){
     btn.innerHTML='⚠️ 영양정보를 불러오지 못했어요. <span style="text-decoration:underline;">다시 누르기</span>';
     setTimeout(()=>{btn.textContent="🥗 영양정보 보기, 추천과 주의 보기";},2800);
   }finally{
+    clearTimeout(nutTm);
     btn.classList.remove("loading");
   }
 }
@@ -2379,22 +2386,27 @@ async function loadStory(){
     btn.textContent="📖 이 음식 이야기";
     return;
   }
-  // 별도 엔드포인트 /api/nutrition-story (24h 캐시) — 메모리 캐시도 보관
+  // 별도 엔드포인트 /api/nutrition-story (7d 서버 캐시) — 메모리 캐시도 보관
   let d=_storyCache;
   if(!d){
     btn.classList.add("loading");
     btn.innerHTML='<span class="spinner"></span>이야기 불러오는 중...';
+    // 15초 타임아웃
+    const stCtrl=new AbortController();
+    const stTm=setTimeout(()=>stCtrl.abort(),15000);
     try{
-      const r=await fetch("/api/nutrition-story",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({menuName:curMenu.n})});
+      const r=await fetch("/api/nutrition-story",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({menuName:curMenu.n}),signal:stCtrl.signal});
       const j=await r.json();
       if(!r.ok||!j.data)throw new Error(j.error||"실패");
       d=j.data;_storyCache=d;
     }catch(e){
       btn.innerHTML='⚠️ 이야기를 불러오지 못했어요. <span style="text-decoration:underline;">다시 누르기</span>';
       setTimeout(()=>{btn.textContent="📖 이 음식 이야기";},2800);
+      clearTimeout(stTm);
       btn.classList.remove("loading");
       return;
     }
+    clearTimeout(stTm);
     btn.classList.remove("loading");
   }
   document.getElementById("storyTitle").textContent=`${curMenu.n} 이야기`;
@@ -2415,12 +2427,13 @@ async function loadStory(){
 /* 함께 먹으면 좋은 음식 — showResult에서 자동 호출 */
 let _companionCache=null;
 function _matchSkeleton(){
-  return [1,2,3].map(()=>`
+  const cards=[1,2,3].map(()=>`
     <div class="match-skel-card">
       <span class="skel skel-line skel-line-w50"></span>
       <span class="skel skel-line skel-line-w90"></span>
       <span class="skel skel-line skel-line-w70"></span>
     </div>`).join("");
+  return `<div class="match-loading-text">🔍 최적의 궁합 음식 분석 중...</div>${cards}`;
 }
 function _resetFoodCompanion(){
   _companionCache=null;
@@ -2432,21 +2445,39 @@ async function loadFoodCompanion(){
   const list=document.getElementById("matchRecommList");
   if(!list)return;
   list.innerHTML=_matchSkeleton();
+  // 30초 클라이언트 타임아웃 (서버는 자체 30s × 2회 재시도 후 fallback 반환)
+  const ctrl=new AbortController();
+  const tm=setTimeout(()=>ctrl.abort(),30000);
   try{
     const health=(typeof getHealthInfo==="function")?getHealthInfo():null;
     const r=await fetch("/api/food-companion",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({menuName:curMenu.n, menuCategory:curMenu.cat||"", healthInfo:health, uid:FP_UID})
+      body:JSON.stringify({menuName:curMenu.n, menuCategory:curMenu.cat||"", healthInfo:health, uid:FP_UID}),
+      signal:ctrl.signal
     });
     const j=await r.json();
     if(!r.ok||!j.data||!Array.isArray(j.data.companions)||!j.data.companions.length)throw new Error(j.error||"실패");
     _companionCache=j.data.companions;
-    list.innerHTML=_companionCache.map((c,i)=>_renderMatchCard(c,i)).join("");
-    if(typeof _ga==="function")_ga("food_companion_load",{menu:curMenu.n,source:j.source||"ai"});
+    const isFallback=!!j.data.isFallback||j.source==="fallback";
+    const cards=_companionCache.map((c,i)=>_renderMatchCard(c,i)).join("");
+    const footer=isFallback?`<div class="match-fallback-note">* 기본 추천 (AI 분석 일시 불가)</div>`:"";
+    list.innerHTML=cards+footer;
+    if(typeof _ga==="function")_ga("food_companion_load",{menu:curMenu.n,source:j.source||"ai",fallback:isFallback?1:0});
   }catch(e){
-    list.innerHTML=`<div class="match-err">⚠️ 궁합 음식을 불러오지 못했어요. <button onclick="loadFoodCompanion()">↻ 재시도</button></div>`;
+    // 서버가 fallback을 늘 반환하므로 여기 도달은 네트워크/abort일 때. 그래도 fallback 표시.
+    list.innerHTML=_renderClientFallback();
+  }finally{
+    clearTimeout(tm);
   }
+}
+function _renderClientFallback(){
+  const cards=[
+    {rank:1,name:'계란',emoji:'🥚',shortReason:'단백질 보완',detailReason:'계란의 완전 단백질이 부족한 아미노산을 채워 균형을 맞춰줍니다.',evidence:'영양학 기본 원칙',coupangKeyword:'계란 1판',kcalBalance:'1개 약 78kcal — 부담 없이 추가'},
+    {rank:2,name:'두부',emoji:'🫘',shortReason:'식물성 단백질',detailReason:'두부의 이소플라본과 식물성 단백질이 건강한 식단에 도움이 됩니다.',evidence:'식약처 인정',coupangKeyword:'두부',kcalBalance:'1/2모 약 100kcal'},
+    {rank:3,name:'방울토마토',emoji:'🍅',shortReason:'비타민C 보충',detailReason:'리코펜과 비타민C가 풍부해 항산화·면역에 도움이 됩니다.',evidence:'식약처 인정',coupangKeyword:'방울토마토',kcalBalance:'10개 약 30kcal'}
+  ].map((c,i)=>_renderMatchCard(c,i)).join("");
+  return cards+`<div class="match-fallback-note">* 기본 추천 (AI 분석 일시 불가)</div>`;
 }
 function _renderMatchCard(c, i){
   const rank=parseInt(c.rank,10)||(i+1);
@@ -3587,10 +3618,9 @@ function showResult(menu,nextMenus){
   const rc=document.getElementById("resultCard");
   rc.classList.remove("show");void rc.offsetWidth;rc.classList.add("show");
   addHist(menu);updateProg();
-  // AI 추천 이유 + 함께 먹으면 좋은 음식 — 결과 표시 시 자동 호출
-  // 호출 순서: recommend 먼저, food-companion 병렬. nutrition·story는 사용자가 명시적으로 펼칠 때만.
-  loadAiReason();
-  loadFoodCompanion();
+  // AI 추천 이유 + 함께 먹으면 좋은 음식 — 결과 표시 시 병렬 호출
+  // nutrition·story는 사용자가 명시적으로 펼칠 때만 호출.
+  Promise.all([loadAiReason(), loadFoodCompanion()]).catch(()=>{});
 
   // GA4: 메뉴 추천 이벤트 전송
   _ga("menu_recommend", {
