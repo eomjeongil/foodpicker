@@ -2236,8 +2236,9 @@ if (document.readyState === 'loading') {
   setTimeout(loadHealth, 0);
 }
 
-/* 영양정보 lazy-load + 토글 (story/insight 캐시 보관) */
+/* 영양정보 lazy-load + 토글 (영양: 빠른 응답 / 이야기: 별도 엔드포인트) */
 let _nutriCache=null;
+let _storyCache=null;
 async function loadNutrition(){
   if(!curMenu)return;
   const btn=document.getElementById("nutriBtn");
@@ -2344,6 +2345,7 @@ function _resetNutrition(){
   if(sec)sec.classList.remove("show");
   if(btn){btn.textContent="🥗 영양정보 보기, 추천과 주의 보기";btn.classList.remove("loading");}
   _nutriCache=null;
+  _storyCache=null;
   const stSec=document.getElementById("storySection");
   const stBtn=document.getElementById("storyBtn");
   if(stSec)stSec.classList.remove("show");
@@ -2368,17 +2370,16 @@ async function loadStory(){
     btn.textContent="📖 이 음식 이야기";
     return;
   }
-  // 영양정보 응답에 6항목 같이 옴 → 캐시 활용, 없으면 가져오기
-  let d=_nutriCache;
+  // 별도 엔드포인트 /api/nutrition-story (24h 캐시) — 메모리 캐시도 보관
+  let d=_storyCache;
   if(!d){
     btn.classList.add("loading");
     btn.innerHTML='<span class="spinner"></span>이야기 불러오는 중...';
     try{
-      const health=(typeof getHealthInfo==="function")?getHealthInfo():null;
-      const r=await fetch("/api/nutrition",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({menuName:curMenu.n,weight:health?.weight||null})});
+      const r=await fetch("/api/nutrition-story",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({menuName:curMenu.n})});
       const j=await r.json();
       if(!r.ok||!j.data)throw new Error(j.error||"실패");
-      d=j.data;_nutriCache=d;
+      d=j.data;_storyCache=d;
     }catch(e){
       btn.innerHTML='⚠️ 이야기를 불러오지 못했어요. <span style="text-decoration:underline;">다시 누르기</span>';
       setTimeout(()=>{btn.textContent="📖 이 음식 이야기";},2800);
@@ -2389,17 +2390,8 @@ async function loadStory(){
   }
   document.getElementById("storyTitle").textContent=`${curMenu.n} 이야기`;
   const grid=document.getElementById("storyGrid");
-  // 6항목 렌더 — 누락된 필드는 카드 자체를 숨김 (구버전 캐시 호환을 위해 story/insight도 fallback)
-  const fallback={
-    origin: d.origin || d.story || "",
-    regional: d.regional || "",
-    season: d.season || "",
-    funfact: d.funfact || d.insight || "",
-    world: d.world || "",
-    trend: d.trend || ""
-  };
   grid.innerHTML=_STORY_FIELDS.map(f=>{
-    const v=(fallback[f.key]||"").trim();
+    const v=(d[f.key]||"").trim();
     if(!v)return "";
     return `<div class="story-card ${f.cls}">
       <div class="story-card-head"><span>${f.icon}</span><span>${f.label}</span></div>
