@@ -1449,12 +1449,17 @@ async function _logClick(type, menu) {
       </div>
     </div>
   </div>
+  <!-- ⑦+ 식습관 리포트 트리거 (오늘 먹은 것 기록 위로 이동) -->
+  <button class="report-trigger" onclick="openReport()">
+    📊 내 식습관 리포트 보기
+  </button>
+
   <!-- ⑦ 오늘 식사 직접 입력 (접이식) -->
   <div class="daily-meal-card" style="margin:14px 0 12px;border:1px solid var(--border);border-radius:var(--rsm);background:#fff;overflow:hidden;">
     <button id="dailyMealToggle" type="button" onclick="toggleDailyMeal()"
       style="width:100%;padding:14px 16px;background:linear-gradient(135deg,#FFFAF5,#FFF7EE);border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;">
       <span style="display:flex;flex-direction:column;gap:3px;">
-        <span style="font-size:14px;font-weight:800;color:var(--pr);">📝 오늘 먹은 것 기록하기</span>
+        <span style="font-size:14px;font-weight:800;color:var(--pr);">📝 오늘 먹은 음식 매일 기록하여 내 식습관 알아가기</span>
         <span style="font-size:11.5px;color:var(--text2);font-weight:600;">직접 입력하면 더 정확한 식습관 분석이 가능해요</span>
       </span>
       <span id="dailyMealCaret" style="font-size:13px;font-weight:800;color:var(--text2);">▼</span>
@@ -1489,11 +1494,6 @@ async function _logClick(type, menu) {
       </button>
     </div>
   </div>
-
-  <!-- ⑦+ 식습관 리포트 트리거 -->
-  <button class="report-trigger" onclick="openReport()">
-    📊 내 식습관 리포트 보기
-  </button>
 
   <!-- ⑦++ 카카오 채널 구독 -->
   <div class="channel-card">
@@ -2475,7 +2475,6 @@ async function openReport(){
     const hasHealth=topCats.some(c=>c.category==="health");
     if(!hasHealth)tipList.push("이번 주는 채소류를 더 드셔보세요 🥗");
   }
-  if(dq!=="real")tipList.push("'먹었어요' 버튼을 눌러주시면 더 정확한 분석이 가능해요 ✨");
   if(tipList.length){
     html+=`<div class="report-section-title">💡 개선 추천</div>`;
     html+=tipList.map(t=>`<div class="report-insight" style="margin-top:6px;">${t}</div>`).join("");
@@ -2647,6 +2646,7 @@ function toggleDailyMeal(){
 }
 async function saveDailyMeal(){
   const date=new Date().toISOString().slice(0,10);
+  // 입력값은 저장 후에도 유지 (사용자가 수정·재저장 가능)
   const breakfast=document.getElementById("dmBreakfast")?.value.trim()||"";
   const lunch    =document.getElementById("dmLunch")?.value.trim()||"";
   const dinner   =document.getElementById("dmDinner")?.value.trim()||"";
@@ -2656,17 +2656,26 @@ async function saveDailyMeal(){
   }
   const btn=document.getElementById("dailyMealSave");
   if(btn){btn.disabled=true;btn.textContent="저장 중...";}
+  let ok=false;
   try{
     const r=await fetch("/api/daily-meal",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({date,breakfast,lunch,dinner,snack})});
     const j=await r.json().catch(()=>({}));
     if(!r.ok||!j.success)throw new Error(j.error||"저장 실패");
-    toast("오늘 식사가 기록됐어요! 📊");
+    ok=true;
+    toast("오늘 식사가 기록됐어요! 식습관 리포트에 반영됩니다 📊");
     if(typeof _ga==="function")_ga("daily_meal_save",{filled:[breakfast,lunch,dinner,snack].filter(Boolean).length});
   }catch(e){
-    toast("❌ 저장 실패. 잠시 후 다시 시도");
+    toast("저장에 실패했어요. 다시 시도해주세요 ⚠️");
     console.error("[daily-meal] failed:",e?.message);
-  }finally{
-    if(btn){btn.disabled=false;btn.textContent="💾 기록 저장";}
+  }
+  // 성공 시 "✓ 저장됨" 2초 → 원래대로. 실패 시 즉시 원복.
+  if(btn){
+    if(ok){
+      btn.textContent="✓ 저장됨";
+      setTimeout(()=>{btn.disabled=false;btn.textContent="💾 기록 저장";},2000);
+    }else{
+      btn.disabled=false;btn.textContent="💾 기록 저장";
+    }
   }
 }
 function quickPickAlt(name){
