@@ -1341,23 +1341,6 @@ async function _logClick(type, menu) {
         <div class="ai-reason-body" id="aiReasonText">분석 중...</div>
       </div>
 
-      <!-- ✅ 식사 실기록 버튼 (먹었어요/먹겠어요) -->
-      <div id="mealRecordWrap" style="margin-bottom:10px;">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <button id="btnAte" onclick="recordMeal('ate')"
-            style="padding:14px 10px;border:1.5px solid #B7E0C5;border-radius:13px;background:linear-gradient(135deg,#E8F7EC,#D6F0DD);color:#2E7E47;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;box-shadow:0 4px 12px rgba(76,175,125,.18);">
-            ✅ 먹었어요!
-          </button>
-          <button id="btnWillEat" onclick="recordMeal('will_eat')"
-            style="padding:14px 10px;border:1.5px solid #B6D6F2;border-radius:13px;background:linear-gradient(135deg,#E8F1FB,#D6E5F5);color:#1F5BA8;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;box-shadow:0 4px 12px rgba(31,91,168,.18);">
-            🕐 먹겠어요!
-          </button>
-        </div>
-        <p style="font-size:11.5px;color:#7A6E62;text-align:center;margin:8px 0 0;line-height:1.5;">
-          실기록을 남기면 더 정확한 식습관 리포트가 작성됩니다
-        </p>
-      </div>
-
       <!-- 다시 선택하기 (ai-reason-card 바로 아래로 이동) -->
       <div style="margin-bottom:12px;">
         <button onclick="scrollToTop()" style="width:100%;padding:15px;border:1.5px solid #FFE3CC;border-radius:13px;background:#fff;color:#7A6E62;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 2px 8px rgba(255,107,53,.06);"
@@ -3129,47 +3112,6 @@ function _resetAiReason(){
   if(row)row.querySelectorAll(".health-badge").forEach(b=>b.remove());
 }
 
-/* ── 식사 실기록 (먹었어요/먹겠어요) ── */
-// mealTime(morning/lunch/dinner/night) → 서버 enum(breakfast/lunch/dinner/snack)
-const _MEAL_TYPE_MAP={morning:"breakfast",lunch:"lunch",dinner:"dinner",night:"snack"};
-function _resetMealRecord(){
-  // 새 메뉴 추천 시 두 버튼 모두 활성화 상태로 복원
-  const a=document.getElementById("btnAte"), w=document.getElementById("btnWillEat");
-  if(a){a.disabled=false;a.style.opacity="1";a.style.cursor="pointer";a.innerHTML="✅ 먹었어요!";}
-  if(w){w.disabled=false;w.style.opacity="1";w.style.cursor="pointer";w.innerHTML="🕐 먹겠어요!";}
-}
-async function recordMeal(recordType){
-  if(!curMenu){toast("먼저 메뉴를 추천받아 주세요!");return;}
-  const a=document.getElementById("btnAte"), w=document.getElementById("btnWillEat");
-  // 이미 클릭된 경우 무시
-  if(a?.disabled||w?.disabled)return;
-  const meal_type=_MEAL_TYPE_MAP[mealTime]||"lunch";
-  const kcal=(_nutriCache&&isFinite(parseInt(_nutriCache.kcal,10)))?parseInt(_nutriCache.kcal,10):null;
-  const date=new Date().toISOString().slice(0,10);
-  const body={
-    menu:curMenu.n,
-    category:curMenu.cat||"etc",
-    meal_type,
-    record_type:recordType,
-    kcal,
-    date
-  };
-  try{
-    const r=await fetch("/api/meal-record",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-    const j=await r.json().catch(()=>({}));
-    if(!r.ok||!j.success)throw new Error(j.error||"저장 실패");
-    // 성공 — 두 버튼 비활성화 + 클릭한 버튼만 "기록됐어요 ✓"
-    const tag=recordType==="ate"?"✅ 기록됐어요 ✓":"🕐 기록됐어요 ✓";
-    if(a){a.disabled=true;a.style.opacity=recordType==="ate"?"1":"0.5";a.style.cursor="default";if(recordType==="ate")a.innerHTML=tag;}
-    if(w){w.disabled=true;w.style.opacity=recordType==="will_eat"?"1":"0.5";w.style.cursor="default";if(recordType==="will_eat")w.innerHTML=tag;}
-    toast("식사 기록이 저장됐어요! 리포트에 반영됩니다 📊");
-    if(typeof _ga==="function")_ga("meal_record",{record_type:recordType,menu:curMenu.n,category:curMenu.cat||"etc",meal_type});
-  }catch(e){
-    toast("❌ 기록 저장 실패. 잠시 후 다시 시도");
-    console.error("[meal-record] failed:",e?.message);
-  }
-}
-
 /* ── 하루 식사 직접 입력 (daily_meals) ── */
 // 오늘 기록 존재 여부 — 페이지 로드 시 1회 + 섹션 열 때마다 갱신
 let _dailyMealLoaded=false;
@@ -3640,7 +3582,6 @@ function showResult(menu,nextMenus){
   _resetAiReason();
   _resetNutrition();
   _resetFoodMatch();
-  _resetMealRecord();
   // 이미지
   const img=document.getElementById("foodImg"),wrap=document.getElementById("imgWrap");
   const prev=wrap.querySelector(".fb-e");if(prev)prev.remove();
