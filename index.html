@@ -533,6 +533,38 @@ body{
 .ml-del-date{font-size:10.5px;color:#999;margin-top:2px;}
 .ml-restore-btn{padding:5px 10px;border:1px solid #4CAF7D;border-radius:7px;background:#fff;color:#2E7D32;font-size:11.5px;font-weight:700;cursor:pointer;}
 .ml-restore-btn:hover{background:#E8F5E9;}
+/* ── 리포트 식습관 평가 + 부족 영양소 ── */
+.report-section{margin:12px 0;}
+.report-section-title{font-size:14px;font-weight:800;color:#2E7D32;margin:0 0 8px;display:flex;align-items:center;gap:6px;}
+.report-good-list,.report-bad-list{display:flex;flex-direction:column;gap:4px;margin:6px 0;}
+.report-good-item{background:#E8F5E9;border-radius:8px;padding:6px 10px;margin-bottom:4px;font-size:13px;color:#2E7D32;}
+.report-bad-item{background:#FFF3E0;border-radius:8px;padding:6px 10px;margin-bottom:4px;font-size:13px;color:#E65100;}
+.report-habit-type{display:inline-block;background:#E3F2FD;color:#1565C0;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;margin:8px 0;}
+.report-score{display:flex;align-items:baseline;gap:4px;margin:8px 0;}
+.rs-number{font-size:36px;font-weight:900;color:#FF6B35;line-height:1;}
+.rs-label{font-size:14px;color:#888;}
+.rs-bar-wrap{flex:1;background:#eee;border-radius:20px;height:8px;overflow:hidden;margin-left:10px;align-self:center;}
+.rs-bar{height:100%;border-radius:20px;background:linear-gradient(90deg,#FFB300,#FF6B35);transition:width .5s ease;}
+.report-deficiency{background:#fff;border:1px solid #eee;border-radius:12px;padding:14px;margin-bottom:10px;}
+.rd-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.rd-severity-high{font-size:14px;}
+.rd-severity-medium{font-size:14px;}
+.rd-severity-low{font-size:14px;}
+.rd-nutrient{font-size:15px;font-weight:800;color:#1F1C18;}
+.rd-deficit{font-size:12px;color:#C2392C;font-weight:700;margin-left:auto;}
+.rd-explanation{font-size:12px;color:#666;line-height:1.5;margin-bottom:10px;padding:8px;background:#F9F9F9;border-radius:8px;}
+.rd-food-title{font-size:12px;font-weight:700;color:#2E7D32;margin-bottom:6px;}
+.rd-food-card{display:flex;align-items:center;gap:10px;padding:8px;background:#F9FFF9;border-radius:8px;margin-bottom:6px;}
+.rdf-emoji{font-size:20px;flex-shrink:0;}
+.rdf-info{flex:1;min-width:0;}
+.rdf-name{font-size:13px;font-weight:700;color:#1F1C18;}
+.rdf-benefit{font-size:11px;color:#888;margin-top:2px;}
+.rdf-buy-btn{padding:6px 10px;background:#FF6B35;color:#fff;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;}
+.rdf-buy-btn:hover{background:#E55A2B;}
+.rd-menu-suggest{font-size:12px;color:#1565C0;background:#E3F2FD;padding:8px 10px;border-radius:8px;margin:8px 0;}
+.rd-supplement-note{font-size:11px;color:#aaa;border-top:1px solid #eee;padding-top:8px;margin-top:8px;line-height:1.4;}
+.rd-loading{padding:18px;text-align:center;color:#888;font-size:12.5px;background:#fff;border:1px dashed #ddd;border-radius:12px;}
+.rd-error{padding:14px;text-align:center;color:#C2392C;font-size:12px;background:#FFF5F5;border:1px solid #FFCDD2;border-radius:12px;}
 /* 오늘 칼로리 + 운동 추천 카드 */
 .report-today-kcal{background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border-radius:12px;padding:14px;margin-bottom:12px;}
 .rtk-title{font-size:13px;font-weight:700;color:#2E7D32;margin-bottom:8px;}
@@ -2314,6 +2346,40 @@ function selHealthMulti(el,key,exclusive){
 }
 function saveHealth(){
   try{localStorage.setItem(HEALTH_LS_KEY,JSON.stringify(selHealth));}catch(e){}
+  // 서버 user_health 동기화 — 디바운스 (칩 토글 연타 시 과호출 방지)
+  _scheduleHealthSync();
+}
+let _healthSyncT=null;
+function _scheduleHealthSync(){
+  if(_healthSyncT)clearTimeout(_healthSyncT);
+  _healthSyncT=setTimeout(_pushHealthInfo,800);
+}
+function _pushHealthInfo(){
+  if(!FP_UID)return;
+  // 입력값이 하나도 없으면 서버 호출 스킵 (의미 있는 동기화만)
+  const info=getHealthInfo?getHealthInfo():null;
+  if(!info)return;
+  const payload={
+    uid:FP_UID,
+    gender:typeof selGend!=="undefined"?selGend:null,
+    age:typeof selAgeV!=="undefined"?selAgeV:null,
+    height:info.height,
+    weight:info.weight,
+    bmi:info.bmi,
+    bloodPressure:info.bp,
+    bloodPressureMeds:info.bpMeds?1:0,
+    bloodSugar:info.glucose,
+    cholesterol:info.cholesterol,
+    familyHistory:info.family,
+    allergies:info.allergy,
+    healthGoal:info.goal
+  };
+  fetch("/api/user/health-info",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(payload),
+    keepalive:true
+  }).catch(()=>{});
 }
 function loadHealth(){
   try{
@@ -3047,6 +3113,12 @@ async function openReport(){
     ${a.nutrition_comment?`<div class="rsc-note" style="font-style:normal;color:#444;margin-top:8px;">💡 ${_escAt(a.nutrition_comment)}</div>`:""}
   </div>`;
 
+  // [모든 단계 공통] 식습관 평가 — good/bad/habit_type/health_score
+  html+=_renderHabitEvaluation(a.habit_evaluation);
+
+  // [모든 단계 공통] 부족 영양소 + 식품 추천 — 비동기 로드
+  html+=`<div id="deficiencyMount" class="rd-loading">🧪 영양소 분석 중...</div>`;
+
   // [stage 2+] 끼니별 분포 + 나트륨 + 개선 제안
   if(stage>=2){
     const dist=a.meal_type_dist||{};
@@ -3061,15 +3133,13 @@ async function openReport(){
     </div>`;
   }
 
-  // [stage 3+] 식습관 유형 + 주간 추이 + 잘한 것/아쉬운 것
+  // [stage 3+] 주간 추이 — habit_type/잘한·아쉬운은 위 habit_evaluation 카드에서 이미 노출
   if(stage>=3){
     const trend=Array.isArray(a.weekly_trend)?a.weekly_trend:[];
-    const max=trend.reduce((m,t)=>Math.max(m,t.kcal||0),0)||1;
-    html+=`<div class="report-stage-card">
-      <h4>🌟 식습관 진단</h4>
-      <div class="rsc-row"><span class="lbl">유형 진단</span><span class="val" style="color:#FF6B35;">${_escAt(a.habit_type||"-")}</span></div>
-      <div class="rsc-row" style="display:block;margin-top:10px;">
-        <div class="lbl" style="margin-bottom:6px;">최근 7일 칼로리 추이</div>
+    if(trend.length){
+      const max=trend.reduce((m,t)=>Math.max(m,t.kcal||0),0)||1;
+      html+=`<div class="report-stage-card">
+        <h4>📈 최근 7일 칼로리 추이</h4>
         <div class="report-trend-bar">
           ${trend.map(t=>{
             const pct=Math.round((t.kcal/max)*100);
@@ -3077,10 +3147,8 @@ async function openReport(){
             return `<div style="height:${Math.max(4,pct)}%;" title="${_escAt(t.date)}: ${t.kcal}kcal"><span class="ttd">${dd}</span></div>`;
           }).join("")}
         </div>
-      </div>
-      ${a.good_point?`<div class="rsc-note" style="font-style:normal;color:#2E7D32;margin-top:14px;">✅ <strong>잘한 점:</strong> ${_escAt(a.good_point)}</div>`:""}
-      ${a.improve_point?`<div class="rsc-note" style="font-style:normal;color:#C2392C;margin-top:4px;">⚠️ <strong>아쉬운 점:</strong> ${_escAt(a.improve_point)}</div>`:""}
-    </div>`;
+      </div>`;
+    }
   }
 
   // [stage 4] 월간 베스트/워스트 + 목표 진행 + 다음달 목표
@@ -3106,6 +3174,100 @@ async function openReport(){
 
   // 비동기로 픽헬스 자격 검증 → 양쪽 슬롯에 같은 카드 렌더
   verifyPickHealth();
+  // 비동기로 부족 영양소 + 식품 추천 분석 (Claude AI 또는 휴리스틱)
+  loadNutritionAnalysis();
+}
+
+/* ── 식습관 평가 카드 (good/bad/habit_type/health_score) ── */
+function _renderHabitEvaluation(he){
+  if(!he)return "";
+  const good=Array.isArray(he.good)?he.good:[];
+  const bad=Array.isArray(he.bad)?he.bad:[];
+  const score=Math.max(0,Math.min(100,parseInt(he.health_score,10)||0));
+  const habit=_escAt(he.habit_type||"분석 중");
+  const goodHtml=good.length
+    ? good.map(t=>`<div class="report-good-item">✅ ${_escAt(t)}</div>`).join("")
+    : `<div class="report-good-item" style="opacity:.6;">기록을 더 쌓으면 잘한 것을 찾아드려요</div>`;
+  const badHtml=bad.length
+    ? bad.map(t=>`<div class="report-bad-item">⚠️ ${_escAt(t)}</div>`).join("")
+    : `<div class="report-bad-item" style="opacity:.6;">현재 큰 문제는 보이지 않아요</div>`;
+  return `<div class="report-stage-card report-section">
+    <div class="report-section-title">📋 내 식습관 평가</div>
+    <div style="font-size:12px;color:#2E7D32;font-weight:700;margin:6px 0 2px;">잘하고 있는 것</div>
+    <div class="report-good-list">${goodHtml}</div>
+    <div style="font-size:12px;color:#E65100;font-weight:700;margin:10px 0 2px;">아쉬운 것</div>
+    <div class="report-bad-list">${badHtml}</div>
+    <div style="margin-top:10px;">식습관 유형 <span class="report-habit-type">🏷️ ${habit}</span></div>
+    <div class="report-score">
+      <span class="rs-number">${score}</span>
+      <span class="rs-label">/ 100점</span>
+      <span class="rs-bar-wrap"><span class="rs-bar" style="width:${score}%"></span></span>
+    </div>
+  </div>`;
+}
+
+/* ── 부족 영양소 분석 lazy-load ── */
+async function loadNutritionAnalysis(){
+  const mount=document.getElementById("deficiencyMount");
+  if(!mount)return;
+  let data=null, source="ai";
+  try{
+    const health=(typeof getHealthInfo==="function")?getHealthInfo():null;
+    const r=await fetch("/api/nutrition-analysis",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({uid:FP_UID, healthInfo:health})
+    });
+    const j=await r.json().catch(()=>({}));
+    if(j && j.data && Array.isArray(j.data.deficiencies)){
+      data=j.data; source=j.source||"ai";
+    }
+  }catch(e){ console.warn("[nutrition-analysis] failed:",e?.message); }
+
+  if(!data){
+    mount.outerHTML=`<div class="rd-error">⚠️ 영양소 분석을 불러오지 못했어요. 잠시 후 다시 시도</div>`;
+    return;
+  }
+
+  const overall=data.overall_comment?`<div class="rsc-note" style="text-align:center;color:#1565C0;font-style:normal;margin:6px 0 10px;font-size:12.5px;">${_escAt(data.overall_comment)}</div>`:"";
+  let html=`<div class="report-section">
+    <div class="report-section-title">🧪 부족한 영양소 + 식품 추천</div>
+    ${overall}
+    ${data.deficiencies.map((d,idx)=>_renderDeficiency(d,idx)).join("")}
+  </div>`;
+  mount.outerHTML=html;
+  if(typeof _ga==="function")_ga("nutrition_analysis_render",{n:data.deficiencies.length, source});
+}
+
+function _renderDeficiency(d, idx){
+  const sev=String(d.severity||"medium").toLowerCase();
+  const sevIcon={high:"🔴",medium:"🟠",low:"🟢"}[sev]||"🟠";
+  const sources=Array.isArray(d.food_sources)?d.food_sources:[];
+  const foodCards=sources.map((f,i)=>{
+    const kw=String(f.coupang_keyword||f.name||"").trim();
+    const sid=`fp_deficiency_${idx}_${i}`;
+    const link=kw?_cu(kw,sid,"deficiency"):"#";
+    return `<div class="rd-food-card">
+      <span class="rdf-emoji">${_escAt(f.emoji||"🍽️")}</span>
+      <div class="rdf-info">
+        <div class="rdf-name">${_escAt(f.name||"")} ${f.amount?`<span style="color:#888;font-weight:500;">(${_escAt(f.amount)})</span>`:""}</div>
+        <div class="rdf-benefit">${_escAt(f.benefit||"")}</div>
+      </div>
+      <a href="${link}" target="_blank" rel="noopener sponsored"
+         class="rdf-buy-btn" onclick="_logCpa('food_ingredient')">🛒 구매</a>
+    </div>`;
+  }).join("");
+  return `<div class="report-deficiency rd-severity-${_escAt(sev)}">
+    <div class="rd-header">
+      <span class="rd-severity-${_escAt(sev)}">${sevIcon}</span>
+      <span class="rd-nutrient">${_escAt(d.nutrient||"")}</span>
+      ${d.daily_deficit?`<span class="rd-deficit">${_escAt(d.daily_deficit)}</span>`:""}
+    </div>
+    <div class="rd-explanation">${_escAt(d.explanation||"")}</div>
+    <div class="rd-food-title">🥗 이 음식으로 먼저 채워보세요</div>
+    ${foodCards||""}
+    ${d.recommended_menu?`<div class="rd-menu-suggest">💡 추천 메뉴: ${_escAt(d.recommended_menu)}</div>`:""}
+    ${d.supplement_note?`<div class="rd-supplement-note">💊 ${_escAt(d.supplement_note)}</div>`:""}
+  </div>`;
 }
 function closeReport(){
   document.getElementById("reportOverlay")?.classList.remove("show");
