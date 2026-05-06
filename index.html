@@ -1889,6 +1889,8 @@ const _dbLoadPromise = fetch(DB_URL, { cache: 'force-cache' })
   .then(d => {
     DB = Array.isArray(d) ? d : [];
     _dbReady = true;
+    // top-level `let`은 window에 바인딩되지 않음 — 자동완성/일일 기록 모듈이 window.DB 참조하므로 명시적으로 노출
+    window.DB = DB;
     // 메뉴 카운트 배지 동적 업데이트 (DB 추가/감소에 자동 반영)
     const badge = document.getElementById('menuCountBadge');
     if (badge) badge.textContent = `🗂️ ${DB.length.toLocaleString()}개 메뉴 DB`;
