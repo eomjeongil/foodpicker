@@ -1271,6 +1271,21 @@ async function _logClick(type, menu) {
     </div>
   </div>
 
+  <!-- ③++ 직전 식사 (선택 · 추천 영양 균형 반영) -->
+  <div class="card last-meal-card">
+    <div class="sl" style="color:#FF6B35;font-weight:700;">🍽️ 직전 식사가 뭐였나요? <span style="font-size:11px;color:var(--text3);font-weight:700;margin-left:4px;">(선택사항)</span></div>
+    <div class="dm-row" style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+      <div class="dm-acwrap">
+        <input id="lmInput" type="text" maxlength="200" autocomplete="off" placeholder="직전에 드신 음식을 검색하세요"
+          style="width:100%;padding:10px 12px;border:1px solid #FFE3CC;border-radius:10px;font-size:13px;background:#fff;outline:none;">
+        <div class="dm-ac" id="lmAc"></div>
+      </div>
+      <span class="dm-tag" id="lmTag"></span>
+      <button type="button" id="lmClear" onclick="clearLastMeal()"
+        style="display:none;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text2);font-size:11.5px;font-weight:700;cursor:pointer;">지우기</button>
+    </div>
+  </div>
+
   <!-- ④ 카테고리 -->
   <div class="card">
     <div class="sl">🍱 카테고리</div>
@@ -1941,6 +1956,290 @@ let selMoodV="평범",selOccV="혼자",selBudgetV="보통";
 function selMood(el){document.querySelectorAll("#moodRow .ctog").forEach(t=>t.classList.remove("on"));el.classList.add("on");selMoodV=el.dataset.mood;snd("click");}
 function selOcc(el){document.querySelectorAll("#occRow .ctog").forEach(t=>t.classList.remove("on"));el.classList.add("on");selOccV=el.dataset.occ;snd("click");}
 function selBudget(el){document.querySelectorAll("#bgtRow .ctog").forEach(t=>t.classList.remove("on"));el.classList.add("on");selBudgetV=el.dataset.bg;snd("click");}
+
+/* ── 직전 식사 (lastMeal) — 추천 영양 균형 보조 컨텍스트 ── */
+// 시간대 자동 판단 — 6시 이전은 '어제 야식', 그 외는 아침/점심/저녁/간식
+function _lmDetectMealType(date){
+  const d=date||new Date();
+  const h=d.getHours();
+  if(h<6)        return "yesterday_snack";
+  if(h<10)       return "breakfast";
+  if(h<14)       return "lunch";
+  if(h<19)       return "dinner";
+  return "snack";
+}
+function getLastMeal(){
+  // 우선순위: localStorage 저장값 > 입력창 현재 값
+  try{
+    const saved=JSON.parse(localStorage.getItem("fp6_last_meal")||"null");
+    if(saved&&saved.text)return saved;
+  }catch(e){}
+  const input=document.getElementById("lmInput");
+  if(!input||!input.value.trim())return null;
+  return {
+    text: input.value.trim(),
+    kcal: parseInt(input.dataset.kcal||"0",10) || null,
+    category: input.dataset.category||"",
+    source: input.dataset.source||"manual",
+    mealType: _lmDetectMealType(),
+    savedAt: Date.now()
+  };
+}
+function _lmRenderTag(){
+  const tag=document.getElementById("lmTag");
+  const input=document.getElementById("lmInput");
+  const clr=document.getElementById("lmClear");
+  if(!tag||!input)return;
+  tag.className="dm-tag";
+  tag.removeAttribute("title");
+  const text=input.value.trim();
+  const kcal=parseInt(input.dataset.kcal||"0",10)||0;
+  const src=input.dataset.source||"";
+  if(!text){
+    tag.style.display="none";tag.textContent="";
+    if(clr)clr.style.display="none";
+    return;
+  }
+  if(src==="db"&&kcal){
+    tag.classList.add("is-db");
+    tag.textContent=`${kcal}kcal ✓`;
+    tag.style.display="inline-block";
+  }else if(src==="manual"){
+    tag.classList.add("is-manual");
+    tag.textContent="AI 분석 예정";
+    tag.title="저장 시 AI가 칼로리를 자동 분석합니다";
+    tag.style.display="inline-block";
+  }else{
+    tag.style.display="none";tag.textContent="";
+  }
+  if(clr)clr.style.display="inline-block";
+}
+function _lmSaveLocal(){
+  const input=document.getElementById("lmInput");
+  if(!input||!input.value.trim()){
+    localStorage.removeItem("fp6_last_meal");return;
+  }
+  const obj={
+    text:input.value.trim(),
+    kcal:parseInt(input.dataset.kcal||"0",10)||null,
+    category:input.dataset.category||"",
+    source:input.dataset.source||"manual",
+    mealType:_lmDetectMealType(),
+    savedAt:Date.now()
+  };
+  try{localStorage.setItem("fp6_last_meal",JSON.stringify(obj));}catch(e){}
+}
+function clearLastMeal(){
+  const input=document.getElementById("lmInput");
+  if(input){input.value="";delete input.dataset.kcal;delete input.dataset.category;delete input.dataset.source;}
+  localStorage.removeItem("fp6_last_meal");
+  const ac=document.getElementById("lmAc");
+  if(ac)ac.classList.remove("show");
+  _lmRenderTag();
+  if(typeof toast==="function")toast("직전 식사 정보를 지웠어요");
+}
+function _lmAcRender(query){
+  const ac=document.getElementById("lmAc");
+  if(!ac)return;
+  const q=String(query||"").trim();
+  let html="";
+  if(!q){
+    html=`<div class="dm-ac-item dm-ac-hint" data-hint="1">
+      <span class="dm-ac-emoji">🔍</span>
+      <span class="dm-ac-name">음식명을 입력하면 DB에서 검색합니다</span>
+    </div>`;
+  }else{
+    const hits=(typeof _dmSearchDB==="function")?_dmSearchDB(q,5):[];
+    if(hits.length){
+      for(const m of hits){
+        const kcal=(typeof _dmKcalFor==="function")?_dmKcalFor(m):500;
+        html+=`<div class="dm-ac-item" data-name="${_dmEsc(m.n)}" data-cat="${_dmEsc(m.cat||"etc")}" data-kcal="${kcal}" data-src="db">
+          <span class="dm-ac-emoji">${_dmEsc(m.e||"🍽️")}</span>
+          <span class="dm-ac-name">${_dmEsc(m.n)}</span>
+          <span class="dm-ac-meta">${kcal}kcal</span>
+        </div>`;
+      }
+      html+=`<div class="dm-ac-item dm-ac-manual-row" data-name="${_dmEsc(q)}" data-src="manual">
+        <span class="dm-ac-emoji">✏️</span>
+        <span class="dm-ac-name dm-ac-manual">DB에 없는 메뉴예요. '${_dmEsc(q)}' 직접 입력하기</span>
+      </div>`;
+    }else{
+      html=`<div class="dm-ac-item dm-ac-manual-row" data-name="${_dmEsc(q)}" data-src="manual">
+        <span class="dm-ac-emoji">✏️</span>
+        <span class="dm-ac-name dm-ac-manual">DB에 없는 메뉴예요. '${_dmEsc(q)}' 직접 입력하기</span>
+      </div>`;
+    }
+  }
+  ac.innerHTML=html;
+  ac.classList.add("show");
+}
+function _lmAcSelect(el){
+  const input=document.getElementById("lmInput");
+  if(!input||!el)return;
+  if(el.classList.contains("dm-ac-hint")||el.dataset.hint==="1")return;
+  const name=el.dataset.name||"";
+  const src=el.dataset.src||"manual";
+  input.value=name;
+  if(src==="db"){
+    input.dataset.kcal=el.dataset.kcal||"";
+    input.dataset.category=el.dataset.cat||"";
+    input.dataset.source="db";
+  }else{
+    delete input.dataset.kcal;delete input.dataset.category;
+    input.dataset.source="manual";
+  }
+  _lmRenderTag();
+  _lmSaveLocal();
+  const ac=document.getElementById("lmAc");
+  if(ac)ac.classList.remove("show");
+  // 입력 후 — 시간대 기반 토스트 플로우 (오전 6시 이후만)
+  _lmAfterSave();
+}
+function _lmInit(){
+  const input=document.getElementById("lmInput");
+  const ac=document.getElementById("lmAc");
+  if(!input||!ac)return;
+  // localStorage 복원 (날짜는 무관, 단순히 마지막 직전 식사 보존)
+  try{
+    const saved=JSON.parse(localStorage.getItem("fp6_last_meal")||"null");
+    if(saved&&saved.text){
+      input.value=saved.text;
+      if(saved.kcal)input.dataset.kcal=String(saved.kcal);
+      if(saved.category)input.dataset.category=saved.category;
+      if(saved.source)input.dataset.source=saved.source;
+      _lmRenderTag();
+    }
+  }catch(e){}
+  let timer=null;
+  input.addEventListener("input",e=>{
+    delete input.dataset.kcal;
+    delete input.dataset.category;
+    delete input.dataset.source;
+    _lmRenderTag();
+    clearTimeout(timer);
+    const v=e.target.value;
+    timer=setTimeout(()=>_lmAcRender(v),120);
+  });
+  const openAc=()=>_lmAcRender(input.value||"");
+  input.addEventListener("focus",openAc);
+  input.addEventListener("click",openAc);
+  input.addEventListener("keydown",e=>{
+    if(e.key==="Escape"){ac.classList.remove("show");return;}
+    if(e.key==="Enter"){
+      const first=ac.querySelector(".dm-ac-item:not(.dm-ac-hint)");
+      if(first&&ac.classList.contains("show")){
+        e.preventDefault();_lmAcSelect(first);
+      }else if(input.value.trim()){
+        // 자동완성 안 떠도 Enter면 텍스트 그대로 manual 저장
+        input.dataset.source="manual";
+        _lmRenderTag();_lmSaveLocal();_lmAfterSave();
+      }
+    }
+  });
+  ac.addEventListener("mousedown",e=>{
+    const item=e.target.closest(".dm-ac-item");
+    if(item){e.preventDefault();_lmAcSelect(item);}
+  });
+  input.addEventListener("blur",()=>setTimeout(()=>ac.classList.remove("show"),120));
+}
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",_lmInit);
+}else{
+  _lmInit();
+}
+
+/* ── 입력 후 — 오늘 식사 기록에 추가할지 묻는 토스트 (오전 6시 이후만) ── */
+function _lmAfterSave(){
+  const input=document.getElementById("lmInput");
+  if(!input||!input.value.trim())return;
+  const lm=getLastMeal();
+  if(!lm)return;
+  const mt=lm.mealType;
+  // 오전 6시 이전은 어제 야식 — 오늘 리포트에 미포함, 안내만
+  if(mt==="yesterday_snack"){
+    if(typeof toast==="function")toast("어제 야식으로 기록됐어요 (오늘 리포트엔 미포함)");
+    return;
+  }
+  // 동일 메뉴 중복 토스트 방지 — sessionStorage로 한 번만
+  const key=`fp6_lm_added_prompt:${input.value.trim()}:${mt}`;
+  if(sessionStorage.getItem(key))return;
+  sessionStorage.setItem(key,"1");
+  _lmShowAddPrompt(lm);
+}
+function _lmShowAddPrompt(lm){
+  // 기존 prompt가 있으면 제거
+  const old=document.getElementById("lmAddPrompt");
+  if(old)old.remove();
+  const slotKor={breakfast:"아침",lunch:"점심",dinner:"저녁",snack:"간식/야식"};
+  const wrap=document.createElement("div");
+  wrap.id="lmAddPrompt";
+  wrap.style.cssText="position:fixed;left:50%;bottom:80px;transform:translateX(-50%);z-index:9999;background:#fff;border:1px solid var(--border-strong);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.16);padding:14px 16px;display:flex;flex-direction:column;gap:10px;max-width:340px;width:calc(100% - 32px);animation:toastIn .3s cubic-bezier(.34,1.56,.64,1);";
+  wrap.innerHTML=`
+    <div style="font-size:13px;font-weight:700;color:var(--text);line-height:1.5;">
+      직전 식사(<strong style="color:var(--pr);">${_dmEsc(lm.text)}</strong>)를<br>
+      오늘 ${_dmEsc(slotKor[lm.mealType]||"식사")} 기록에 추가할까요?
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button id="lmAddYes" style="flex:1;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,#4CAF7D,#2E9E6B);color:#fff;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 3px 10px rgba(76,175,125,.3);">✅ 추가</button>
+      <button id="lmAddNo" style="flex:1;padding:10px;border:1px solid var(--border-strong);border-radius:10px;background:#fff;color:var(--text2);font-size:13px;font-weight:800;cursor:pointer;">건너뛰기</button>
+    </div>`;
+  document.body.appendChild(wrap);
+  const close=()=>{wrap.remove();};
+  document.getElementById("lmAddYes").onclick=async ()=>{
+    close();
+    await _lmAddToDailyMeal(lm);
+  };
+  document.getElementById("lmAddNo").onclick=close;
+  // 12초 후 자동 닫기
+  setTimeout(()=>{if(document.getElementById("lmAddPrompt"))close();},12000);
+}
+async function _lmAddToDailyMeal(lm){
+  const date=new Date().toISOString().slice(0,10);
+  // 기존 daily-meal 기록 가져온 뒤 해당 슬롯만 갱신해 upsert
+  let cur={breakfast:"",lunch:"",dinner:"",snack:""};
+  let curK={breakfast_kcal:0,lunch_kcal:0,dinner_kcal:0,snack_kcal:0};
+  try{
+    const r=await fetch(`/api/daily-meal?date=${encodeURIComponent(date)}`,{cache:"no-store"});
+    const j=await r.json().catch(()=>({}));
+    if(j&&j.exists&&j.data){
+      cur={breakfast:j.data.breakfast||"",lunch:j.data.lunch||"",dinner:j.data.dinner||"",snack:j.data.snack||""};
+      curK={
+        breakfast_kcal:j.data.breakfast_kcal||0,
+        lunch_kcal:j.data.lunch_kcal||0,
+        dinner_kcal:j.data.dinner_kcal||0,
+        snack_kcal:j.data.snack_kcal||0
+      };
+    }
+  }catch(e){}
+  const slot=lm.mealType;
+  if(!["breakfast","lunch","dinner","snack"].includes(slot))return;
+  // 같은 슬롯에 이미 값이 있으면 쉼표로 추가
+  const existing=(cur[slot]||"").trim();
+  cur[slot]= existing && existing!==lm.text ? `${existing}, ${lm.text}` : lm.text;
+  curK[`${slot}_kcal`]=(curK[`${slot}_kcal`]||0)+(parseInt(lm.kcal,10)||0);
+  const total_kcal=(curK.breakfast_kcal||0)+(curK.lunch_kcal||0)+(curK.dinner_kcal||0)+(curK.snack_kcal||0);
+  // meals 메타도 같이 전송
+  const meals=["breakfast","lunch","dinner","snack"].map(k=>({
+    meal_type:k,
+    text:cur[k]||"",
+    kcal:curK[`${k}_kcal`]||0,
+    category:k===slot?(lm.category||""):"",
+    source:k===slot?(lm.source||"manual"):""
+  }));
+  try{
+    const r=await fetch("/api/daily-meal",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({date,...cur,...curK,total_kcal,meals})
+    });
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||!j.success)throw new Error(j.error||"저장 실패");
+    if(typeof toast==="function")toast("식사 기록에 추가됐어요! 📊");
+    if(typeof _ga==="function")_ga("last_meal_added",{slot,menu:lm.text});
+  }catch(e){
+    if(typeof toast==="function")toast("기록 추가 실패. 잠시 후 다시 시도");
+    console.error("[lastMeal:addDaily] failed:",e?.message);
+  }
+}
 
 /* ============================================================
    🩺 건강정보 (선택 · localStorage 자동 저장 / 서버에는 전송만)
@@ -2757,6 +3056,7 @@ async function loadAiReason(){
   _aiShowSkeleton();
   try{
     const health=(typeof getHealthInfo==="function")?getHealthInfo():null;
+    const lm=(typeof getLastMeal==="function")?getLastMeal():null;
     const r=await fetch("/api/recommend",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
@@ -2770,7 +3070,10 @@ async function loadAiReason(){
         category:typeof selCatV!=="undefined"?selCatV:"random",
         weather:typeof wxCode!=="undefined"?wxCode:"clear",
         mealTime:typeof mealTime!=="undefined"?mealTime:"lunch",
-        health:health
+        health:health,
+        lastMealName: lm?.text || null,
+        lastMealKcal: lm?.kcal || null,
+        lastMealCategory: lm?.category || null
       })
     });
     const j=await r.json();
