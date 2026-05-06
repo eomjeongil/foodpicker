@@ -1550,6 +1550,12 @@ async function _logClick(type, menu) {
 
       <!-- 기록 목록 -->
       <div class="meal-log-list" id="mealLogList" style="margin-top:12px;"></div>
+
+      <!-- 전체 초기화 버튼 — 기록이 1건 이상일 때만 노출 (loadMealLogs에서 토글) -->
+      <button id="mealLogResetBtn" type="button" onclick="resetMealLogs()"
+        style="display:none;width:100%;padding:10px;background:none;border:1px solid #ffcdd2;border-radius:8px;color:#e57373;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;">
+        🗑️ 전체 기록 초기화
+      </button>
     </div>
   </div>
 
@@ -3244,10 +3250,15 @@ async function loadMealLogs(){
     const logs=Array.isArray(j.logs)?j.logs:[];
     renderMealLogList(logs);
     updateMealProgress(logs.length);
+    // 리셋 버튼은 1건 이상일 때만
+    const resetBtn=document.getElementById("mealLogResetBtn");
+    if(resetBtn)resetBtn.style.display=logs.length?"block":"none";
   }catch(e){
     console.warn("[meal-log:list] failed:",e?.message);
     renderMealLogList([]);
     updateMealProgress(0);
+    const resetBtn=document.getElementById("mealLogResetBtn");
+    if(resetBtn)resetBtn.style.display="none";
   }
 }
 
@@ -3281,10 +3292,24 @@ async function deleteMealLog(id){
     const r=await fetch(`/api/meal-log/${id}?uid=${encodeURIComponent(FP_UID)}`,{method:"DELETE"});
     const j=await r.json().catch(()=>({}));
     if(!r.ok||!j.success)throw new Error(j.error||"삭제 실패");
-    loadMealLogs();
+    await loadMealLogs();
     _catGuardLikeToast("삭제됐어요");
   }catch(e){
     _catGuardLikeToast("삭제 실패. 잠시 후 다시 시도");
+  }
+}
+
+async function resetMealLogs(){
+  if(!confirm("모든 식사 기록이 삭제됩니다. 계속하시겠어요?"))return;
+  try{
+    const r=await fetch(`/api/meal-logs/reset?uid=${encodeURIComponent(FP_UID)}`,{method:"DELETE"});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||!j.success)throw new Error(j.error||"초기화 실패");
+    await loadMealLogs();
+    _catGuardLikeToast("기록이 초기화됐어요");
+    if(typeof _ga==="function")_ga("meal_log_reset",{deleted:j.deleted||0});
+  }catch(e){
+    _catGuardLikeToast("초기화 실패. 잠시 후 다시 시도");
   }
 }
 
