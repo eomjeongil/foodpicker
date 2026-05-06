@@ -2400,21 +2400,42 @@ function _renderTodayBlock(today){
   if(!today||!today.total_kcal)return "";
   const k=today.total_kcal||0, rec=today.recommend_kcal||1800;
   const kPct=Math.round(k/rec*100);
-  const kColor=kPct>110?"linear-gradient(90deg,#E63946,#FF6B6B)":kPct<60?"linear-gradient(90deg,#4D96FF,#6CB3FF)":"linear-gradient(90deg,var(--green),#4ECDC4)";
+  const kOver=k>rec;
+  // 총 칼로리 강조 색상: 초과=빨강, 정상/부족=초록
+  const kNumColor=kOver?"#C62828":"#2E7D32";
+  const kBarColor=kOver?"linear-gradient(90deg,#C62828,#E63946)":"linear-gradient(90deg,#2E7D32,#4ECDC4)";
   const carb=today.carb_pct||0, prot=today.protein_pct||0, fat=today.fat_pct||0;
+  // 비율 이상 범위(탄 65+, 단 12-, 지 40+)면 해당 칸 색상 강조
+  const carbStrong=carb>=65, protLow=prot<12, fatStrong=fat>40;
   const sod=today.total_sodium||0, sodPct=Math.round(sod/2000*100);
-  const sodColor=sod>2000?"linear-gradient(90deg,#E63946,#FF6B6B)":"linear-gradient(90deg,#4ECDC4,#06D6A0)";
+  const sodOver=sod>2000;
+  const sodNumColor=sodOver?"#C62828":"#2E7D32";
+  const sodBarColor=sodOver?"linear-gradient(90deg,#C62828,#E63946)":"linear-gradient(90deg,#2E7D32,#4ECDC4)";
+
   let html=`<div class="report-section-title">📅 오늘의 분석</div>
-    <div class="report-stat"><span class="l">총 칼로리</span><span class="v">${k}kcal <span style="font-size:11px;color:var(--text2);font-weight:700;">/ ${rec}kcal (${kPct}%)</span></span></div>
-    ${_gauge(kPct,kColor)}
-    <div class="report-section-title">⚖️ 영양소 균형 (탄·단·지)</div>
-    <div class="nutri-macro-bar" style="display:flex;height:18px;border-radius:50px;overflow:hidden;border:1px solid var(--border);">
-      <div style="width:${carb}%;background:#FFD166;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:#7A4A0F;">${carb>=10?`탄 ${carb}%`:""}</div>
-      <div style="width:${prot}%;background:#06D6A0;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:#fff;">${prot>=10?`단 ${prot}%`:""}</div>
-      <div style="width:${fat}%;background:#FF6B6B;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:#fff;">${fat>=10?`지 ${fat}%`:""}</div>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:6px 0 4px;">
+      <span style="font-size:13px;font-weight:700;color:var(--text2);">총 칼로리</span>
+      <span style="font-family:'Black Han Sans',sans-serif;font-size:24px;font-weight:900;color:${kNumColor};line-height:1;">
+        ${k}<span style="font-size:13px;font-weight:800;color:${kNumColor};letter-spacing:.3px;"> kcal</span>
+        <span style="font-size:11.5px;color:var(--text2);font-weight:700;margin-left:4px;">/ ${rec}kcal (${kPct}%)</span>
+      </span>
     </div>
-    <div class="report-section-title">🧂 나트륨 (${sod}mg / 2000mg)</div>
-    ${_gauge(sodPct,sodColor)}
+    ${_gauge(Math.min(kPct,150),kBarColor)}
+    <div class="report-section-title">⚖️ 영양소 균형 (탄·단·지)</div>
+    <div class="nutri-macro-bar" style="display:flex;height:22px;border-radius:50px;overflow:hidden;border:1px solid var(--border);">
+      <div style="width:${carb}%;background:${carbStrong?'linear-gradient(135deg,#C62828,#E63946)':'#FFB300'};display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:900;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3);">${carb>=10?`탄 ${carb}%`:""}</div>
+      <div style="width:${prot}%;background:${protLow?'linear-gradient(135deg,#FF8C00,#FFA040)':'#06D6A0'};display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:900;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3);">${prot>=10?`단 ${prot}%`:""}</div>
+      <div style="width:${fat}%;background:${fatStrong?'linear-gradient(135deg,#C62828,#E63946)':'#FF6B6B'};display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:900;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3);">${fat>=10?`지 ${fat}%`:""}</div>
+    </div>
+    <div class="report-section-title">🧂 나트륨</div>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:2px 0 6px;">
+      <span style="font-size:12.5px;font-weight:700;color:var(--text2);">${sodOver?'⚠️ 권장 초과':'권장 범위'}</span>
+      <span style="font-family:'Black Han Sans',sans-serif;font-size:22px;font-weight:900;color:${sodNumColor};line-height:1;">
+        ${sodOver?'⚠️ ':''}${sod}<span style="font-size:13px;font-weight:800;color:${sodNumColor};"> mg</span>
+        <span style="font-size:11.5px;color:var(--text2);font-weight:700;margin-left:4px;">/ 2000mg</span>
+      </span>
+    </div>
+    ${_gauge(Math.min(sodPct,150),sodBarColor)}
     <div class="report-section-title">🍱 식사별 상세</div>`;
   if(Array.isArray(today.meals)&&today.meals.length){
     for(const m of today.meals){
@@ -2423,38 +2444,37 @@ function _renderTodayBlock(today){
         <span style="font-size:16px;">${_SLOT_EMOJI[m.meal_type]||"🍽️"}</span>
         <span style="flex:1;font-weight:700;color:var(--text);">${_escAt(m.text||"")}</span>
         ${tag}
-        <span style="font-weight:800;color:var(--pr);">${m.kcal||0}kcal</span>
+        <span style="font-weight:900;color:var(--pr);font-size:14px;">${m.kcal||0}kcal</span>
       </div>`;
     }
   }
-  // 운동 추천 — 초과 칼로리 기반 / 균형이면 칭찬 메시지 / 데이터 없으면 생략
+  // 운동 추천 — 새 응답 구조 (excess / goal / maintain) — 항상 items 3개
   const ex=today.exercise;
-  if(ex&&ex.type==="balance"){
-    html+=`<div class="report-section-title">🔥 초과 칼로리 소모 운동 (참고용)</div>
-      <div class="report-insight" style="margin-top:6px;background:linear-gradient(135deg,#DDF1E1,#E8F7EC);border-color:#B7E0C5;color:#2E7E47;">
-        오늘 칼로리 균형 잘 맞추셨어요 ✅ 내일도 이렇게 드세요!
-      </div>`;
-  }else if(ex&&ex.type==="excess"&&Array.isArray(ex.items)&&ex.items.length){
-    html+=`<div class="report-section-title">🔥 초과 칼로리 소모 운동 (참고용)</div>
-      <div style="font-size:11.5px;color:var(--text2);font-weight:700;margin-bottom:6px;">초과 ${ex.excess_kcal||0}kcal 기준</div>
-      <div style="display:flex;flex-direction:column;gap:6px;">${ex.items.map(e=>`
-        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border-radius:10px;border:1px solid var(--border);">
-          <span style="font-size:20px;">${_escAt(e.emoji||"🏃")}</span>
-          <span style="flex:1;font-weight:700;color:var(--text);">${_escAt(e.name||"-")}</span>
-          <span style="font-weight:800;color:var(--pr);">약 ${e.minutes||0}분 내외 (참고용)</span>
-        </div>`).join("")}</div>
+  if(ex&&Array.isArray(ex.items)&&ex.items.length){
+    html+=`<div class="report-section-title">🔥 오늘의 운동 추천</div>
+      <div style="font-size:11.5px;color:var(--text2);font-weight:700;margin-bottom:8px;">${_escAt(ex.subTitle||"")}</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">${ex.items.map(e=>{
+        const calcTag=e.isCalculated?'<span style="font-size:10.5px;color:var(--text3);font-weight:700;margin-left:4px;">(참고용)</span>':'';
+        return `<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:#E8F5E9;border-radius:10px;border:1px solid #B7E0C5;border-left:4px solid #4CAF7D;">
+          <span style="font-size:22px;flex-shrink:0;">${_escAt(e.emoji||"🏃")}</span>
+          <div style="flex:1;display:flex;flex-direction:column;gap:2px;">
+            <div style="font-weight:800;color:var(--text);font-size:13.5px;">${_escAt(e.name||"-")} <span style="color:#2E7D32;font-weight:900;">${_escAt(e.duration||"")}</span>${calcTag}</div>
+            <div style="font-size:11.5px;color:var(--text2);font-weight:700;">${_escAt(e.description||"")}</div>
+          </div>
+        </div>`;
+      }).join("")}</div>
       <div style="font-size:10.5px;color:var(--text3);margin-top:8px;line-height:1.55;">
-        * MET 기반 추정치이며 개인 체력·강도에 따라 다를 수 있습니다.
+        ${_escAt(ex.disclaimer||"* MET 기반 추정치이며 개인 체력·강도에 따라 다를 수 있습니다.")}
       </div>`;
   }
-  // 데이터가 없으면(ex == null) 운동 섹션 자체를 생략
   // 건강 경고
   if(Array.isArray(today.health_alerts)&&today.health_alerts.length){
     html+=`<div class="report-section-title">⚠️ 건강 경고</div>`;
     html+=today.health_alerts.map(a=>{
       const bg=a.level==="warn"?"linear-gradient(135deg,#FFE0DA,#FFE6E0)":"linear-gradient(135deg,#FFF7EE,#FFFAE6)";
       const bd=a.level==="warn"?"#F5C8C8":"#F5E2A8";
-      return `<div class="report-insight" style="background:${bg};border-color:${bd};margin-top:6px;">${_escAt(a.text||"")}</div>`;
+      const cl=a.level==="warn"?"#C2392C":"#7A5A14";
+      return `<div class="report-insight" style="background:${bg};border-color:${bd};color:${cl};font-weight:700;margin-top:6px;">${_escAt(a.text||"")}</div>`;
     }).join("");
   }
   if(Array.isArray(today.tips)&&today.tips.length){
