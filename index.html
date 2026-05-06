@@ -829,6 +829,14 @@ body{
 .dm-ac-name{flex:1;font-weight:700;color:var(--text);}
 .dm-ac-meta{font-size:11px;color:var(--text2);font-weight:700;}
 .dm-ac-manual{color:var(--pr);font-weight:800;}
+/* 빈 입력 시 안내 행 — 클릭 비활성, 회색 텍스트 */
+.dm-ac-hint{cursor:default;color:var(--text2);font-weight:700;background:#FAFAF8;}
+.dm-ac-hint:hover{background:#FAFAF8;}
+.dm-ac-hint .dm-ac-name{color:var(--text2);font-weight:700;font-size:12.5px;}
+/* 매칭 결과와 직접 입력 행 사이 구분선 (강한 시각적 분리) */
+.dm-ac-item.dm-ac-manual-row{border-top:2px solid var(--border-strong);background:linear-gradient(135deg,#FFFAF5,#FFF7EE);}
+.dm-ac-item.dm-ac-manual-row:hover{background:linear-gradient(135deg,#FFF1E0,#FFEBD3);}
+.dm-ac-item.dm-ac-manual-row .dm-ac-name{color:var(--pr);font-weight:800;font-size:12.5px;}
 .report-overlay{
   display:none;position:fixed;inset:0;z-index:600;
   background:rgba(45,42,38,.65);backdrop-filter:blur(10px);
@@ -1506,7 +1514,7 @@ async function _logClick(type, menu) {
         <div class="dm-row" style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text);font-weight:700;">
           <span style="width:62px;flex-shrink:0;">🌅 아침</span>
           <div class="dm-acwrap">
-            <input id="dmBreakfast" type="text" maxlength="200" autocomplete="off" placeholder="예: 토스트, 커피"
+            <input id="dmBreakfast" type="text" maxlength="200" autocomplete="off" placeholder="아침에 드신 음식을 검색하세요"
               style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;background:#fff;outline:none;">
             <div class="dm-ac" id="dmAcBreakfast"></div>
           </div>
@@ -1515,7 +1523,7 @@ async function _logClick(type, menu) {
         <div class="dm-row" style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text);font-weight:700;">
           <span style="width:62px;flex-shrink:0;">☀️ 점심</span>
           <div class="dm-acwrap">
-            <input id="dmLunch" type="text" maxlength="200" autocomplete="off" placeholder="예: 비빔밥, 된장국"
+            <input id="dmLunch" type="text" maxlength="200" autocomplete="off" placeholder="점심에 드신 음식을 검색하세요"
               style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;background:#fff;outline:none;">
             <div class="dm-ac" id="dmAcLunch"></div>
           </div>
@@ -1524,7 +1532,7 @@ async function _logClick(type, menu) {
         <div class="dm-row" style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text);font-weight:700;">
           <span style="width:62px;flex-shrink:0;">🌙 저녁</span>
           <div class="dm-acwrap">
-            <input id="dmDinner" type="text" maxlength="200" autocomplete="off" placeholder="예: 삼겹살, 쌈채소"
+            <input id="dmDinner" type="text" maxlength="200" autocomplete="off" placeholder="저녁에 드신 음식을 검색하세요"
               style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;background:#fff;outline:none;">
             <div class="dm-ac" id="dmAcDinner"></div>
           </div>
@@ -1533,7 +1541,7 @@ async function _logClick(type, menu) {
         <div class="dm-row" style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text);font-weight:700;">
           <span style="width:62px;flex-shrink:0;">🍪 간식</span>
           <div class="dm-acwrap">
-            <input id="dmSnack" type="text" maxlength="200" autocomplete="off" placeholder="예: 아메리카노, 과자"
+            <input id="dmSnack" type="text" maxlength="200" autocomplete="off" placeholder="간식을 검색하세요"
               style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;background:#fff;outline:none;">
             <div class="dm-ac" id="dmAcSnack"></div>
           </div>
@@ -2880,6 +2888,7 @@ function _dmRenderTag(slot){
   if(!input||!tag)return;
   const meta=_dmGetMeta(input);
   tag.className="dm-tag";
+  tag.removeAttribute("title");
   if(!meta.text){tag.style.display="none";tag.textContent="";return;}
   if(meta.source==="db" && meta.kcal){
     tag.classList.add("is-db");
@@ -2888,6 +2897,7 @@ function _dmRenderTag(slot){
   }else if(meta.source==="manual"){
     tag.classList.add("is-manual");
     tag.textContent="AI 분석 예정";
+    tag.title="저장 시 AI가 칼로리를 자동 분석합니다";
     tag.style.display="inline-block";
   }else{
     tag.style.display="none";tag.textContent="";
@@ -3001,32 +3011,52 @@ function _dmSearchDB(q,limit){
 }
 function _dmAcRender(slot,query){
   const ac=document.getElementById(slot.ac);
+  const input=document.getElementById(slot.id);
   if(!ac)return;
+  // disabled 상태에선 드롭다운 노출 금지
+  if(input&&input.disabled){ac.classList.remove("show");ac.innerHTML="";return;}
   const q=String(query||"").trim();
-  if(!q){ac.classList.remove("show");ac.innerHTML="";return;}
-  const hits=_dmSearchDB(q,5);
   let html="";
-  for(let i=0;i<hits.length;i++){
-    const m=hits[i];
-    const kcal=_dmKcalFor(m.cat);
-    html+=`<div class="dm-ac-item" data-i="${i}" data-name="${_dmEsc(m.n)}" data-cat="${_dmEsc(m.cat||"etc")}" data-kcal="${kcal}" data-src="db">
-      <span class="dm-ac-emoji">${_dmEsc(m.e||"🍽️")}</span>
-      <span class="dm-ac-name">${_dmEsc(m.n)}</span>
-      <span class="dm-ac-meta">${kcal}kcal</span>
+  if(!q){
+    // 빈 입력 — 검색 안내 (클릭 비활성)
+    html=`<div class="dm-ac-item dm-ac-hint" data-hint="1">
+      <span class="dm-ac-emoji">🔍</span>
+      <span class="dm-ac-name">음식명을 입력하면 DB에서 검색합니다</span>
     </div>`;
+  }else{
+    const hits=_dmSearchDB(q,5);
+    if(hits.length){
+      // DB 매칭 결과 + 하단 구분선 + 직접 입력 행
+      for(let i=0;i<hits.length;i++){
+        const m=hits[i];
+        const kcal=_dmKcalFor(m.cat);
+        html+=`<div class="dm-ac-item" data-i="${i}" data-name="${_dmEsc(m.n)}" data-cat="${_dmEsc(m.cat||"etc")}" data-kcal="${kcal}" data-src="db">
+          <span class="dm-ac-emoji">${_dmEsc(m.e||"🍽️")}</span>
+          <span class="dm-ac-name">${_dmEsc(m.n)}</span>
+          <span class="dm-ac-meta">${kcal}kcal</span>
+        </div>`;
+      }
+      html+=`<div class="dm-ac-item dm-ac-manual-row" data-name="${_dmEsc(q)}" data-src="manual">
+        <span class="dm-ac-emoji">✏️</span>
+        <span class="dm-ac-name dm-ac-manual">DB에 없는 메뉴예요. '${_dmEsc(q)}' 직접 입력하기</span>
+      </div>`;
+    }else{
+      // 매칭 0건 — 직접 입력 행만
+      html=`<div class="dm-ac-item dm-ac-manual-row" data-name="${_dmEsc(q)}" data-src="manual">
+        <span class="dm-ac-emoji">✏️</span>
+        <span class="dm-ac-name dm-ac-manual">DB에 없는 메뉴예요. '${_dmEsc(q)}' 직접 입력하기</span>
+      </div>`;
+    }
   }
-  // 항상 마지막에 직접 입력 옵션 노출 (DB 매칭이 없거나 사용자가 정확히 원하는 게 없을 때)
-  html+=`<div class="dm-ac-item dm-ac-manual-row" data-name="${_dmEsc(q)}" data-src="manual">
-    <span class="dm-ac-emoji">✏️</span>
-    <span class="dm-ac-name dm-ac-manual">'${_dmEsc(q)}' 직접 입력하기</span>
-    <span class="dm-ac-meta">AI 분석</span>
-  </div>`;
   ac.innerHTML=html;
   ac.classList.add("show");
 }
 function _dmAcSelect(slot,el){
   const input=document.getElementById(slot.id);
   if(!input||!el)return;
+  // 안내 행은 클릭 비활성
+  if(el.classList.contains("dm-ac-hint")||el.dataset.hint==="1")return;
+  if(input.disabled)return;
   const name=el.dataset.name||"";
   const src=el.dataset.src||"manual";
   if(src==="db"){
@@ -3048,7 +3078,8 @@ function _dmInitAutocomplete(){
     if(!input||!ac)return;
     let timer=null;
     input.addEventListener("input",e=>{
-      // 입력값 변경 시 메타 초기화 — 사용자가 직접 타이핑한 경우는 일단 manual로 둠 (자동완성 선택 전엔 빈 source)
+      if(input.disabled){ac.classList.remove("show");return;}
+      // 입력값 변경 시 메타 초기화 — 자동완성 선택 전엔 source 비워둠
       input.dataset.source="";
       input.dataset.kcal="";
       input.dataset.category="";
@@ -3057,15 +3088,19 @@ function _dmInitAutocomplete(){
       const v=e.target.value;
       timer=setTimeout(()=>_dmAcRender(slot,v),120);
     });
-    input.addEventListener("focus",()=>{
-      const v=input.value;
-      if(v&&v.trim())_dmAcRender(slot,v);
-    });
+    // focus / click — 비어있어도 드롭다운에서 검색 안내 노출
+    const openAc=()=>{
+      if(input.disabled)return;
+      _dmAcRender(slot,input.value||"");
+    };
+    input.addEventListener("focus",openAc);
+    input.addEventListener("click",openAc);
     input.addEventListener("keydown",e=>{
-      if(e.key==="Escape"){ac.classList.remove("show");}
+      if(input.disabled)return;
+      if(e.key==="Escape"){ac.classList.remove("show");return;}
       if(e.key==="Enter"){
-        // 첫 항목 자동 선택
-        const first=ac.querySelector(".dm-ac-item");
+        // 안내 행은 건너뛰고 첫 선택 가능 항목 자동 선택
+        const first=ac.querySelector(".dm-ac-item:not(.dm-ac-hint)");
         if(first&&ac.classList.contains("show")){
           e.preventDefault();
           _dmAcSelect(slot,first);
