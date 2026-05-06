@@ -1005,18 +1005,47 @@ body{
 }
 </style>
 <script>
-async function _sendStat(endpoint, data) {
-  try { await fetch("https://foodpicker.kr/" + endpoint, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)}); } catch(e) {}
+/* UUID 기기 ID — 로컬 영구 저장. 모든 서버 API 호출에 함께 전송. */
+function _getOrCreateUid() {
+  try {
+    let uid = localStorage.getItem('fp_uid');
+    if (uid && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uid)) return uid;
+    uid = (window.crypto && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+          const r = (window.crypto && crypto.getRandomValues
+            ? crypto.getRandomValues(new Uint8Array(1))[0] & 0xf
+            : Math.random() * 16 | 0);
+          return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+    localStorage.setItem('fp_uid', uid);
+    return uid;
+  } catch (e) {
+    // localStorage 차단 환경 — 세션 메모리 fallback (서버에는 같은 uid 유지되지 않음)
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0;
+      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+  }
 }
-window.addEventListener("load", () => _sendStat("api/visit", {device: /Mobi/.test(navigator.userAgent) ? "mobile" : "pc"}));
+const FP_UID = _getOrCreateUid();
+
+async function _sendStat(endpoint, data) {
+  try { await fetch("https://foodpicker.kr/" + endpoint, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...data, uid: FP_UID})}); } catch(e) {}
+}
+window.addEventListener("load", () => {
+  // 첫 방문 등록 + 재방문 last_seen 갱신
+  fetch('/api/user/ping', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uid: FP_UID})}).catch(()=>{});
+  _sendStat("api/visit", {device: /Mobi/.test(navigator.userAgent) ? "mobile" : "pc"});
+});
 </script>
 
 <script>
 async function _logMenu(menu, category, gender, age) {
-  try { await fetch('https://foodpicker.kr/api/log-menu', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({menu,category,gender,age})}); } catch(e) {}
+  try { await fetch('https://foodpicker.kr/api/log-menu', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({menu,category,gender,age,uid:FP_UID})}); } catch(e) {}
 }
 async function _logClick(type, menu) {
-  try { await fetch('https://foodpicker.kr/api/log-click', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,menu})}); } catch(e) {}
+  try { await fetch('https://foodpicker.kr/api/log-click', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,menu,uid:FP_UID})}); } catch(e) {}
 }
 </script>
 </head>
@@ -1489,7 +1518,7 @@ async function _logClick(type, menu) {
       <div class="channel-title">매일 추천을 카톡으로</div>
       <div class="channel-desc">푸드피커 카카오 채널 추가 후 점심·저녁 알림 받기</div>
     </div>
-    <a class="channel-btn" id="channelBtn" href="https://pf.kakao.com/_xgexjxbX/friend" rel="noopener" onclick="_logCpa('kakao_channel')">채널 추가</a>
+    <a class="channel-btn" id="channelBtn" href="https://pf.kakao.com/_xgexjxbX/friend" target="_blank" rel="noopener" onclick="return addKakaoChannel(event);">채널 추가</a>
   </div>
 
 </div>
@@ -2401,7 +2430,7 @@ async function loadFoodCompanion(){
     const r=await fetch("/api/food-companion",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({menuName:curMenu.n, menuCategory:curMenu.cat||"", healthInfo:health})
+      body:JSON.stringify({menuName:curMenu.n, menuCategory:curMenu.cat||"", healthInfo:health, uid:FP_UID})
     });
     const j=await r.json();
     if(!r.ok||!j.data||!Array.isArray(j.data.companions)||!j.data.companions.length)throw new Error(j.error||"실패");
@@ -2723,8 +2752,8 @@ async function openReport(){
   let serverData=null, todayMeal=null;
   try{
     const [rRep,rDay]=await Promise.all([
-      fetch("/api/report",{cache:"no-store"}),
-      fetch(`/api/daily-meal?date=${encodeURIComponent(todayStr)}`,{cache:"no-store"})
+      fetch(`/api/report?uid=${encodeURIComponent(FP_UID)}`,{cache:"no-store"}),
+      fetch(`/api/daily-meal?uid=${encodeURIComponent(FP_UID)}&date=${encodeURIComponent(todayStr)}`,{cache:"no-store"})
     ]);
     if(rRep.ok)serverData=await rRep.json();
     if(rDay.ok)todayMeal=await rDay.json();
@@ -2752,6 +2781,7 @@ async function openReport(){
           method:"POST",
           headers:{"Content-Type":"application/json"},
           body:JSON.stringify({
+            uid:FP_UID,
             date:todayStr,
             weight:health?.weight||null,
             height:health?.height||null,
@@ -3028,7 +3058,7 @@ async function loadTodayDailyMeal(){
   const ctrl=new AbortController();
   const tm=setTimeout(()=>ctrl.abort(),10000);
   try{
-    const r=await fetch(`/api/daily-meal?date=${encodeURIComponent(date)}`,{cache:"no-store",signal:ctrl.signal});
+    const r=await fetch(`/api/daily-meal?uid=${encodeURIComponent(FP_UID)}&date=${encodeURIComponent(date)}`,{cache:"no-store",signal:ctrl.signal});
     const j=await r.json().catch(()=>({}));
     if(j&&j.exists&&j.data){
       _dailyMealHasToday=true;
@@ -3255,6 +3285,7 @@ async function saveDailyMeal(){
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
+        uid:FP_UID,
         date, breakfast, lunch, dinner, snack,
         breakfast_kcal, lunch_kcal, dinner_kcal, snack_kcal, total_kcal,
         meals
@@ -3292,7 +3323,7 @@ function quickPickAlt(name){
 /* CPA 클릭 트래킹 */
 function _logCpa(type){
   if(typeof _ga==="function")_ga("cpa_click",{type,menu:curMenu?.n||"",cat:curMenu?.cat||""});
-  fetch("/api/log-click",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:`cpa_${type}`,menu:curMenu?.n||""}),keepalive:true}).catch(()=>{});
+  fetch("/api/log-click",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:`cpa_${type}`,menu:curMenu?.n||"",uid:FP_UID}),keepalive:true}).catch(()=>{});
 }
 
 /* ============================================================
@@ -3569,7 +3600,7 @@ function imgFallback(){
 // 서버 클릭 트래킹 헬퍼 (sendBeacon으로 페이지 이탈에도 전송 보장)
 function _logClick(type, menu){
   try {
-    const payload = JSON.stringify({ type: type, menu: menu || '' });
+    const payload = JSON.stringify({ type: type, menu: menu || '', uid: FP_UID });
     if (navigator.sendBeacon) {
       navigator.sendBeacon('/api/log-click', new Blob([payload], { type: 'application/json' }));
     } else {
@@ -3835,6 +3866,52 @@ window.addEventListener("scroll",()=>{document.getElementById("fab").classList.t
 
 /* 카카오 초기화 */
 try{if(typeof Kakao!=="undefined"&&_cfg.k!=="YOUR_KAKAO_JS_KEY")Kakao.init(_cfg.k);}catch(e){}
+
+/* 카카오 채널 추가 + (가능하면) 로그인으로 user_id 받아 uid 연동
+   - SDK 사용 가능: Channel.addChannel + Auth.login → /api/user/link-kakao
+   - 실패/미초기화: 평범한 URL hop으로 폴백 (return true → <a> 기본 동작) */
+function addKakaoChannel(ev){
+  _logCpa('kakao_channel');
+  try{
+    if (typeof Kakao !== 'undefined' && Kakao.isInitialized && Kakao.isInitialized()
+        && Kakao.Channel && typeof Kakao.Channel.addChannel === 'function') {
+      // 채널 추가는 별도 popup. 결과 콜백 없음 — UX는 Kakao SDK가 관리.
+      try { Kakao.Channel.addChannel({ channelPublicId: '_xgexjxbX' }); } catch(_){}
+      // 동의 받으면 사용자 ID로 연동, 거부/실패해도 채널 추가는 유지
+      if (Kakao.Auth && typeof Kakao.Auth.login === 'function') {
+        Kakao.Auth.login({
+          scope: 'profile_nickname',
+          success: () => {
+            if (Kakao.API && typeof Kakao.API.request === 'function') {
+              Kakao.API.request({ url: '/v2/user/me' })
+                .then(u => {
+                  const kakaoId = u && u.id != null ? String(u.id) : '';
+                  if (!kakaoId) return;
+                  return fetch('/api/user/link-kakao', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uid: FP_UID, kakaoId })
+                  }).then(r => r.json()).then(j => {
+                    if (j && j.success && typeof toast === 'function') {
+                      toast('카카오 채널 연동 완료! 기기가 바뀌어도 데이터가 유지됩니다 ✅');
+                    }
+                    if (typeof _ga === 'function') _ga('kakao_link', { ok: !!(j && j.success) });
+                  });
+                })
+                .catch(err => console.warn('[kakao:me] failed:', err && err.message));
+            }
+          },
+          fail: (err) => { console.warn('[kakao:auth] cancelled/failed:', err); }
+        });
+      }
+      // SDK 경로 사용 — <a> 기본 동작 차단 (popup이 동시에 두 번 뜨는 것 방지)
+      if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
+      return false;
+    }
+  }catch(e){ console.warn('[kakao:channel] fallback to URL:', e && e.message); }
+  // SDK 미초기화/실패 → 기본 URL hop 유지
+  return true;
+}
 
 updateProg();renderHist();
 </script>
