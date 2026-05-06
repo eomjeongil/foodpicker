@@ -1449,6 +1449,13 @@ async function _logClick(type, menu) {
       </div>
     </div>
   </div>
+  <!-- ⑧ 히스토리 (추천 기록) — 리포트 보기 위로 이동 -->
+  <div class="hist-wrap" id="histWrap">
+    <div class="sl">📅 추천 기록</div>
+    <div id="histList"></div>
+    <button class="clrbtn" onclick="clearAll()">전체 초기화</button>
+  </div>
+
   <!-- ⑦+ 식습관 리포트 트리거 (오늘 먹은 것 기록 위로 이동) -->
   <button class="report-trigger" onclick="openReport()">
     📊 내 식습관 리포트 보기
@@ -1488,9 +1495,15 @@ async function _logClick(type, menu) {
             style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;background:#fff;outline:none;">
         </label>
       </div>
+      <div id="dailyMealLockedNotice" style="display:none;font-size:11.5px;color:var(--text2);font-weight:700;text-align:center;margin-top:10px;line-height:1.5;">
+        ✓ 오늘 기록이 저장되어 있어요. 수정하려면 아래 버튼을 눌러주세요.
+      </div>
       <button id="dailyMealSave" type="button" onclick="saveDailyMeal()"
         style="width:100%;margin-top:12px;padding:13px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--pr),#FF8A5A);color:#fff;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(255,107,53,.25);">
-        💾 기록 저장
+        저장완료
+      </button>
+      <button id="dailyMealEdit" type="button" onclick="enableDailyMealEdit()" style="display:none;width:100%;margin-top:12px;padding:13px;border:1.5px solid var(--pr);border-radius:11px;background:#fff;color:var(--pr);font-size:14px;font-weight:800;cursor:pointer;">
+        ✏️ 수정하기
       </button>
     </div>
   </div>
@@ -1505,12 +1518,6 @@ async function _logClick(type, menu) {
     <a class="channel-btn" id="channelBtn" href="https://pf.kakao.com/_xgexjxbX/friend" rel="noopener" onclick="_logCpa('kakao_channel')">채널 추가</a>
   </div>
 
-  <!-- ⑧ 히스토리 -->
-  <div class="hist-wrap" id="histWrap">
-    <div class="sl">📅 추천 기록</div>
-    <div id="histList"></div>
-    <button class="clrbtn" onclick="clearAll()">전체 초기화</button>
-  </div>
 </div>
 
 <!-- 관리자 트리거 (화면 왼쪽 하단 보이지 않는 영역 5번 탭) -->
@@ -2627,6 +2634,68 @@ async function recordMeal(recordType){
 }
 
 /* ── 하루 식사 직접 입력 (daily_meals) ── */
+// 오늘 기록 존재 여부 — 페이지 로드 시 1회 + 섹션 열 때마다 갱신
+let _dailyMealLoaded=false;
+let _dailyMealHasToday=false;
+function _setDailyMealMode(locked){
+  // locked=true: disabled 입력 + "수정하기" 버튼 / locked=false: 입력 가능 + "저장완료" 버튼
+  const ids=["dmBreakfast","dmLunch","dmDinner","dmSnack"];
+  ids.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.disabled=!!locked;
+    el.style.background=locked?"#F8F8F6":"#fff";
+    el.style.color=locked?"var(--text2)":"";
+  });
+  const saveBtn=document.getElementById("dailyMealSave");
+  const editBtn=document.getElementById("dailyMealEdit");
+  const notice =document.getElementById("dailyMealLockedNotice");
+  if(locked){
+    if(saveBtn)saveBtn.style.display="none";
+    if(editBtn)editBtn.style.display="block";
+    if(notice)notice.style.display="block";
+  }else{
+    if(saveBtn){saveBtn.style.display="block";saveBtn.disabled=false;saveBtn.textContent="저장완료";}
+    if(editBtn)editBtn.style.display="none";
+    if(notice)notice.style.display="none";
+  }
+}
+async function loadTodayDailyMeal(){
+  const date=new Date().toISOString().slice(0,10);
+  // 10초 타임아웃 — 네트워크 지연 시 무한 대기 방지
+  const ctrl=new AbortController();
+  const tm=setTimeout(()=>ctrl.abort(),10000);
+  try{
+    const r=await fetch(`/api/daily-meal?date=${encodeURIComponent(date)}`,{cache:"no-store",signal:ctrl.signal});
+    const j=await r.json().catch(()=>({}));
+    if(j&&j.exists&&j.data){
+      _dailyMealHasToday=true;
+      const m=j.data;
+      const setVal=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||"";};
+      setVal("dmBreakfast",m.breakfast);
+      setVal("dmLunch",m.lunch);
+      setVal("dmDinner",m.dinner);
+      setVal("dmSnack",m.snack);
+      _setDailyMealMode(true);
+    }else{
+      _dailyMealHasToday=false;
+      _setDailyMealMode(false);
+    }
+  }catch(e){
+    // 조회 실패는 조용히 — 저장 자체는 가능하도록 입력 모드로 둠
+    console.warn("[daily-meal:get] failed:",e?.message);
+    _dailyMealHasToday=false;
+    _setDailyMealMode(false);
+  }finally{
+    clearTimeout(tm);
+    _dailyMealLoaded=true;
+  }
+}
+function enableDailyMealEdit(){
+  // 잠금 해제 → 입력 가능 / 저장 버튼 노출
+  _setDailyMealMode(false);
+  if(typeof _ga==="function")_ga("daily_meal_edit",{});
+}
 function toggleDailyMeal(){
   const body=document.getElementById("dailyMealBody");
   const caret=document.getElementById("dailyMealCaret");
@@ -2641,6 +2710,8 @@ function toggleDailyMeal(){
     const ymd=d.toISOString().slice(0,10);
     const lbl=document.getElementById("dailyMealDateLabel");
     if(lbl)lbl.textContent=`📅 ${ymd} (오늘)`;
+    // 첫 열기 또는 자정 넘어 날짜 바뀐 경우 모두 재조회
+    loadTodayDailyMeal();
     if(typeof _ga==="function")_ga("daily_meal_open",{});
   }
 }
@@ -2655,26 +2726,44 @@ async function saveDailyMeal(){
     toast("최소 한 끼는 입력해주세요 😊");return;
   }
   const btn=document.getElementById("dailyMealSave");
+  // 버튼 상태 — finally에서 무조건 복원
+  const restore=(label,disabled)=>{
+    if(!btn)return;
+    btn.disabled=!!disabled;
+    btn.textContent=label;
+  };
   if(btn){btn.disabled=true;btn.textContent="저장 중...";}
+  // 10초 타임아웃 — 무한 "저장 중..." 방지
+  const ctrl=new AbortController();
+  const tm=setTimeout(()=>ctrl.abort(),10000);
   let ok=false;
   try{
-    const r=await fetch("/api/daily-meal",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({date,breakfast,lunch,dinner,snack})});
+    const r=await fetch("/api/daily-meal",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({date,breakfast,lunch,dinner,snack}),
+      signal:ctrl.signal
+    });
     const j=await r.json().catch(()=>({}));
     if(!r.ok||!j.success)throw new Error(j.error||"저장 실패");
     ok=true;
     toast("오늘 식사가 기록됐어요! 식습관 리포트에 반영됩니다 📊");
     if(typeof _ga==="function")_ga("daily_meal_save",{filled:[breakfast,lunch,dinner,snack].filter(Boolean).length});
   }catch(e){
-    toast("저장에 실패했어요. 다시 시도해주세요 ⚠️");
+    toast(e?.name==="AbortError"?"저장 시간이 초과됐어요. 다시 시도해주세요 ⚠️":"저장에 실패했어요. 다시 시도해주세요 ⚠️");
     console.error("[daily-meal] failed:",e?.message);
-  }
-  // 성공 시 "✓ 저장됨" 2초 → 원래대로. 실패 시 즉시 원복.
-  if(btn){
+  }finally{
+    clearTimeout(tm);
     if(ok){
-      btn.textContent="✓ 저장됨";
-      setTimeout(()=>{btn.disabled=false;btn.textContent="💾 기록 저장";},2000);
+      // "✓ 저장됨" 잠시 표시 → 잠금 모드로 전환
+      restore("✓ 저장됨",true);
+      _dailyMealHasToday=true;
+      setTimeout(()=>{
+        _setDailyMealMode(true);
+      },1500);
     }else{
-      btn.disabled=false;btn.textContent="💾 기록 저장";
+      // 실패 시 즉시 복원해 사용자가 재시도 가능
+      restore("저장완료",false);
     }
   }
 }
