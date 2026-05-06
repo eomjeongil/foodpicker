@@ -2081,8 +2081,6 @@ function _lmAcSelect(el){
   if(typeof setLast==="function")setLast(name);
   const ac=document.getElementById("lmAc");
   if(ac)ac.classList.remove("show");
-  // 입력 후 — 시간대 기반 토스트 플로우 (오전 6시 이후만)
-  _lmAfterSave();
 }
 function _lmInit(){
   const input=document.getElementById("lmInput");
@@ -2124,7 +2122,6 @@ function _lmInit(){
         input.dataset.source="manual";
         _lmRenderTag();_lmSaveLocal();
         if(typeof setLast==="function")setLast(input.value.trim());
-        _lmAfterSave();
       }
     }
   });
@@ -2138,99 +2135,6 @@ if(document.readyState==="loading"){
   document.addEventListener("DOMContentLoaded",_lmInit);
 }else{
   _lmInit();
-}
-
-/* ── 입력 후 — 오늘 식사 기록에 추가할지 묻는 토스트 (오전 6시 이후만) ── */
-function _lmAfterSave(){
-  const input=document.getElementById("lmInput");
-  if(!input||!input.value.trim())return;
-  const lm=getLastMeal();
-  if(!lm)return;
-  const mt=lm.mealType;
-  // 오전 6시 이전은 어제 야식 — 오늘 리포트에 미포함, 안내만
-  if(mt==="yesterday_snack"){
-    if(typeof toast==="function")toast("어제 야식으로 기록됐어요 (오늘 리포트엔 미포함)");
-    return;
-  }
-  // 동일 메뉴 중복 토스트 방지 — sessionStorage로 한 번만
-  const key=`fp6_lm_added_prompt:${input.value.trim()}:${mt}`;
-  if(sessionStorage.getItem(key))return;
-  sessionStorage.setItem(key,"1");
-  _lmShowAddPrompt(lm);
-}
-function _lmShowAddPrompt(lm){
-  // 기존 prompt가 있으면 제거
-  const old=document.getElementById("lmAddPrompt");
-  if(old)old.remove();
-  const slotKor={breakfast:"아침",lunch:"점심",dinner:"저녁",snack:"간식/야식"};
-  const wrap=document.createElement("div");
-  wrap.id="lmAddPrompt";
-  wrap.style.cssText="position:fixed;left:50%;bottom:80px;transform:translateX(-50%);z-index:9999;background:#fff;border:1px solid var(--border-strong);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.16);padding:14px 16px;display:flex;flex-direction:column;gap:10px;max-width:340px;width:calc(100% - 32px);animation:toastIn .3s cubic-bezier(.34,1.56,.64,1);";
-  wrap.innerHTML=`
-    <div style="font-size:13px;font-weight:700;color:var(--text);line-height:1.5;">
-      직전 식사(<strong style="color:var(--pr);">${_dmEsc(lm.text)}</strong>)를<br>
-      오늘 ${_dmEsc(slotKor[lm.mealType]||"식사")} 기록에 추가할까요?
-    </div>
-    <div style="display:flex;gap:8px;">
-      <button id="lmAddYes" style="flex:1;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,#4CAF7D,#2E9E6B);color:#fff;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 3px 10px rgba(76,175,125,.3);">✅ 추가</button>
-      <button id="lmAddNo" style="flex:1;padding:10px;border:1px solid var(--border-strong);border-radius:10px;background:#fff;color:var(--text2);font-size:13px;font-weight:800;cursor:pointer;">건너뛰기</button>
-    </div>`;
-  document.body.appendChild(wrap);
-  const close=()=>{wrap.remove();};
-  document.getElementById("lmAddYes").onclick=async ()=>{
-    close();
-    await _lmAddToDailyMeal(lm);
-  };
-  document.getElementById("lmAddNo").onclick=close;
-  // 12초 후 자동 닫기
-  setTimeout(()=>{if(document.getElementById("lmAddPrompt"))close();},12000);
-}
-async function _lmAddToDailyMeal(lm){
-  const date=new Date().toISOString().slice(0,10);
-  // 기존 daily-meal 기록 가져온 뒤 해당 슬롯만 갱신해 upsert
-  let cur={breakfast:"",lunch:"",dinner:"",snack:""};
-  let curK={breakfast_kcal:0,lunch_kcal:0,dinner_kcal:0,snack_kcal:0};
-  try{
-    const r=await fetch(`/api/daily-meal?date=${encodeURIComponent(date)}`,{cache:"no-store"});
-    const j=await r.json().catch(()=>({}));
-    if(j&&j.exists&&j.data){
-      cur={breakfast:j.data.breakfast||"",lunch:j.data.lunch||"",dinner:j.data.dinner||"",snack:j.data.snack||""};
-      curK={
-        breakfast_kcal:j.data.breakfast_kcal||0,
-        lunch_kcal:j.data.lunch_kcal||0,
-        dinner_kcal:j.data.dinner_kcal||0,
-        snack_kcal:j.data.snack_kcal||0
-      };
-    }
-  }catch(e){}
-  const slot=lm.mealType;
-  if(!["breakfast","lunch","dinner","snack"].includes(slot))return;
-  // 같은 슬롯에 이미 값이 있으면 쉼표로 추가
-  const existing=(cur[slot]||"").trim();
-  cur[slot]= existing && existing!==lm.text ? `${existing}, ${lm.text}` : lm.text;
-  curK[`${slot}_kcal`]=(curK[`${slot}_kcal`]||0)+(parseInt(lm.kcal,10)||0);
-  const total_kcal=(curK.breakfast_kcal||0)+(curK.lunch_kcal||0)+(curK.dinner_kcal||0)+(curK.snack_kcal||0);
-  // meals 메타도 같이 전송
-  const meals=["breakfast","lunch","dinner","snack"].map(k=>({
-    meal_type:k,
-    text:cur[k]||"",
-    kcal:curK[`${k}_kcal`]||0,
-    category:k===slot?(lm.category||""):"",
-    source:k===slot?(lm.source||"manual"):""
-  }));
-  try{
-    const r=await fetch("/api/daily-meal",{
-      method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({date,...cur,...curK,total_kcal,meals})
-    });
-    const j=await r.json().catch(()=>({}));
-    if(!r.ok||!j.success)throw new Error(j.error||"저장 실패");
-    if(typeof toast==="function")toast("식사 기록에 추가됐어요! 📊");
-    if(typeof _ga==="function")_ga("last_meal_added",{slot,menu:lm.text});
-  }catch(e){
-    if(typeof toast==="function")toast("기록 추가 실패. 잠시 후 다시 시도");
-    console.error("[lastMeal:addDaily] failed:",e?.message);
-  }
 }
 
 /* ============================================================
