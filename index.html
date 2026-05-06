@@ -533,6 +533,27 @@ body{
 .ml-del-date{font-size:10.5px;color:#999;margin-top:2px;}
 .ml-restore-btn{padding:5px 10px;border:1px solid #4CAF7D;border-radius:7px;background:#fff;color:#2E7D32;font-size:11.5px;font-weight:700;cursor:pointer;}
 .ml-restore-btn:hover{background:#E8F5E9;}
+/* 🎉 21끼 달성 축하 팝업 */
+.achieve-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;display:flex;align-items:center;justify-content:center;padding:14px;animation:fadeIn .25s ease;}
+.achieve-popup-inner{background:#fff;border-radius:20px;padding:28px 20px;width:90%;max-width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:popIn .35s cubic-bezier(.34,1.56,.64,1);}
+.ap-confetti{font-size:48px;margin-bottom:8px;}
+.ap-title{font-size:24px;font-weight:900;color:#1F1C18;margin-bottom:6px;}
+.ap-subtitle{font-size:14px;color:#666;line-height:1.5;margin-bottom:16px;}
+.ap-benefits{background:#F9FFF9;border-radius:12px;padding:12px 14px;margin-bottom:16px;text-align:left;}
+.ap-benefit-item{font-size:13px;color:#2E7D32;padding:4px 0;font-weight:600;}
+.ap-kakao-btn{width:100%;padding:14px;background:#FEE500;color:#1F1C18;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:8px;box-shadow:0 4px 14px rgba(254,229,0,.4);transition:transform .15s ease;}
+.ap-kakao-btn:hover{transform:translateY(-1px);}
+.ap-later-btn{width:100%;padding:12px;background:#f5f5f5;color:#888;border:none;border-radius:12px;font-size:13px;cursor:pointer;margin-bottom:12px;}
+.ap-later-btn:hover{background:#eee;color:#666;}
+.ap-note{font-size:10px;color:#aaa;line-height:1.5;}
+/* 결과 카드 하단 카카오 채널 유도 */
+.result-kakao-nudge{display:flex;align-items:center;gap:10px;padding:12px;background:#FFFDE7;border:1px solid #FFF176;border-radius:12px;margin-bottom:14px;}
+.rkn-icon{font-size:24px;flex-shrink:0;}
+.rkn-text{flex:1;min-width:0;}
+.rkn-title{font-size:12px;font-weight:700;color:#1F1C18;}
+.rkn-desc{font-size:11px;color:#888;margin-top:2px;line-height:1.4;}
+.rkn-btn{padding:8px 12px;background:#FEE500;color:#1F1C18;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;transition:transform .15s ease;}
+.rkn-btn:hover{transform:translateY(-1px);}
 /* ── 리포트 식습관 평가 + 부족 영양소 ── */
 .report-section{margin:12px 0;}
 .report-section-title{font-size:14px;font-weight:800;color:#2E7D32;margin:0 0 8px;display:flex;align-items:center;gap:6px;}
@@ -1505,6 +1526,16 @@ async function _logClick(type, menu) {
         <div class="related-grid" id="relatedGrid"></div>
       </div>
 
+      <!-- 카카오 채널 추가 유도 — 카카오 미연동 시에만 표시 (refreshKakaoNudge에서 토글) -->
+      <div class="result-kakao-nudge" id="resultKakaoNudge" style="display:none;">
+        <span class="rkn-icon">📱</span>
+        <div class="rkn-text">
+          <div class="rkn-title">이런 추천을 매일 카톡으로 받아보세요</div>
+          <div class="rkn-desc">푸드피커 채널 추가하면 매일 저녁 맞춤 건강리포트 발송</div>
+        </div>
+        <button onclick="linkKakaoChannel('result_card')" class="rkn-btn" type="button">채널 추가</button>
+      </div>
+
       <!-- 영양정보 (lazy-load) — 칼로리·탄단지·good_for·avoid_for까지 -->
       <button class="nutri-btn" id="nutriBtn" onclick="loadNutrition()">
         🥗 영양정보 보기, 추천과 주의 보기
@@ -1759,6 +1790,36 @@ async function _logClick(type, menu) {
     <div class="report-title">📊 내 식습관 리포트</div>
     <div id="reportContent"></div>
     <button class="report-close" onclick="closeReport()">닫기</button>
+  </div>
+</div>
+
+<!-- 🎉 21끼 달성 축하 + 카카오 연동 유도 팝업 — showAchievePopup이 토글 -->
+<div class="achieve-popup-overlay" id="achievePopup" style="display:none;"
+     onclick="if(event.target===this)closeAchievePopup()">
+  <div class="achieve-popup-inner" role="dialog" aria-modal="true" aria-labelledby="achieveTitle">
+    <div class="ap-confetti">🎉</div>
+    <div class="ap-title" id="achieveTitle">21끼 달성!</div>
+    <div class="ap-subtitle">신뢰할 수 있는 식습관 분석이<br>시작됐어요 🌟</div>
+
+    <div class="ap-benefits">
+      <div class="ap-benefit-item">✅ 기기가 바뀌어도 데이터 유지</div>
+      <div class="ap-benefit-item">✅ 매일 저녁 맞춤 건강리포트 카톡</div>
+      <div class="ap-benefit-item">✅ 픽헬스 맞춤 영양제 추천 연동</div>
+      <div class="ap-benefit-item">✅ picki.kr 신규 서비스 알림</div>
+    </div>
+
+    <button onclick="linkKakaoChannel('21_achieve')" class="ap-kakao-btn" type="button">
+      <img src="https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_small.png"
+           alt="" style="width:20px;vertical-align:middle;margin-right:6px;">
+      카카오로 1초 연동하기
+    </button>
+
+    <button onclick="closeAchievePopup()" class="ap-later-btn" type="button">나중에 하기</button>
+
+    <div class="ap-note">
+      * 카카오 채널 추가로 간편하게 연동됩니다<br>
+      * 광고성 메시지는 동의 시에만 발송됩니다
+    </div>
   </div>
 </div>
 
@@ -3555,10 +3616,80 @@ async function saveMealLog(){
     // 목록·진행 바 갱신
     loadMealLogs();
     if(typeof _ga==="function")_ga("meal_log_save",{type:_mealLogMeal,date:_mealLogDate});
+    // 21끼 달성 첫 순간 감지 — 팝업 1회 노출
+    _check21AchievementAfterSave();
   }catch(e){
     _catGuardLikeToast("저장 실패. 잠시 후 다시 시도");
     console.error("[meal-log:save] failed:",e?.message);
   }
+}
+
+/* ── 21끼 달성 감지 + 카카오 가입 유도 팝업 ── */
+const FP_LS_ACHIEVED="fp_21_achieved";
+const FP_LS_KAKAO   ="fp_kakao_linked";
+async function _check21AchievementAfterSave(){
+  try{
+    // 이미 표시했거나 카카오 연동 완료된 사용자는 스킵
+    if(localStorage.getItem(FP_LS_ACHIEVED)==="1")return;
+    if(localStorage.getItem(FP_LS_KAKAO)==="1")return;
+    const r=await fetch(`/api/meal-logs/verify-pickhealth?uid=${encodeURIComponent(FP_UID)}`,{cache:"no-store"});
+    if(!r.ok)return;
+    const d=await r.json();
+    if(d && d.is_eligible){
+      showAchievePopup();
+    }
+  }catch(_){ /* 네트워크 실패는 조용히 패스 */ }
+}
+function showAchievePopup(){
+  const el=document.getElementById("achievePopup");
+  if(!el)return;
+  el.style.display="flex";
+  if(typeof _ga==="function")_ga("achieve21_popup_open",{});
+}
+function closeAchievePopup(){
+  const el=document.getElementById("achievePopup");
+  if(el)el.style.display="none";
+  // 다시 안 뜨도록 표시 (사용자가 명시적으로 닫은 경우만)
+  try{ localStorage.setItem(FP_LS_ACHIEVED,"1"); }catch(_){}
+  if(typeof _ga==="function")_ga("achieve21_popup_close",{});
+}
+
+/* 카카오 채널 연동 — pf.kakao.com/.../friend 새 탭 + 서버 기록
+   원래의 SDK 기반 addKakaoChannel과 별도. 이 함수는 21끼 팝업/결과카드 nudge에서 호출. */
+const KAKAO_CHANNEL_URL="https://pf.kakao.com/_xgexjxbX/friend";
+async function linkKakaoChannel(source){
+  const _src=["21_achieve","result_card","report"].includes(source)?source:"manual";
+  // 1) 채널 추가 페이지 — 새 탭으로 열기 (모바일에서도 안전한 사용자-제스처 컨텍스트)
+  try{ window.open(KAKAO_CHANNEL_URL,"_blank","noopener"); }catch(_){}
+  // 2) 서버에 출처 기록 (kakaoId 없이도 OK — 채널 추가만 추적)
+  try{
+    await fetch("/api/user/link-kakao",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({uid:FP_UID, source:_src}),
+      keepalive:true
+    });
+  }catch(_){}
+  // 3) 로컬 표시 — 이후 nudge / 팝업 비활성화
+  try{
+    localStorage.setItem(FP_LS_KAKAO,"1");
+    localStorage.setItem(FP_LS_ACHIEVED,"1");
+  }catch(_){}
+  // 4) UI 정리 — 팝업 닫고 nudge 숨김 + CPA 추적
+  const el=document.getElementById("achievePopup");
+  if(el)el.style.display="none";
+  refreshKakaoNudge();
+  _catGuardLikeToast("카카오 채널 연동 완료! 📱 매일 저녁 건강리포트를 받아보세요");
+  if(typeof _logCpa==="function")_logCpa("kakao_channel_link");
+  if(typeof _ga==="function")_ga("kakao_link_clicked",{source:_src});
+}
+
+/* 결과 카드 하단 카카오 nudge — 미연동 사용자에게만 노출 */
+function refreshKakaoNudge(){
+  const n=document.getElementById("resultKakaoNudge");
+  if(!n)return;
+  const linked=localStorage.getItem(FP_LS_KAKAO)==="1";
+  n.style.display=linked?"none":"flex";
 }
 
 // "이전 기록 더 보기" 토글 상태 (loadMealLogs마다 초기화)
@@ -4193,6 +4324,8 @@ function showResult(menu,nextMenus){
 
   const rc=document.getElementById("resultCard");
   rc.classList.remove("show");void rc.offsetWidth;rc.classList.add("show");
+  // 결과가 표시될 때 카카오 nudge 상태 새로고침 (카카오 미연동 시에만 노출)
+  refreshKakaoNudge();
   addHist(menu);updateProg();
   // AI 추천 이유 + 함께 먹으면 좋은 음식 — 결과 표시 시 병렬 호출
   // nutrition·story는 사용자가 명시적으로 펼칠 때만 호출.
@@ -4524,8 +4657,10 @@ function addKakaoChannel(ev){
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ uid: FP_UID, kakaoId })
                   }).then(r => r.json()).then(j => {
-                    if (j && j.success && typeof toast === 'function') {
-                      toast('카카오 채널 연동 완료! 기기가 바뀌어도 데이터가 유지됩니다 ✅');
+                    if (j && j.success){
+                      try{ localStorage.setItem('fp_kakao_linked','1'); }catch(_){}
+                      if(typeof toast === 'function') toast('카카오 채널 연동 완료! 기기가 바뀌어도 데이터가 유지됩니다 ✅');
+                      if(typeof refreshKakaoNudge === 'function') refreshKakaoNudge();
                     }
                     if (typeof _ga === 'function') _ga('kakao_link', { ok: !!(j && j.success) });
                   });
