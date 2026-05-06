@@ -1278,6 +1278,23 @@ async function _logClick(type, menu) {
         <div class="ai-reason-body" id="aiReasonText">분석 중...</div>
       </div>
 
+      <!-- ✅ 식사 실기록 버튼 (먹었어요/먹겠어요) -->
+      <div id="mealRecordWrap" style="margin-bottom:10px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button id="btnAte" onclick="recordMeal('ate')"
+            style="padding:14px 10px;border:1.5px solid #B7E0C5;border-radius:13px;background:linear-gradient(135deg,#E8F7EC,#D6F0DD);color:#2E7E47;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;box-shadow:0 4px 12px rgba(76,175,125,.18);">
+            ✅ 먹었어요!
+          </button>
+          <button id="btnWillEat" onclick="recordMeal('will_eat')"
+            style="padding:14px 10px;border:1.5px solid #B6D6F2;border-radius:13px;background:linear-gradient(135deg,#E8F1FB,#D6E5F5);color:#1F5BA8;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;box-shadow:0 4px 12px rgba(31,91,168,.18);">
+            🕐 먹겠어요!
+          </button>
+        </div>
+        <p style="font-size:11.5px;color:#7A6E62;text-align:center;margin:8px 0 0;line-height:1.5;">
+          실기록을 남기면 더 정확한 식습관 리포트가 작성됩니다
+        </p>
+      </div>
+
       <!-- 다시 선택하기 (ai-reason-card 바로 아래로 이동) -->
       <div style="margin-bottom:12px;">
         <button onclick="scrollToTop()" style="width:100%;padding:15px;border:1.5px solid #FFE3CC;border-radius:13px;background:#fff;color:#7A6E62;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 2px 8px rgba(255,107,53,.06);"
@@ -1419,6 +1436,47 @@ async function _logClick(type, menu) {
       </div>
     </div>
   </div>
+  <!-- ⑦ 오늘 식사 직접 입력 (접이식) -->
+  <div class="daily-meal-card" style="margin:14px 0 12px;border:1px solid var(--border);border-radius:var(--rsm);background:#fff;overflow:hidden;">
+    <button id="dailyMealToggle" type="button" onclick="toggleDailyMeal()"
+      style="width:100%;padding:14px 16px;background:linear-gradient(135deg,#FFFAF5,#FFF7EE);border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;">
+      <span style="display:flex;flex-direction:column;gap:3px;">
+        <span style="font-size:14px;font-weight:800;color:var(--pr);">📝 오늘 먹은 것 기록하기</span>
+        <span style="font-size:11.5px;color:var(--text2);font-weight:600;">직접 입력하면 더 정확한 식습관 분석이 가능해요</span>
+      </span>
+      <span id="dailyMealCaret" style="font-size:13px;font-weight:800;color:var(--text2);">▼</span>
+    </button>
+    <div id="dailyMealBody" style="display:none;padding:14px 16px 16px;border-top:1px solid var(--border);">
+      <div id="dailyMealDateLabel" style="font-size:11.5px;color:var(--text2);font-weight:700;margin-bottom:10px;letter-spacing:.4px;">📅 오늘 날짜</div>
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text);font-weight:700;">
+          <span style="width:62px;flex-shrink:0;">🌅 아침</span>
+          <input id="dmBreakfast" type="text" maxlength="200" placeholder="예: 토스트, 커피"
+            style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;background:#fff;outline:none;">
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text);font-weight:700;">
+          <span style="width:62px;flex-shrink:0;">☀️ 점심</span>
+          <input id="dmLunch" type="text" maxlength="200" placeholder="예: 비빔밥, 된장국"
+            style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;background:#fff;outline:none;">
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text);font-weight:700;">
+          <span style="width:62px;flex-shrink:0;">🌙 저녁</span>
+          <input id="dmDinner" type="text" maxlength="200" placeholder="예: 삼겹살, 쌈채소"
+            style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;background:#fff;outline:none;">
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text);font-weight:700;">
+          <span style="width:62px;flex-shrink:0;">🍪 간식</span>
+          <input id="dmSnack" type="text" maxlength="200" placeholder="예: 아메리카노, 과자"
+            style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;background:#fff;outline:none;">
+        </label>
+      </div>
+      <button id="dailyMealSave" type="button" onclick="saveDailyMeal()"
+        style="width:100%;margin-top:12px;padding:13px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--pr),#FF8A5A);color:#fff;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(255,107,53,.25);">
+        💾 기록 저장
+      </button>
+    </div>
+  </div>
+
   <!-- ⑦+ 식습관 리포트 트리거 -->
   <button class="report-trigger" onclick="openReport()">
     📊 내 식습관 리포트 보기
@@ -2229,48 +2287,184 @@ function _updateWeatherBanner(){
   else b.classList.remove("show");
 }
 
-/* 식습관 리포트 (localStorage 데이터로 랜더) */
-const _CAT_LBL={korean:"🥢 한식",japanese:"🍣 일식",chinese:"🥟 중식",western:"🍝 양식",chicken:"🍗 치킨",pizza:"🍕 피자",cafe:"☕ 카페",snack:"🍢 분식",seafood:"🦞 해산물",health:"🥗 건강식",meat:"🥩 고기",noodle:"🍜 면",rice:"🍚 밥",season:"🌸 계절",random:"🎲 랜덤",etc:"기타"};
+/* 식습관 리포트 — 서버 /api/report (3단계 분기) + localStorage fallback */
+const _CAT_LBL={korean:"🥢 한식",japanese:"🍣 일식",chinese:"🥟 중식",western:"🍝 양식",chicken:"🍗 치킨",pizza:"🍕 피자",cafe:"☕ 카페",snack:"🍢 분식",seafood:"🦞 해산물",health:"🥗 건강식",meat:"🥩 고기",noodle:"🍜 면",rice:"🍚 밥",season:"🌸 계절",random:"🎲 랜덤",etc:"기타",custom:"✏️ 직접입력"};
 const _MEAL_LBL={morning:"🌅 아침",lunch:"🌞 점심",dinner:"🌆 저녁",night:"🌙 야식"};
-function openReport(){
+const _MEAL_TYPE_LBL={breakfast:"🌅 아침",lunch:"☀️ 점심",dinner:"🌙 저녁",snack:"🍪 간식"};
+const _DQ_BADGE={
+  real:    {cls:"hb-balanced",icon:"🟢",text:"실기록 기반 분석 (가장 정확)"},
+  manual:  {cls:"hb-bmi",     icon:"🟡",text:"직접 입력 기반 분석"},
+  estimated:{cls:"hb-glucose",icon:"🔵",text:"추천 이력 기반 분석 (참고용)"}
+};
+// 고나트륨/고당분 키워드 — 건강 연동 평가용 휴리스틱
+const _HI_SODIUM=["라면","찌개","국","탕","젓갈","김치","햄","소시지","베이컨","순두부","찜","전골","우동","칼국수","짬뽕","된장","고등어","치킨"];
+const _HI_GI=["흰밥","흰쌀","빵","케이크","도넛","아이스크림","떡","파스타","피자","파이","쿠키","머핀","탄산","주스"];
+function _hasMatch(text,keywords){
+  if(!text)return false;
+  const t=String(text);
+  return keywords.some(k=>t.includes(k));
+}
+async function openReport(){
   if(typeof _ga==="function")_ga("report_open",{});
   const overlay=document.getElementById("reportOverlay");
   const content=document.getElementById("reportContent");
-  const mc=JSON.parse(localStorage.getItem("fp6_menu_counts")||"{}");
-  const cc=JSON.parse(localStorage.getItem("fp6_cat_counts")||"{}");
-  const mealCnt=JSON.parse(localStorage.getItem("fp6_meal_counts")||"{}");
-  const rf=JSON.parse(localStorage.getItem("fp6_recent_feed")||"[]");
-  const total=rf.length;
-  if(total===0){
-    content.innerHTML='<div class="report-empty">아직 추천 기록이 없어요!<br>먼저 메뉴를 추천받아보세요 🍽️</div>';
-    overlay.classList.add("show");return;
-  }
-  const now=Date.now();
-  const week=rf.filter(r=>{try{return now-new Date(r.t).getTime()<=7*24*3600*1000;}catch(e){return false;}});
-  const top3=Object.entries(mc).sort((a,b)=>b[1]-a[1]).slice(0,3);
-  const catTotal=Object.values(cc).reduce((a,b)=>a+b,0)||1;
-  const catSorted=Object.entries(cc).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  const mealTotal=Object.values(mealCnt).reduce((a,b)=>a+b,0)||1;
-  const topCat=catSorted[0];
-  const topPct=topCat?Math.round(topCat[1]/catTotal*100):0;
-  let insight;
-  if(topPct>=60)insight=`이번 주 <strong>${_CAT_LBL[topCat[0]]||topCat[0]}</strong>을 ${topPct}% 받으셨어요 — 다른 카테고리도 도전해보세요!`;
-  else if(total<3)insight="조금만 더 사용해보면 패턴이 보이기 시작해요!";
-  else if(mealTotal>0&&mealCnt.night>=mealTotal*0.4)insight="야식 비중이 높아요. 잘 자려면 가벼운 메뉴도 시도해보세요 😴";
-  else insight="다양한 카테고리를 골고루 추천받고 계시네요 👍";
-
-  content.innerHTML=`
-    <div class="report-stat"><span class="l">누적 추천</span><span class="v">${total}회</span></div>
-    <div class="report-stat"><span class="l">최근 7일</span><span class="v">${week.length}회</span></div>
-    <div class="report-stat"><span class="l">서로 다른 메뉴</span><span class="v">${Object.keys(mc).length}종</span></div>
-    <div class="report-section-title">🏆 자주 받은 메뉴 TOP 3</div>
-    ${top3.length?top3.map((t,i)=>`<div class="report-bar"><span class="report-bar-label">${i+1}위</span><span style="flex:1;font-size:12.5px;font-weight:700;color:var(--text);">${t[0]}</span><span class="report-bar-cnt">${t[1]}회</span></div>`).join(""):'<div style="font-size:12px;color:var(--text3);">데이터 부족</div>'}
-    <div class="report-section-title">📊 카테고리 분포</div>
-    ${catSorted.map(c=>{const pct=Math.round(c[1]/catTotal*100);return `<div class="report-bar"><span class="report-bar-label">${_CAT_LBL[c[0]]||c[0]}</span><span class="report-bar-track"><span class="report-bar-fill" style="width:${pct}%"></span></span><span class="report-bar-cnt">${pct}%</span></div>`;}).join("")}
-    ${mealTotal>1?`<div class="report-section-title">⏰ 식사시간 분포</div>${Object.entries(mealCnt).filter(m=>m[1]>0).map(m=>{const pct=Math.round(m[1]/mealTotal*100);return `<div class="report-bar"><span class="report-bar-label">${_MEAL_LBL[m[0]]||m[0]}</span><span class="report-bar-track"><span class="report-bar-fill" style="width:${pct}%"></span></span><span class="report-bar-cnt">${pct}%</span></div>`;}).join("")}`:""}
-    <div class="report-insight"><strong>💡 한줄 인사이트.</strong> ${insight}</div>
-  `;
+  if(!overlay||!content)return;
+  // 로딩 상태 즉시 표시
+  content.innerHTML='<div class="report-empty">📊 리포트 분석 중...</div>';
   overlay.classList.add("show");
+
+  let serverData=null;
+  try{
+    const r=await fetch("/api/report",{cache:"no-store"});
+    if(r.ok)serverData=await r.json();
+  }catch(e){console.warn("[report] server fetch failed:",e?.message);}
+
+  const health=(typeof getHealthInfo==="function")?getHealthInfo():null;
+
+  // 서버 데이터 + 클라 localStorage(보조)
+  const mc=JSON.parse(localStorage.getItem("fp6_menu_counts")||"{}");
+  const localTotal=(JSON.parse(localStorage.getItem("fp6_recent_feed")||"[]")).length;
+
+  // 서버 응답 정규화
+  const dq=serverData?.data_quality||"estimated";
+  const weekTotal=serverData?.week_total||0;
+  const topMenus=Array.isArray(serverData?.top_menus)?serverData.top_menus:[];
+  const topCats=Array.isArray(serverData?.top_categories)?serverData.top_categories:[];
+  const mealTypes=Array.isArray(serverData?.meal_types)?serverData.meal_types:[];
+  const realTotal=serverData?.real_total||0;
+  const manualTotal=serverData?.manual_total||0;
+  const ateCnt=serverData?.ate_count||0;
+  const willCnt=serverData?.will_eat_count||0;
+
+  // 데이터가 정말 비어있는 경우 (서버 실패 + 로컬도 0)
+  const totallyEmpty=(!serverData)
+    ? (localTotal===0)
+    : (weekTotal===0 && realTotal===0 && manualTotal===0 && topMenus.length===0);
+
+  if(totallyEmpty){
+    content.innerHTML=`
+      <div class="report-empty">
+        아직 기록이 없어요.<br>
+        추천 메뉴를 드신 후<br>
+        <strong>'먹었어요'</strong> 버튼을 눌러보세요! 📊
+      </div>`;
+    return;
+  }
+
+  // 데이터 품질 배지
+  const dqInfo=_DQ_BADGE[dq]||_DQ_BADGE.estimated;
+  let html=`<div style="display:flex;justify-content:center;margin-bottom:14px;">
+    <span class="health-badge ${dqInfo.cls}" style="font-size:11.5px;">${dqInfo.icon} ${_escAt(dqInfo.text)}</span>
+  </div>`;
+
+  // 핵심 카운트
+  const weekLabel=dq==="real"?"이번 주 실제 식사":dq==="manual"?"이번 주 입력 끼니":"이번 주 추천 받은 횟수";
+  html+=`<div class="report-stat"><span class="l">${weekLabel}</span><span class="v">${weekTotal}회</span></div>`;
+  if(dq==="real"){
+    html+=`<div class="report-stat"><span class="l">총 실기록</span><span class="v">${realTotal}건</span></div>`;
+    if(ateCnt+willCnt>0){
+      const total=ateCnt+willCnt;
+      const atePct=Math.round(ateCnt/total*100);
+      html+=`<div class="report-stat"><span class="l">먹었어요 vs 먹겠어요</span><span class="v">${atePct}% : ${100-atePct}%</span></div>`;
+    }
+  }else if(dq==="manual"){
+    html+=`<div class="report-stat"><span class="l">직접 입력 일수</span><span class="v">${manualTotal}일</span></div>`;
+  }else{
+    const menusSeen=Object.keys(mc).length||topMenus.length;
+    if(menusSeen)html+=`<div class="report-stat"><span class="l">서로 다른 메뉴</span><span class="v">${menusSeen}종</span></div>`;
+  }
+
+  // 자주 먹은/받은 메뉴 TOP5
+  if(topMenus.length){
+    const title=dq==="real"?"🏆 자주 드신 메뉴 TOP 5":dq==="manual"?"🏆 직접 입력 메뉴 TOP 5":"🏆 자주 받은 메뉴 TOP 5";
+    html+=`<div class="report-section-title">${title}</div>`;
+    html+=topMenus.slice(0,5).map((t,i)=>`
+      <div class="report-bar">
+        <span class="report-bar-label">${i+1}위</span>
+        <span style="flex:1;font-size:12.5px;font-weight:700;color:var(--text);">${_escAt(t.menu||t[0]||"-")}</span>
+        <span class="report-bar-cnt">${t.cnt||t[1]||0}회</span>
+      </div>`).join("");
+  }
+
+  // 카테고리 TOP3 (real / estimated에서만 의미 있음)
+  if(topCats.length){
+    const ctot=topCats.reduce((a,b)=>a+(b.cnt||0),0)||1;
+    html+=`<div class="report-section-title">📊 가장 많이 먹은 카테고리 TOP 3</div>`;
+    html+=topCats.slice(0,3).map(c=>{
+      const pct=Math.round((c.cnt||0)/ctot*100);
+      return `<div class="report-bar">
+        <span class="report-bar-label">${_CAT_LBL[c.category]||c.category||"기타"}</span>
+        <span class="report-bar-track"><span class="report-bar-fill" style="width:${pct}%"></span></span>
+        <span class="report-bar-cnt">${pct}%</span>
+      </div>`;
+    }).join("");
+  }
+
+  // 식사 시간대 분포
+  if(mealTypes.length){
+    const mtot=mealTypes.reduce((a,b)=>a+(b.cnt||0),0)||1;
+    html+=`<div class="report-section-title">⏰ 식사 시간대 분포</div>`;
+    html+=mealTypes.map(m=>{
+      const pct=Math.round((m.cnt||0)/mtot*100);
+      return `<div class="report-bar">
+        <span class="report-bar-label">${_MEAL_TYPE_LBL[m.meal_type]||m.meal_type||"-"}</span>
+        <span class="report-bar-track"><span class="report-bar-fill" style="width:${pct}%"></span></span>
+        <span class="report-bar-cnt">${pct}%</span>
+      </div>`;
+    }).join("");
+  }
+
+  // 건강정보 연동 평가
+  const evals=[];
+  if(health){
+    const menuTexts=topMenus.map(t=>String(t.menu||t[0]||""));
+    if(health.bp&&health.bp!=="정상"){
+      const sodHits=menuTexts.filter(m=>_hasMatch(m,_HI_SODIUM)).length;
+      if(sodHits>=1){
+        const lvl=health.bp==="혈압약복용"?"💊 혈압약 복용":(health.bp==="고혈압"?"🏥 고혈압":"🏥 혈압 경계");
+        evals.push(`<strong>${lvl} 관리 중</strong>인데 나트륨 높은 음식 ${sodHits}회 드셨어요 ⚠️`);
+      }else{
+        evals.push(`<strong>혈압 관리</strong>는 무난해요 — 저나트륨 식단 잘 지키고 계세요 👍`);
+      }
+    }
+    if(health.glucose&&health.glucose!=="정상"){
+      const giHits=menuTexts.filter(m=>_hasMatch(m,_HI_GI)).length;
+      if(giHits>=1){
+        evals.push(`<strong>혈당 관리</strong> 중인데 고GI 음식 ${giHits}회 ⚠️ 잡곡·채소·단백질 비중을 늘려보세요`);
+      }
+    }
+    const algItems=(health.allergy||[]).filter(v=>v!=="없음");
+    if(algItems.length){
+      evals.push(`🚫 회피 ${algItems.length}개 (${algItems.join(", ")}) — 추천 시 자동 제외됩니다`);
+    }
+    if(health.goal==="체중감량"){
+      evals.push(`🎯 <strong>체중감량 목표</strong> — 저칼로리·고단백 메뉴 우선 추천 중`);
+    }else if(health.goal==="근육증가"){
+      evals.push(`💪 <strong>근육증가 목표</strong> — 고단백 메뉴 우선 추천 중`);
+    }
+  }
+  if(evals.length){
+    html+=`<div class="report-section-title">❤️ 건강정보 연동 평가</div>`;
+    html+=evals.map(e=>`<div class="report-insight" style="margin-top:6px;">${e}</div>`).join("");
+  }
+
+  // 개선 추천 — 카테고리 다양성 + 채소류 권장
+  const tipList=[];
+  if(topCats.length){
+    const top1=topCats[0];
+    const tot=topCats.reduce((a,b)=>a+(b.cnt||0),0)||1;
+    const top1Pct=Math.round((top1.cnt||0)/tot*100);
+    if(top1Pct>=60)tipList.push(`<strong>${_CAT_LBL[top1.category]||top1.category}</strong> 비중이 ${top1Pct}% — 다른 카테고리도 도전해보세요 🍱`);
+    const hasHealth=topCats.some(c=>c.category==="health");
+    if(!hasHealth)tipList.push("이번 주는 채소류를 더 드셔보세요 🥗");
+  }
+  if(dq!=="real")tipList.push("'먹었어요' 버튼을 눌러주시면 더 정확한 분석이 가능해요 ✨");
+  if(tipList.length){
+    html+=`<div class="report-section-title">💡 개선 추천</div>`;
+    html+=tipList.map(t=>`<div class="report-insight" style="margin-top:6px;">${t}</div>`).join("");
+  }
+
+  content.innerHTML=html;
 }
 function closeReport(){
   document.getElementById("reportOverlay")?.classList.remove("show");
@@ -2373,6 +2567,90 @@ function _resetAiReason(){
   // 결과 카드 상단의 이전 건강 배지도 함께 정리
   const row=document.getElementById("rTags");
   if(row)row.querySelectorAll(".health-badge").forEach(b=>b.remove());
+}
+
+/* ── 식사 실기록 (먹었어요/먹겠어요) ── */
+// mealTime(morning/lunch/dinner/night) → 서버 enum(breakfast/lunch/dinner/snack)
+const _MEAL_TYPE_MAP={morning:"breakfast",lunch:"lunch",dinner:"dinner",night:"snack"};
+function _resetMealRecord(){
+  // 새 메뉴 추천 시 두 버튼 모두 활성화 상태로 복원
+  const a=document.getElementById("btnAte"), w=document.getElementById("btnWillEat");
+  if(a){a.disabled=false;a.style.opacity="1";a.style.cursor="pointer";a.innerHTML="✅ 먹었어요!";}
+  if(w){w.disabled=false;w.style.opacity="1";w.style.cursor="pointer";w.innerHTML="🕐 먹겠어요!";}
+}
+async function recordMeal(recordType){
+  if(!curMenu){toast("먼저 메뉴를 추천받아 주세요!");return;}
+  const a=document.getElementById("btnAte"), w=document.getElementById("btnWillEat");
+  // 이미 클릭된 경우 무시
+  if(a?.disabled||w?.disabled)return;
+  const meal_type=_MEAL_TYPE_MAP[mealTime]||"lunch";
+  const kcal=(_nutriCache&&isFinite(parseInt(_nutriCache.kcal,10)))?parseInt(_nutriCache.kcal,10):null;
+  const date=new Date().toISOString().slice(0,10);
+  const body={
+    menu:curMenu.n,
+    category:curMenu.cat||"etc",
+    meal_type,
+    record_type:recordType,
+    kcal,
+    date
+  };
+  try{
+    const r=await fetch("/api/meal-record",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||!j.success)throw new Error(j.error||"저장 실패");
+    // 성공 — 두 버튼 비활성화 + 클릭한 버튼만 "기록됐어요 ✓"
+    const tag=recordType==="ate"?"✅ 기록됐어요 ✓":"🕐 기록됐어요 ✓";
+    if(a){a.disabled=true;a.style.opacity=recordType==="ate"?"1":"0.5";a.style.cursor="default";if(recordType==="ate")a.innerHTML=tag;}
+    if(w){w.disabled=true;w.style.opacity=recordType==="will_eat"?"1":"0.5";w.style.cursor="default";if(recordType==="will_eat")w.innerHTML=tag;}
+    toast("식사 기록이 저장됐어요! 리포트에 반영됩니다 📊");
+    if(typeof _ga==="function")_ga("meal_record",{record_type:recordType,menu:curMenu.n,category:curMenu.cat||"etc",meal_type});
+  }catch(e){
+    toast("❌ 기록 저장 실패. 잠시 후 다시 시도");
+    console.error("[meal-record] failed:",e?.message);
+  }
+}
+
+/* ── 하루 식사 직접 입력 (daily_meals) ── */
+function toggleDailyMeal(){
+  const body=document.getElementById("dailyMealBody");
+  const caret=document.getElementById("dailyMealCaret");
+  if(!body)return;
+  const open=body.style.display!=="none";
+  if(open){body.style.display="none";if(caret)caret.textContent="▼";}
+  else{
+    body.style.display="block";
+    if(caret)caret.textContent="▲";
+    // 오늘 날짜 라벨 채우기 (열 때마다 갱신)
+    const d=new Date();
+    const ymd=d.toISOString().slice(0,10);
+    const lbl=document.getElementById("dailyMealDateLabel");
+    if(lbl)lbl.textContent=`📅 ${ymd} (오늘)`;
+    if(typeof _ga==="function")_ga("daily_meal_open",{});
+  }
+}
+async function saveDailyMeal(){
+  const date=new Date().toISOString().slice(0,10);
+  const breakfast=document.getElementById("dmBreakfast")?.value.trim()||"";
+  const lunch    =document.getElementById("dmLunch")?.value.trim()||"";
+  const dinner   =document.getElementById("dmDinner")?.value.trim()||"";
+  const snack    =document.getElementById("dmSnack")?.value.trim()||"";
+  if(!breakfast&&!lunch&&!dinner&&!snack){
+    toast("최소 한 끼는 입력해주세요 😊");return;
+  }
+  const btn=document.getElementById("dailyMealSave");
+  if(btn){btn.disabled=true;btn.textContent="저장 중...";}
+  try{
+    const r=await fetch("/api/daily-meal",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({date,breakfast,lunch,dinner,snack})});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||!j.success)throw new Error(j.error||"저장 실패");
+    toast("오늘 식사가 기록됐어요! 📊");
+    if(typeof _ga==="function")_ga("daily_meal_save",{filled:[breakfast,lunch,dinner,snack].filter(Boolean).length});
+  }catch(e){
+    toast("❌ 저장 실패. 잠시 후 다시 시도");
+    console.error("[daily-meal] failed:",e?.message);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent="💾 기록 저장";}
+  }
 }
 function quickPickAlt(name){
   if(!name)return;
@@ -2501,6 +2779,7 @@ function showResult(menu,nextMenus){
   _resetAiReason();
   _resetNutrition();
   _resetFoodMatch();
+  _resetMealRecord();
   // 이미지
   const img=document.getElementById("foodImg"),wrap=document.getElementById("imgWrap");
   const prev=wrap.querySelector(".fb-e");if(prev)prev.remove();
