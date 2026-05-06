@@ -484,6 +484,32 @@ body{
 .report-trend-bar > div{flex:1;background:linear-gradient(180deg,#4CAF7D,#2E9E6B);border-radius:3px 3px 0 0;min-height:4px;position:relative;}
 .report-trend-bar .ttd{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:9px;color:#888;}
 .report-cta-btn{display:block;margin:12px auto 0;padding:12px 22px;border:none;border-radius:11px;background:linear-gradient(135deg,#4CAF7D,#2E9E6B);color:#fff;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(76,175,125,.35);}
+/* 오늘 칼로리 + 운동 추천 카드 */
+.report-today-kcal{background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border-radius:12px;padding:14px;margin-bottom:12px;}
+.rtk-title{font-size:13px;font-weight:700;color:#2E7D32;margin-bottom:8px;}
+.rtk-numbers{display:flex;align-items:baseline;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
+.rtk-actual{font-size:24px;font-weight:900;color:#1F1C18;}
+.rtk-divider{color:#aaa;font-size:14px;}
+.rtk-recommend{font-size:13px;color:#888;}
+.rtk-gauge-wrap{background:#ddd;border-radius:20px;height:8px;overflow:hidden;margin-bottom:6px;}
+.rtk-gauge-bar{height:100%;border-radius:20px;transition:width .5s ease;}
+.rtk-gauge-ok{background:linear-gradient(90deg,#4CAF7D,#2E9E6B);}
+.rtk-gauge-over{background:linear-gradient(90deg,#FF6B35,#C62828);}
+.rtk-gauge-under{background:linear-gradient(90deg,#FFB300,#FF8F00);}
+.rtk-status{font-size:12px;font-weight:700;text-align:right;}
+.rtk-over{color:#C62828;}
+.rtk-under{color:#FF8F00;}
+.rtk-ok{color:#2E7D32;}
+.report-exercise{background:#fff;border:1px solid #E0F0E8;border-radius:12px;padding:14px;margin-bottom:12px;}
+.rex-title{font-size:13px;font-weight:800;color:#1F1C18;margin-bottom:4px;}
+.rex-subtitle{font-size:11px;color:#888;margin-bottom:10px;}
+.rex-card{display:flex;align-items:center;gap:10px;padding:10px;background:#F9FFF9;border-radius:8px;margin-bottom:6px;}
+.rex-emoji{font-size:24px;flex-shrink:0;}
+.rex-name{font-size:13px;font-weight:700;color:#1F1C18;}
+.rex-time{font-size:14px;font-weight:900;color:#4CAF7D;margin-top:2px;}
+.rex-basis{font-size:10px;color:#aaa;margin-top:2px;}
+.rex-disclaimer{font-size:10px;color:#aaa;margin-top:10px;line-height:1.5;border-top:1px solid #eee;padding-top:8px;}
+.rex-no-data{padding:14px;text-align:center;color:#888;font-size:12.5px;background:#F9FFF9;border:1px dashed #E0F0E8;border-radius:10px;margin-bottom:12px;}
 
 /* ── HERO CTA — 랜덤 픽 직링 ── */
 .hero-cta{
@@ -2841,6 +2867,52 @@ function _renderMonthSummary(history){
   html+=next.map(t=>`<div class="report-insight" style="margin-top:6px;">${_escAt(t)}</div>`).join("");
   return html;
 }
+function _renderTodayKcalAndExercise(today){
+  if(!today)return "";
+  // 기록 없음 — 안내만
+  if(!today.meal_count){
+    return `<div class="rex-no-data">오늘 식사 기록이 없어요. 기록하면 운동 추천이 계산됩니다 🏃</div>`;
+  }
+  const kcal=Math.max(0,parseInt(today.kcal,10)||0);
+  const rec =Math.max(1,parseInt(today.recommend_kcal,10)||1800);
+  const excess=parseInt(today.excess_kcal,10)||0;
+  const pct=Math.max(0,Math.min(150,Math.round(kcal/rec*100)));
+  let gaugeCls="rtk-gauge-ok", statusCls="rtk-ok", statusText="🟢 균형 잡힘";
+  if(excess>50){ gaugeCls="rtk-gauge-over"; statusCls="rtk-over"; statusText=`🔥 초과 ${excess}kcal`; }
+  else if(excess<-200){ gaugeCls="rtk-gauge-under"; statusCls="rtk-under"; statusText=`🟡 부족 ${Math.abs(excess)}kcal`; }
+  let html=`
+    <div class="report-today-kcal">
+      <div class="rtk-title">📊 오늘 기록 칼로리 (${today.meal_count}끼)</div>
+      <div class="rtk-numbers">
+        <span class="rtk-actual">${kcal} kcal</span>
+        <span class="rtk-divider">/</span>
+        <span class="rtk-recommend">권장 ${rec}kcal</span>
+      </div>
+      <div class="rtk-gauge-wrap"><div class="rtk-gauge-bar ${gaugeCls}" style="width:${Math.min(pct,100)}%;"></div></div>
+      <div class="rtk-status ${statusCls}">${statusText}</div>
+    </div>`;
+  // 운동 추천 카드
+  const ex=Array.isArray(today.exercise)?today.exercise:[];
+  if(ex.length){
+    const w=parseFloat(today.weight_used)||65;
+    html+=`
+    <div class="report-exercise">
+      <div class="rex-title">🔥 오늘의 운동 추천 (참고용)</div>
+      <div class="rex-subtitle">${_escAt(today.exercise_subtitle||"")}</div>
+      ${ex.map(e=>`
+        <div class="rex-card">
+          <span class="rex-emoji">${_escAt(e.emoji||"🏃")}</span>
+          <div class="rex-info" style="flex:1;">
+            <div class="rex-name">${_escAt(e.name||"")}</div>
+            <div class="rex-time">${_escAt(e.display||(e.minutes?`약 ${e.minutes}분 내외`:""))}</div>
+            <div class="rex-basis">${_escAt(e.basis||"")}${e.met?` · 체중 ${w}kg 적용`:""}</div>
+          </div>
+        </div>`).join("")}
+      <div class="rex-disclaimer">* MET(대사당량) 공식 기반 추정치입니다. 개인 체력·운동 강도에 따라 실제와 다를 수 있습니다.${today.weight_used===65?" 몸무게 입력 시 더 정확한 계산이 가능합니다.":""}</div>
+    </div>`;
+  }
+  return html;
+}
 async function openReport(){
   if(typeof _ga==="function")_ga("report_open",{});
   const overlay=document.getElementById("reportOverlay");
@@ -2851,7 +2923,14 @@ async function openReport(){
 
   let data=null;
   try{
-    const r=await fetch(`/api/report?uid=${encodeURIComponent(FP_UID)}`,{cache:"no-store"});
+    // 권장 칼로리 + 운동 추천 계산을 위해 health 단편 동봉
+    const health=(typeof getHealthInfo==="function")?getHealthInfo():null;
+    const qp=new URLSearchParams({uid:FP_UID});
+    if(health?.weight)qp.set("weight",String(health.weight));
+    if(health?.height)qp.set("height",String(health.height));
+    if(health?.goal)qp.set("healthGoal",health.goal);
+    if(typeof selGend!=="undefined"&&selGend)qp.set("gender",selGend);
+    const r=await fetch(`/api/report?${qp.toString()}`,{cache:"no-store"});
     if(r.ok)data=await r.json();
   }catch(e){console.warn("[report] fetch failed:",e?.message);}
 
@@ -2864,11 +2943,13 @@ async function openReport(){
   const stage=data.stage||0;
   const a=data.analysis||{};
 
-  // stage 0 — 진행 바 + CTA만
+  // stage 0 — 진행 바 + CTA + (오늘 기록이 있으면 today 블록도 함께)
   if(stage===0){
     const need=data.meals_to_next||5;
     const pct=Math.max(0,Math.min(100,(total/5)*100));
+    const todayBlock=_renderTodayKcalAndExercise(data.today);
     content.innerHTML=`
+      ${todayBlock}
       <div class="report-empty">
         <div style="font-size:42px;margin-bottom:10px;">🍽️</div>
         <div style="font-weight:800;color:var(--text);font-size:16px;margin-bottom:6px;">아직 분석하기엔 기록이 부족해요</div>
@@ -2890,6 +2971,9 @@ async function openReport(){
   </div>`;
 
   let html=stageHead;
+
+  // [모든 단계 공통] 오늘 칼로리 + 운동 추천 (today 블록)
+  html+=_renderTodayKcalAndExercise(data.today);
 
   // [모든 단계 공통] 평균 칼로리 + TOP 메뉴
   const topMenus=Array.isArray(a.top_menus)?a.top_menus:[];
