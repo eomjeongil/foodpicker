@@ -1341,12 +1341,20 @@ async function _logClick(type, menu) {
         <div class="ai-reason-body" id="aiReasonText">분석 중...</div>
       </div>
 
-      <!-- 다시 선택하기 (ai-reason-card 바로 아래로 이동) -->
-      <div style="margin-bottom:12px;">
-        <button onclick="scrollToTop()" style="width:100%;padding:15px;border:1.5px solid #FFE3CC;border-radius:13px;background:#fff;color:#7A6E62;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 2px 8px rgba(255,107,53,.06);"
+      <!-- 다시 선택하기 — 컨텍스트 유지하고 메뉴/대안만 새로 뽑음 -->
+      <div style="margin-bottom:8px;">
+        <button onclick="pickAgain()" style="width:100%;padding:15px;border:1.5px solid #FFE3CC;border-radius:13px;background:#fff;color:#7A6E62;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 2px 8px rgba(255,107,53,.06);"
           onmouseover="this.style.borderColor='#FF6B35';this.style.color='#FF6B35'"
           onmouseout="this.style.borderColor='#FFE3CC';this.style.color='#7A6E62'">
-          ⬆️ 다시 선택하기
+          🔁 다시 선택하기
+        </button>
+      </div>
+      <!-- 처음부터 다시 선택하기 — 모든 입력 초기화 -->
+      <div style="margin-bottom:12px;">
+        <button onclick="resetAll()" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:13px;background:#fff;color:#7A6E62;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;"
+          onmouseover="this.style.borderColor='#FF6B35';this.style.color='#FF6B35'"
+          onmouseout="this.style.borderColor='#ddd';this.style.color='#7A6E62'">
+          🔄 처음부터 다시 선택하기
         </button>
       </div>
 
@@ -3554,6 +3562,99 @@ function pickMenu(){
   },700);
 }
 function reroll(){pickMenu();}
+
+/* ── 다시 선택하기 — 컨텍스트 유지, 메뉴/대안/AI 이유 모두 갱신 (스크롤 이동 X) ── */
+function pickAgain(){
+  // pickMenu() → showResult() → _resetAiReason() + loadAiReason() 체인이 메뉴/AI 대안/이유 모두 갱신.
+  // showResult는 자체 스크롤이 없으므로 현재 스크롤 위치 유지됨.
+  if(!_dbReady||!DB.length){if(typeof toast==="function")toast("⏳ 메뉴 DB 로드 중...");return;}
+  // 이전 AI 대안 카드 먼저 숨겨 잔영 방지 — loadAiReason이 다시 표시함
+  const altsSec=document.getElementById("aiAltsSection");
+  if(altsSec)altsSec.style.display="none";
+  pickMenu();
+  if(typeof _ga==="function")_ga("pick_again",{});
+}
+
+/* ── 처음부터 다시 선택하기 — 모든 입력/상태 초기화 ── */
+function resetAll(){
+  // 1) 컨텍스트 토글 — 초기 기본값으로 복원
+  selGend="N";
+  document.querySelectorAll("#gRow .tog").forEach(t=>{
+    t.classList.remove("sel-m","sel-f","sel-a");
+    if(t.dataset.g==="N")t.classList.add("sel-a");
+  });
+  selAgeV="30";
+  document.querySelectorAll("#aRow .tog").forEach(t=>{
+    t.classList.remove("sel-m","sel-f","sel-a");
+    if(t.dataset.a==="30")t.classList.add("sel-a");
+  });
+  selMoodV="평범";
+  document.querySelectorAll("#moodRow .ctog").forEach(t=>{
+    t.classList.remove("on");
+    if(t.dataset.mood==="평범")t.classList.add("on");
+  });
+  selOccV="혼자";
+  document.querySelectorAll("#occRow .ctog").forEach(t=>{
+    t.classList.remove("on");
+    if(t.dataset.occ==="혼자")t.classList.add("on");
+  });
+  selBudgetV="보통";
+  document.querySelectorAll("#bgtRow .ctog").forEach(t=>{
+    t.classList.remove("on");
+    if(t.dataset.bg==="보통")t.classList.add("on");
+  });
+  // 2) 카테고리 → 랜덤
+  selCatV="random";
+  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+  const randomChip=document.querySelector('.chip[data-cat="random"]');
+  if(randomChip)randomChip.classList.add("active");
+  // 3) 직전 식사 — 입력창 + localStorage + 룰 기반 전역
+  if(typeof clearLastMeal==="function"){
+    // clearLastMeal은 토스트를 띄우므로 직접 inline (조용히 정리)
+    const lmInp=document.getElementById("lmInput");
+    if(lmInp){lmInp.value="";delete lmInp.dataset.kcal;delete lmInp.dataset.category;delete lmInp.dataset.source;}
+    try{localStorage.removeItem("fp6_last_meal");}catch(e){}
+    const lmAc=document.getElementById("lmAc");if(lmAc)lmAc.classList.remove("show");
+    if(typeof _lmRenderTag==="function")_lmRenderTag();
+    if(typeof setLast==="function")setLast("");
+  }
+  // 4) 건강정보 — 모두 지우기 (clearHealth는 자체 토스트가 있으므로 inline으로 조용히)
+  selHealth={height:null,weight:null,bp:null,glu:null,chol:null,goal:null,fam:[],alg:[]};
+  const hH=document.getElementById("hHeight"),hW=document.getElementById("hWeight"),hBmi=document.getElementById("hBmiDisplay");
+  if(hH)hH.value="";
+  if(hW)hW.value="";
+  if(hBmi)hBmi.style.display="none";
+  document.querySelectorAll("#healthCard .h-chip.on").forEach(c=>c.classList.remove("on"));
+  try{localStorage.removeItem(HEALTH_LS_KEY);}catch(e){}
+  // 건강 카드는 닫힌 상태로
+  const healthCard=document.getElementById("healthCard");
+  if(healthCard){
+    healthCard.classList.remove("open");
+    healthCard.querySelector(".health-toggle")?.setAttribute("aria-expanded","false");
+  }
+  // 5) 결과 카드 + AI 이유/대안 + 영양/궁합 모두 숨김
+  const rc=document.getElementById("resultCard");
+  if(rc)rc.classList.remove("show");
+  curMenu=null;
+  const aiCard=document.getElementById("aiReasonCard");
+  if(aiCard)aiCard.style.display="none";
+  const altsSec=document.getElementById("aiAltsSection");
+  if(altsSec){altsSec.style.display="none";const al=document.getElementById("aiAltsList");if(al)al.innerHTML="";}
+  const aiTxt=document.getElementById("aiReasonText");if(aiTxt)aiTxt.innerHTML="";
+  // 영양/궁합 토글 닫힘
+  const nutriSec=document.getElementById("nutriSection");if(nutriSec)nutriSec.classList.remove("show");
+  const storySec=document.getElementById("storySection");if(storySec)storySec.classList.remove("show");
+  _nutriCache=null;
+  // 6) 직접 입력 필드 초기화
+  const dInp=document.getElementById("directInput");if(dInp)dInp.value="";
+  // 7) 결과 카드 위 건강 배지도 정리
+  const rTags=document.getElementById("rTags");
+  if(rTags)rTags.querySelectorAll(".health-badge").forEach(b=>b.remove());
+  // 8) 페이지 최상단으로
+  window.scrollTo({top:0,behavior:"smooth"});
+  if(typeof toast==="function")toast("처음부터 다시 시작해요! 🌟");
+  if(typeof _ga==="function")_ga("reset_all",{});
+}
 
 function directPick(){
   if (!_dbReady || !DB.length) {
