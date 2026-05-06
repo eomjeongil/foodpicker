@@ -499,6 +499,40 @@ body{
 .report-trend-bar > div{flex:1;background:linear-gradient(180deg,#4CAF7D,#2E9E6B);border-radius:3px 3px 0 0;min-height:4px;position:relative;}
 .report-trend-bar .ttd{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:9px;color:#888;}
 .report-cta-btn{display:block;margin:12px auto 0;padding:12px 22px;border:none;border-radius:11px;background:linear-gradient(135deg,#4CAF7D,#2E9E6B);color:#fff;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(76,175,125,.35);}
+/* 픽헬스 활성화 카드 — 잠금/해제 상태 */
+.pickhealth-card{margin-top:12px;border-radius:12px;padding:14px;background:#fff;}
+.pickhealth-lock{border:1.5px dashed #cfd8dc;background:#FAFAFA;}
+.pickhealth-unlock{border:1.5px solid #4CAF7D;background:linear-gradient(135deg,#E8F5E9,#F1F8E9);box-shadow:0 4px 14px rgba(76,175,125,.18);}
+.ph-title{font-size:13px;font-weight:800;color:#2E7D32;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.pickhealth-lock .ph-title{color:#7A8590;}
+.ph-progress-wrap{background:#E5EDE7;border-radius:20px;height:8px;overflow:hidden;margin:6px 0;}
+.ph-progress-bar{height:100%;border-radius:20px;background:linear-gradient(90deg,#4CAF7D,#2E9E6B);transition:width .5s ease;}
+.ph-status-msg{font-size:12px;color:#666;margin:6px 0 10px;line-height:1.5;}
+.pickhealth-unlock .ph-status-msg{color:#2E7D32;font-weight:700;}
+.ph-lock-btn{width:100%;padding:12px;border:none;border-radius:10px;background:#CFD8DC;color:#7A8590;font-size:13.5px;font-weight:800;cursor:not-allowed;letter-spacing:.2px;}
+.ph-unlock-btn{width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#4CAF7D,#2E9E6B);color:#fff;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:.2px;box-shadow:0 4px 12px rgba(76,175,125,.35);transition:transform .15s ease;}
+.ph-unlock-btn:hover{transform:translateY(-1px);}
+/* 픽헬스 카카오 가입 유도 팝업 */
+.ph-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1200;display:flex;align-items:center;justify-content:center;padding:14px;}
+.ph-modal-inner{background:#fff;border-radius:16px;padding:22px 18px;width:100%;max-width:340px;box-shadow:0 16px 40px rgba(0,0,0,.2);text-align:center;}
+.ph-modal-title{font-size:16px;font-weight:800;color:#2E7D32;margin-bottom:6px;}
+.ph-modal-desc{font-size:13px;color:#666;line-height:1.6;margin-bottom:14px;}
+.ph-modal-actions{display:flex;flex-direction:column;gap:8px;}
+.ph-kakao-btn{padding:11px;border:none;border-radius:10px;background:#FEE500;color:#1F1C18;font-size:14px;font-weight:800;cursor:pointer;}
+.ph-skip-btn{padding:11px;border:1px solid #ddd;border-radius:10px;background:#fff;color:#666;font-size:13px;font-weight:600;cursor:pointer;}
+/* 삭제 복구 패널 */
+.ml-deleted-toggle{width:100%;padding:9px;background:none;border:1px dashed #FFCDD2;border-radius:10px;color:#D6645B;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;}
+.ml-deleted-toggle:hover{background:#FFF5F5;}
+.ml-deleted-list{margin-top:8px;border:1px solid #FFE0E0;border-radius:10px;padding:8px;background:#FFFAFA;display:none;}
+.ml-deleted-list.show{display:block;}
+.ml-deleted-empty{padding:14px;text-align:center;color:#aaa;font-size:12px;}
+.ml-deleted-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;background:#fff;border:1px solid #f0e0e0;margin-bottom:5px;font-size:12px;}
+.ml-deleted-item:last-child{margin-bottom:0;}
+.ml-del-meta{flex:1;color:#555;}
+.ml-del-name{font-weight:700;color:#1F1C18;}
+.ml-del-date{font-size:10.5px;color:#999;margin-top:2px;}
+.ml-restore-btn{padding:5px 10px;border:1px solid #4CAF7D;border-radius:7px;background:#fff;color:#2E7D32;font-size:11.5px;font-weight:700;cursor:pointer;}
+.ml-restore-btn:hover{background:#E8F5E9;}
 /* 오늘 칼로리 + 운동 추천 카드 */
 .report-today-kcal{background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border-radius:12px;padding:14px;margin-bottom:12px;}
 .rtk-title{font-size:13px;font-weight:700;color:#2E7D32;margin-bottom:8px;}
@@ -1591,6 +1625,16 @@ async function _logClick(type, menu) {
 
       <!-- 기록 목록 -->
       <div class="meal-log-list" id="mealLogList" style="margin-top:12px;"></div>
+
+      <!-- 픽헬스 활성화 슬롯 (기록 섹션 하단) — verifyPickHealth가 채움 -->
+      <div id="pickhealthCardRecord"></div>
+
+      <!-- 삭제 복구 토글 + 목록 -->
+      <button class="ml-deleted-toggle" type="button" id="mealLogDeletedToggle"
+        onclick="toggleDeletedList()" style="display:none;">
+        🗑️ 삭제된 기록 복구하기
+      </button>
+      <div class="ml-deleted-list" id="mealLogDeletedList"></div>
 
       <!-- 전체 초기화 버튼 — 기록이 1건 이상일 때만 노출 (loadMealLogs에서 토글) -->
       <button id="mealLogResetBtn" type="button" onclick="resetMealLogs()"
@@ -3055,7 +3099,13 @@ async function openReport(){
     html+=`<div class="rsc-note" style="text-align:center;margin-top:6px;">${_escAt(a.note)}</div>`;
   }
 
+  // 픽헬스 활성화 카드 슬롯 (리포트 하단)
+  html+=`<div id="pickhealthCardReport"></div>`;
+
   content.innerHTML=html;
+
+  // 비동기로 픽헬스 자격 검증 → 양쪽 슬롯에 같은 카드 렌더
+  verifyPickHealth();
 }
 function closeReport(){
   document.getElementById("reportOverlay")?.classList.remove("show");
@@ -3326,13 +3376,20 @@ async function saveMealLog(){
       body:JSON.stringify(payload)
     });
     const j=await r.json().catch(()=>({}));
-    if(!r.ok||!j.success)throw new Error(j.error||"저장 실패");
+    if(!r.ok||!j.success){
+      // 서버가 반환한 검증 코드별 안내
+      const code=j.code||"";
+      const msg=j.error||"저장 실패";
+      _catGuardLikeToast(msg);
+      if(typeof _ga==="function")_ga("meal_log_save_blocked",{code,type:_mealLogMeal,date:_mealLogDate});
+      return;
+    }
     closeMealLogPopup();
     // 입력창 초기화
     const inp=document.getElementById("mealLogInput");
     if(inp)inp.value="";
     _mealLogSelected=null;
-    _catGuardLikeToast("기록됐어요! 📊");
+    _catGuardLikeToast(j.duplicate?"이미 기록되어 있어요":"기록됐어요! 📊");
     // 목록·진행 바 갱신
     loadMealLogs();
     if(typeof _ga==="function")_ga("meal_log_save",{type:_mealLogMeal,date:_mealLogDate});
@@ -3355,12 +3412,34 @@ async function loadMealLogs(){
     updateMealProgress(logs.length);
     const resetBtn=document.getElementById("mealLogResetBtn");
     if(resetBtn)resetBtn.style.display=logs.length?"block":"none";
+    // 삭제 복구 토글 — 30일 내 삭제 항목 1건 이상이면 노출
+    _refreshDeletedToggle();
+    // 픽헬스 활성화 카드 갱신
+    verifyPickHealth();
   }catch(e){
     console.warn("[meal-log:list] failed:",e?.message);
     renderMealLogList([], {});
     updateMealProgress(0);
     const resetBtn=document.getElementById("mealLogResetBtn");
     if(resetBtn)resetBtn.style.display="none";
+    _refreshDeletedToggle();
+    verifyPickHealth();
+  }
+}
+
+async function _refreshDeletedToggle(){
+  const btn=document.getElementById("mealLogDeletedToggle");
+  const box=document.getElementById("mealLogDeletedList");
+  if(!btn)return;
+  try{
+    const r=await fetch(`/api/meal-logs/deleted?uid=${encodeURIComponent(FP_UID)}`,{cache:"no-store"});
+    const j=await r.json().catch(()=>({}));
+    const n=Array.isArray(j.logs)?j.logs.length:0;
+    btn.style.display=n>0?"block":"none";
+    btn.textContent=n>0?`🗑️ 삭제된 기록 복구하기 (${n})`:`🗑️ 삭제된 기록 복구하기`;
+    if(n===0 && box){ box.classList.remove("show"); box.innerHTML=""; }
+  }catch(_){
+    btn.style.display="none";
   }
 }
 
@@ -3464,30 +3543,164 @@ function showMoreMealLogs(){
 }
 
 async function deleteMealLog(id){
-  if(!confirm("이 기록을 삭제할까요?"))return;
+  if(!confirm("이 기록을 삭제할까요? (30일 내 복구 가능)"))return;
   try{
     const r=await fetch(`/api/meal-log/${id}?uid=${encodeURIComponent(FP_UID)}`,{method:"DELETE"});
     const j=await r.json().catch(()=>({}));
     if(!r.ok||!j.success)throw new Error(j.error||"삭제 실패");
     await loadMealLogs();
-    _catGuardLikeToast("삭제됐어요");
+    _catGuardLikeToast("삭제됐어요 (30일 내 복구 가능)");
   }catch(e){
     _catGuardLikeToast("삭제 실패. 잠시 후 다시 시도");
   }
 }
 
 async function resetMealLogs(){
-  if(!confirm("모든 식사 기록이 삭제됩니다. 계속하시겠어요?"))return;
+  // 1단계 — 안내 + 동의
+  if(!confirm("⚠️ 모든 기록이 삭제됩니다.\n\n30일 이내라면 '🗑️ 삭제된 기록 복구하기' 메뉴에서 복구할 수 있어요.\n\n계속할까요?"))return;
+  // 2단계 — 키워드 입력 확인 (오타/오작동 방지)
+  const typed=prompt("정말 초기화하려면 '초기화'라고 입력해 주세요.");
+  if(typed===null)return;
+  if(String(typed).trim()!=="초기화"){
+    _catGuardLikeToast("'초기화'를 정확히 입력해야 진행돼요");
+    return;
+  }
   try{
     const r=await fetch(`/api/meal-logs/reset?uid=${encodeURIComponent(FP_UID)}`,{method:"DELETE"});
     const j=await r.json().catch(()=>({}));
     if(!r.ok||!j.success)throw new Error(j.error||"초기화 실패");
     await loadMealLogs();
-    _catGuardLikeToast("기록이 초기화됐어요");
+    _catGuardLikeToast("기록이 초기화됐어요 (30일 내 복구 가능)");
     if(typeof _ga==="function")_ga("meal_log_reset",{deleted:j.deleted||0});
   }catch(e){
     _catGuardLikeToast("초기화 실패. 잠시 후 다시 시도");
   }
+}
+
+/* ── 삭제된 기록 복구 ── */
+async function toggleDeletedList(){
+  const box=document.getElementById("mealLogDeletedList");
+  if(!box)return;
+  const willShow=!box.classList.contains("show");
+  box.classList.toggle("show", willShow);
+  if(!willShow)return;
+  // 펼칠 때마다 새로 로드
+  box.innerHTML=`<div class="ml-deleted-empty">불러오는 중...</div>`;
+  try{
+    const r=await fetch(`/api/meal-logs/deleted?uid=${encodeURIComponent(FP_UID)}`,{cache:"no-store"});
+    const j=await r.json().catch(()=>({}));
+    const logs=Array.isArray(j.logs)?j.logs:[];
+    if(!logs.length){
+      box.innerHTML=`<div class="ml-deleted-empty">최근 30일 내 삭제된 기록이 없어요</div>`;
+      return;
+    }
+    box.innerHTML=logs.map(l=>{
+      const t=l.meal_type||"";
+      const emoji=_MLOG_TYPE_EMOJI[t]||"🍽️";
+      const kor=_MLOG_TYPE_KOR[t]||t;
+      return `<div class="ml-deleted-item">
+        <span style="font-size:18px;">${emoji}</span>
+        <div class="ml-del-meta">
+          <div class="ml-del-name">${_mlogEsc(l.menu_name)} <span style="color:#888;font-weight:500;">(${_mlogEsc(kor)})</span></div>
+          <div class="ml-del-date">📅 ${_mlogEsc(l.meal_date||"")} · 삭제 ${_mlogEsc((l.deleted_at||"").replace("T"," ").slice(0,16))}</div>
+        </div>
+        <button class="ml-restore-btn" type="button" onclick="restoreMealLog(${l.id})">복구</button>
+      </div>`;
+    }).join("");
+  }catch(e){
+    box.innerHTML=`<div class="ml-deleted-empty">불러오기 실패. 잠시 후 다시 시도</div>`;
+  }
+}
+async function restoreMealLog(id){
+  try{
+    const r=await fetch(`/api/meal-log/restore/${id}?uid=${encodeURIComponent(FP_UID)}`,{method:"POST"});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||!j.success){
+      _catGuardLikeToast(j.error||"복구 실패");
+      return;
+    }
+    _catGuardLikeToast("복구됐어요");
+    await loadMealLogs();
+    // 복구 후 목록 새로고침
+    const box=document.getElementById("mealLogDeletedList");
+    if(box && box.classList.contains("show")){
+      // 토글 후 다시 펼치기 → 강제 새로고침
+      box.classList.remove("show");
+      toggleDeletedList();
+    }
+    if(typeof _ga==="function")_ga("meal_log_restore",{id});
+  }catch(e){
+    _catGuardLikeToast("복구 실패. 잠시 후 다시 시도");
+  }
+}
+
+/* ── 픽헬스 활성화 자격 검증 ── */
+async function verifyPickHealth(){
+  let data=null;
+  try{
+    const r=await fetch(`/api/meal-logs/verify-pickhealth?uid=${encodeURIComponent(FP_UID)}`,{cache:"no-store"});
+    if(r.ok)data=await r.json();
+  }catch(e){}
+  const html=_renderPickHealthCard(data);
+  // 양쪽 슬롯에 같은 내용 (리포트/기록)
+  const a=document.getElementById("pickhealthCardRecord");
+  const b=document.getElementById("pickhealthCardReport");
+  if(a)a.innerHTML=html;
+  if(b)b.innerHTML=html;
+}
+function _renderPickHealthCard(d){
+  if(!d)return "";
+  const total=d.total_meals||0, days=d.unique_days||0;
+  const need=d.meals_needed||0, dneed=d.days_needed||0;
+  const reasons=d.reasons||{};
+  if(d.is_eligible){
+    return `<div class="pickhealth-card pickhealth-unlock">
+      <div class="ph-title">💊 픽헬스 맞춤 추천 가능</div>
+      <div class="ph-status-msg">✅ ${total}끼 / ${days}일 분석 완료 — 이제 픽헬스에서 맞춤 영양제·식단 추천을 받을 수 있어요</div>
+      <button class="ph-unlock-btn" type="button" onclick="openPickHealthInvite()">💊 픽헬스 맞춤 추천 보기</button>
+    </div>`;
+  }
+  // 잠금 상태 — 진행 바 + 부족 안내
+  const pct=Math.max(0,Math.min(100,(total/21)*100));
+  const reasonBits=[];
+  if(!reasons.meals_ok)   reasonBits.push(`${need}끼 더 필요`);
+  if(!reasons.days_ok)    reasonBits.push(`${dneed}일치 더 필요`);
+  if(!reasons.pattern_ok) reasonBits.push("하루 5끼 이상 기록일 발견 — 패턴 정리 필요");
+  if(!reasons.variety_ok) reasonBits.push("메뉴 다양성 부족 — 다른 메뉴도 기록해보세요");
+  return `<div class="pickhealth-card pickhealth-lock">
+    <div class="ph-title">🔒 픽헬스 잠금 상태</div>
+    <div class="ph-progress-wrap"><div class="ph-progress-bar" style="width:${pct}%"></div></div>
+    <div class="ph-status-msg">${total}/21끼 · ${days}/5일 달성 중 — ${reasonBits.length?reasonBits.join(", "):"조건 충족 시 자동 해제"}</div>
+    <button class="ph-lock-btn" type="button" disabled>${need>0?`${need}끼 더 기록하면 해제돼요`:"조건 충족 후 해제"}</button>
+  </div>`;
+}
+function openPickHealthInvite(){
+  // 이미 떠 있으면 중복 생성 방지
+  if(document.getElementById("phInviteModal"))return;
+  const m=document.createElement("div");
+  m.id="phInviteModal";
+  m.className="ph-modal";
+  m.innerHTML=`
+    <div class="ph-modal-inner" onclick="event.stopPropagation()">
+      <div class="ph-modal-title">💊 픽헬스 맞춤 추천</div>
+      <div class="ph-modal-desc">픽헬스 맞춤 추천을 위해<br>카카오로 간편 가입하세요</div>
+      <div class="ph-modal-actions">
+        <button class="ph-kakao-btn" type="button" onclick="_phGoTo('kakao')">카카오로 1초 가입</button>
+        <button class="ph-skip-btn"  type="button" onclick="_phGoTo('skip')">그냥 방문</button>
+      </div>
+    </div>`;
+  m.addEventListener("click",e=>{ if(e.target===m) _phCloseInvite(); });
+  document.body.appendChild(m);
+  if(typeof _ga==="function")_ga("pickhealth_invite_open",{});
+}
+function _phCloseInvite(){
+  const m=document.getElementById("phInviteModal"); if(m)m.remove();
+}
+function _phGoTo(mode){
+  const url=`https://pickhealth.kr?uid=${encodeURIComponent(FP_UID)}&ref=foodpicker${mode==="kakao"?"&login=kakao":""}`;
+  if(typeof _ga==="function")_ga("pickhealth_go",{mode});
+  _phCloseInvite();
+  window.open(url,"_blank","noopener");
 }
 
 function updateMealProgress(count){
