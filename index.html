@@ -1545,7 +1545,7 @@ async function _logClick(type, menu) {
       <div class="meal-log-progress">
         <div class="mlp-count">📊 현재 <span id="mealLogCount">0</span>끼 기록 중</div>
         <div class="progress-wrap"><div class="progress-bar" id="mealLogProgressBar" style="width:0%"></div></div>
-        <div class="mlp-next" id="mealLogNextMsg">5끼를 기록하면 첫 분석이 시작됩니다 <span style="font-size:10px;color:#aaa;">(영양학적 최소 패턴 분석 기준)</span></div>
+        <div class="mlp-next" id="mealLogNextMsg">기록을 불러오는 중...</div>
       </div>
 
       <!-- 기록 목록 -->
@@ -2948,11 +2948,6 @@ async function openReport(){
   // 단계별 주석
   if(a.note){
     html+=`<div class="rsc-note" style="text-align:center;margin-top:6px;">${_escAt(a.note)}</div>`;
-  }
-
-  // 다음 마일스톤 안내
-  if(data.next_milestone&&data.meals_to_next>0){
-    html+=`<div class="report-insight" style="margin-top:14px;">📈 ${data.meals_to_next}끼 더 기록하면 ${data.next_milestone===10?'패턴 분석':data.next_milestone===21?'주간 분석':data.next_milestone===60?'월간 분석':'다음 단계'}이 열려요</div>`;
   }
 
   content.innerHTML=html;
