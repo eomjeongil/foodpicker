@@ -554,6 +554,36 @@ body{
 .rkn-desc{font-size:11px;color:#888;margin-top:2px;line-height:1.4;}
 .rkn-btn{padding:8px 12px;background:#FEE500;color:#1F1C18;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;transition:transform .15s ease;}
 .rkn-btn:hover{transform:translateY(-1px);}
+/* ── 픽헬스 잠금/활성 카드 — 동기부여 카피 (작업 1) ── */
+.ph-intro{text-align:center;margin-bottom:14px;}
+.ph-intro-logo{font-size:20px;font-weight:900;color:#2E7D32;margin-bottom:4px;}
+.ph-intro-tagline{font-size:13px;color:#555;line-height:1.5;}
+.ph-intro-features{background:#F9FFF9;border-radius:10px;padding:10px;margin-bottom:14px;}
+.ph-feature{font-size:12px;color:#444;padding:5px 0;border-bottom:1px solid #E8F5E9;line-height:1.4;}
+.ph-feature:last-child{border-bottom:none;}
+.ph-feature strong{color:#2E7D32;}
+.ph-lock-progress-wrap{margin-bottom:12px;}
+.ph-lock-progress-title{font-size:12px;font-weight:700;color:#888;margin-bottom:6px;}
+.ph-lock-msg{font-size:12px;color:#666;line-height:1.5;margin-top:6px;}
+.ph-lock-sub{font-size:10px;color:#aaa;margin-top:4px;}
+.ph-unlock-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.ph-unlock-logo{font-size:18px;font-weight:900;color:#2E7D32;}
+.ph-unlock-badge{font-size:12px;background:#4CAF7D;color:#fff;padding:3px 10px;border-radius:20px;font-weight:700;}
+.ph-unlock-summary{font-size:13px;color:#444;margin-bottom:10px;line-height:1.5;}
+.ph-highlight{background:#E3F2FD;color:#1565C0;padding:2px 6px;border-radius:6px;font-weight:700;font-size:12px;}
+.ph-score{color:#FF6B35;font-weight:900;font-size:16px;}
+.ph-unlock-preview{background:#F9FFF9;border-radius:10px;padding:10px;margin-bottom:12px;font-size:12px;color:#555;}
+.ph-preview-item{padding:4px 0;border-bottom:1px solid #E8F5E9;}
+.ph-preview-item:last-child{border-bottom:none;}
+.ph-unlock-note{font-size:10px;color:#aaa;text-align:center;margin-top:8px;}
+/* 기록 섹션 상단 픽헬스 동기부여 힌트 (작업 2) */
+.meal-log-pickhealth-hint{display:flex;align-items:flex-start;gap:8px;background:#F3E5F5;border-radius:10px;padding:10px 12px;margin:10px 0;font-size:12px;color:#6A1B9A;line-height:1.5;}
+.mlph-icon{font-size:16px;flex-shrink:0;line-height:1.2;}
+.mlph-text strong{color:#4A148C;}
+.mlph-sub{display:block;color:#9C27B0;font-size:11px;margin-top:2px;}
+/* 리포트 내 픽헬스 연동 힌트 (작업 3) */
+.report-pickhealth-hint{background:#F3E5F5;border:1px solid #CE93D8;border-radius:10px;padding:10px 12px;font-size:12px;color:#6A1B9A;line-height:1.6;margin-top:10px;}
+.report-pickhealth-hint.activated{background:#E8F5E9;border-color:#A5D6A7;color:#2E7D32;}
 /* ── 리포트 식습관 평가 + 부족 영양소 ── */
 .report-section{margin:12px 0;}
 .report-section-title{font-size:14px;font-weight:800;color:#2E7D32;margin:0 0 8px;display:flex;align-items:center;gap:6px;}
@@ -1663,6 +1693,15 @@ async function _logClick(type, menu) {
           생각나는 것부터 하나씩 적어보세요.<br>
           기록이 쌓일수록 나만의 정확한<br>
           건강 식습관 리포트가 만들어집니다 📊
+        </div>
+      </div>
+
+      <!-- 픽헬스 동기부여 힌트 — 21끼 달성하면 맞춤 솔루션 연동 -->
+      <div class="meal-log-pickhealth-hint">
+        <span class="mlph-icon">💡</span>
+        <div class="mlph-text">
+          <strong>21끼를 기록하면</strong> 픽헬스에서 내 식습관 기반 맞춤 건강 솔루션을 받을 수 있어요.
+          <span class="mlph-sub">(영양제 전에 음식으로 먼저 채워드려요)</span>
         </div>
       </div>
 
@@ -3294,8 +3333,11 @@ async function loadNutritionAnalysis(){
     <div class="report-section-title">🧪 부족한 영양소 + 식품 추천</div>
     ${overall}
     ${data.deficiencies.map((d,idx)=>_renderDeficiency(d,idx)).join("")}
+    <div id="reportPickhealthHint"></div>
   </div>`;
   mount.outerHTML=html;
+  // verifyPickHealth 가 이미 끝나 있으면 즉시 채우고, 진행 중이면 다음 verifyPickHealth 호출 때 갱신됨
+  _refreshReportPickhealthHint();
   if(typeof _ga==="function")_ga("nutrition_analysis_render",{n:data.deficiencies.length, source});
 }
 
@@ -3927,46 +3969,119 @@ async function restoreMealLog(id){
   }
 }
 
-/* ── 픽헬스 활성화 자격 검증 ── */
+/* ── 픽헬스 활성화 자격 검증 + 동기부여 카피 카드 ── */
+// 활성 카드는 habit_type / health_score 같이 보여주기 위해 /api/health-profile 도 함께 호출.
+// 두 호출은 무거운 작업이 아니라 병렬 fetch로 처리하고, 어느 한쪽이 실패해도 카드는 그려진다.
+let _phLastVerify=null;
 async function verifyPickHealth(){
-  let data=null;
+  let verify=null, profile=null;
   try{
-    const r=await fetch(`/api/meal-logs/verify-pickhealth?uid=${encodeURIComponent(FP_UID)}`,{cache:"no-store"});
-    if(r.ok)data=await r.json();
-  }catch(e){}
-  const html=_renderPickHealthCard(data);
+    const [vr,pr]=await Promise.all([
+      fetch(`/api/meal-logs/verify-pickhealth?uid=${encodeURIComponent(FP_UID)}`,{cache:"no-store"}),
+      fetch(`/api/health-profile?uid=${encodeURIComponent(FP_UID)}`,{cache:"no-store"})
+    ]);
+    if(vr&&vr.ok)verify=await vr.json();
+    if(pr&&pr.ok)profile=await pr.json();
+  }catch(_){ /* 네트워크 실패는 카드 생략 */ }
+  _phLastVerify=verify;
+  const html=_renderPickHealthCard(verify, profile);
   // 양쪽 슬롯에 같은 내용 (리포트/기록)
   const a=document.getElementById("pickhealthCardRecord");
   const b=document.getElementById("pickhealthCardReport");
   if(a)a.innerHTML=html;
   if(b)b.innerHTML=html;
+  // 리포트의 부족 영양소 섹션 하단 힌트도 같은 상태로 갱신
+  _refreshReportPickhealthHint();
 }
-function _renderPickHealthCard(d){
+function _refreshReportPickhealthHint(){
+  const el=document.getElementById("reportPickhealthHint");
+  if(!el)return;
+  const v=_phLastVerify;
+  if(!v){ el.innerHTML=""; return; }
+  if(v.is_eligible){
+    el.innerHTML=`<div class="report-pickhealth-hint activated">
+      💊 <strong>픽헬스</strong> 연동 준비 완료! 내 식습관 데이터로 맞춤 솔루션을 지금 바로 확인해보세요.
+    </div>`;
+  }else{
+    const need=v.meals_needed||0;
+    el.innerHTML=`<div class="report-pickhealth-hint">
+      💊 <strong>픽헬스</strong>에서는 이 부족한 영양소를 식재료와 영양제로 동시에 해결할 수 있어요.<br>
+      <span style="color:#888;font-size:11px;">${need}끼 더 기록하면 연동 가능합니다</span>
+    </div>`;
+  }
+}
+function _renderPickHealthCard(d, profile){
   if(!d)return "";
   const total=d.total_meals||0, days=d.unique_days||0;
   const need=d.meals_needed||0, dneed=d.days_needed||0;
   const reasons=d.reasons||{};
+
   if(d.is_eligible){
+    const habit=_escAt(profile?.nutrition_analysis?.habit_type||"균형형");
+    const score=parseInt(profile?.nutrition_analysis?.health_score,10);
+    const scoreTxt=isFinite(score)?score:"-";
     return `<div class="pickhealth-card pickhealth-unlock">
-      <div class="ph-title">💊 픽헬스 맞춤 추천 가능</div>
-      <div class="ph-status-msg">✅ ${total}끼 / ${days}일 분석 완료 — 이제 픽헬스에서 맞춤 영양제·식단 추천을 받을 수 있어요</div>
-      <button class="ph-unlock-btn" type="button" onclick="openPickHealthInvite()">💊 픽헬스 맞춤 추천 보기</button>
+      <div class="ph-unlock-header">
+        <div class="ph-unlock-logo">💊 픽헬스</div>
+        <div class="ph-unlock-badge">🎉 연동 가능!</div>
+      </div>
+      <div class="ph-unlock-summary">
+        내 식습관 분석 완료: <span class="ph-highlight">${habit}</span><br>
+        건강 점수 <span class="ph-score">${scoreTxt}점</span>
+      </div>
+      <div class="ph-unlock-preview">
+        💡 픽헬스에서 확인할 수 있어요:
+        <div class="ph-preview-item">🥗 내 부족 영양소별 식재료 추천</div>
+        <div class="ph-preview-item">💊 식습관 기반 정밀 영양제 추천</div>
+        <div class="ph-preview-item">🔬 식약처+임상 근거 있는 추천</div>
+        <div class="ph-preview-item">📦 신선 식재료 + 영양제 바로 구매</div>
+      </div>
+      <button class="ph-unlock-btn" type="button" onclick="openPickhealth()">💊 픽헬스 맞춤 솔루션 보기 →</button>
+      <div class="ph-unlock-note">* 설문 없이 내 실제 식습관으로 추천해요</div>
     </div>`;
   }
-  // 잠금 상태 — 진행 바 + 부족 안내
+
+  // 잠금 상태 — 동기부여 인트로 + 4가지 특징 + 진행바 + 잠금 버튼
   const pct=Math.max(0,Math.min(100,(total/21)*100));
   const reasonBits=[];
-  if(!reasons.meals_ok)   reasonBits.push(`${need}끼 더 필요`);
-  if(!reasons.days_ok)    reasonBits.push(`${dneed}일치 더 필요`);
   if(!reasons.pattern_ok) reasonBits.push("하루 5끼 이상 기록일 발견 — 패턴 정리 필요");
   if(!reasons.variety_ok) reasonBits.push("메뉴 다양성 부족 — 다른 메뉴도 기록해보세요");
+
+  // 진행 메시지 — 부족한 끼니/일이 명확하면 그걸 우선, 아니면 동기부여 카피
+  let lockMsg;
+  if(need>0||dneed>0){
+    const parts=[];
+    if(need>0)parts.push(`${need}끼`);
+    if(dneed>0)parts.push(`${dneed}일치`);
+    lockMsg=`${parts.join(" / ")} 더 기록하면 내 식습관 기반 맞춤 건강 솔루션이 시작됩니다`;
+  }else if(reasonBits.length){
+    lockMsg=reasonBits.join(", ");
+  }else{
+    lockMsg="21끼를 기록하면 내 식습관 기반 맞춤 건강 솔루션이 시작됩니다";
+  }
+
   return `<div class="pickhealth-card pickhealth-lock">
-    <div class="ph-title">🔒 픽헬스 잠금 상태</div>
-    <div class="ph-progress-wrap"><div class="ph-progress-bar" style="width:${pct}%"></div></div>
-    <div class="ph-status-msg">${total}/21끼 · ${days}/5일 달성 중 — ${reasonBits.length?reasonBits.join(", "):"조건 충족 시 자동 해제"}</div>
-    <button class="ph-lock-btn" type="button" disabled>${need>0?`${need}끼 더 기록하면 해제돼요`:"조건 충족 후 해제"}</button>
+    <div class="ph-intro">
+      <div class="ph-intro-logo">💊 픽헬스</div>
+      <div class="ph-intro-tagline">내 식습관 데이터로 만드는<br>맞춤 건강 솔루션</div>
+    </div>
+    <div class="ph-intro-features">
+      <div class="ph-feature">🥗 <strong>음식 먼저</strong> — 부족한 영양소를 식재료로 먼저 채워요</div>
+      <div class="ph-feature">💊 <strong>영양제는 보완</strong> — 식습관으로 부족한 부분만 정확히 추천</div>
+      <div class="ph-feature">📊 <strong>내 데이터 기반</strong> — 설문이 아닌 실제 식습관 분석으로 추천</div>
+      <div class="ph-feature">🔬 <strong>근거 있는 추천</strong> — 식약처 인정 기능성 + 임상 연구 근거</div>
+    </div>
+    <div class="ph-lock-progress-wrap">
+      <div class="ph-lock-progress-title">🔒 맞춤 추천 잠금 해제까지 (${total}/21끼 · ${days}/5일)</div>
+      <div class="progress-wrap"><div class="progress-bar" id="phLockBar" style="width:${pct}%"></div></div>
+      <div class="ph-lock-msg" id="phLockMsg">${_escAt(lockMsg)}</div>
+      <div class="ph-lock-sub">* 5일 이상 기록 시 활성화 (영양학적 신뢰 기준)</div>
+    </div>
+    <button class="ph-lock-btn" type="button" disabled>💊 픽헬스 맞춤 솔루션 보기 🔒</button>
   </div>`;
 }
+// 활성 카드 클릭 — 기존 카카오 가입 유도 모달 재사용
+function openPickhealth(){ openPickHealthInvite(); }
 function openPickHealthInvite(){
   // 이미 떠 있으면 중복 생성 방지
   if(document.getElementById("phInviteModal"))return;
