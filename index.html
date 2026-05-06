@@ -1341,6 +1341,12 @@ async function _logClick(type, menu) {
         <div class="ai-reason-body" id="aiReasonText">분석 중...</div>
       </div>
 
+      <!-- 🎯 AI 대안 메뉴 (왜 이 메뉴 바로 아래로 이동, 클릭 시 directPick) -->
+      <div class="ai-alts-section" id="aiAltsSection" style="display:none;">
+        <div class="ai-alts-title">다른 추천 메뉴 — 탭하면 바로 추천</div>
+        <div class="ai-alts-list" id="aiAltsList"></div>
+      </div>
+
       <!-- 다시 선택하기 — 컨텍스트 유지하고 메뉴/대안만 새로 뽑음 -->
       <div style="margin-bottom:8px;">
         <button onclick="pickAgain()" style="width:100%;padding:15px;border:1.5px solid #FFE3CC;border-radius:13px;background:#fff;color:#7A6E62;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 2px 8px rgba(255,107,53,.06);"
@@ -1458,12 +1464,6 @@ async function _logClick(type, menu) {
     <a id="fp-ad-link-3" href="#" target="_blank">
       <img id="fp-ad-img-3" src="" alt="광고" style="width:100%;border-radius:8px;display:block;">
     </a>
-  </div>
-
-  <!-- 🎯 AI 대안 메뉴 (next-card 대체, 클릭 시 directPick) -->
-  <div class="ai-alts-section" id="aiAltsSection" style="display:none;">
-    <div class="ai-alts-title">다른 추천 메뉴 — 탭하면 바로 추천</div>
-    <div class="ai-alts-list" id="aiAltsList"></div>
   </div>
 
   <!-- ⑤ 외부 링크 — 4개 (네이버·카카오맵·쿠팡이츠·배민) -->
