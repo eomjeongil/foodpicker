@@ -2881,7 +2881,15 @@ const _DM_CAT_KCAL={
   seafood:500, health:380, meat:700, noodle:580,
   rice:550, season:500, random:500, etc:500, custom:500
 };
-function _dmKcalFor(cat){return _DM_CAT_KCAL[cat]||500;}
+function _dmKcalFor(catOrMenu){
+  // 인자가 메뉴 객체면 m.kcal 우선, 없으면 카테고리 추정값
+  if(catOrMenu&&typeof catOrMenu==="object"){
+    const k=parseInt(catOrMenu.kcal,10);
+    if(isFinite(k)&&k>=0)return k;
+    return _DM_CAT_KCAL[catOrMenu.cat]||500;
+  }
+  return _DM_CAT_KCAL[catOrMenu]||500;
+}
 // 입력 필드별 메타 (kcal/category/source) — 자동완성 선택 시 채워짐
 function _dmGetMeta(input){
   return {
@@ -3017,17 +3025,25 @@ function toggleDailyMeal(){
 function _dmEsc(s){return String(s||"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function _dmSearchDB(q,limit){
   if(!Array.isArray(window.DB)||!q)return [];
-  const ql=q.toLowerCase();
-  // 1) 시작 일치 우선, 2) 부분 일치 다음
-  const starts=[],contains=[];
+  // 정규화: 앞뒤 공백 제거 + 내부 공백 정리 + 소문자
+  const norm=s=>String(s||"").trim().replace(/\s+/g," ").toLowerCase();
+  const qn=norm(q);
+  if(!qn)return [];
+  // 부분 일치(includes) 기반 — 점수: 정확 일치 > 시작 일치 > 부분 일치
+  const out=[];
   for(const m of window.DB){
-    const n=String(m.n||"");
-    if(!n)continue;
-    if(n.startsWith(q)||n.toLowerCase().startsWith(ql))starts.push(m);
-    else if(n.includes(q)||n.toLowerCase().includes(ql))contains.push(m);
-    if(starts.length>=limit)break;
+    const raw=String(m.n||"");
+    if(!raw)continue;
+    const nn=norm(raw);
+    let score=0;
+    if(nn===qn)score=3;
+    else if(nn.startsWith(qn))score=2;
+    else if(nn.includes(qn))score=1;
+    if(score>0)out.push({m,score,len:nn.length});
   }
-  return [...starts,...contains].slice(0,limit);
+  // 점수 내림차순 → 짧은 이름 우선(더 정확한 매칭 느낌)
+  out.sort((a,b)=>(b.score-a.score)||(a.len-b.len));
+  return out.slice(0,limit).map(o=>o.m);
 }
 function _dmAcRender(slot,query){
   const ac=document.getElementById(slot.ac);
@@ -3049,7 +3065,7 @@ function _dmAcRender(slot,query){
       // DB 매칭 결과 + 하단 구분선 + 직접 입력 행
       for(let i=0;i<hits.length;i++){
         const m=hits[i];
-        const kcal=_dmKcalFor(m.cat);
+        const kcal=_dmKcalFor(m);
         html+=`<div class="dm-ac-item" data-i="${i}" data-name="${_dmEsc(m.n)}" data-cat="${_dmEsc(m.cat||"etc")}" data-kcal="${kcal}" data-src="db">
           <span class="dm-ac-emoji">${_dmEsc(m.e||"🍽️")}</span>
           <span class="dm-ac-name">${_dmEsc(m.n)}</span>
