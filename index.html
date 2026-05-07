@@ -790,6 +790,40 @@ body{
 }
 .h-clear:hover{color:var(--pr);}
 
+/* ── 건강정보 섹션 구조 (5개 섹션 + 구분선) ── */
+.health-section{margin-bottom:16px;}
+.health-section-title{
+  font-size:13px;font-weight:800;color:#444;
+  margin-bottom:10px;padding-bottom:6px;
+  border-bottom:1.5px solid #f0f0f0;
+}
+.health-section-divider{height:1px;background:#f5f5f5;margin:16px 0;}
+.health-item{margin-bottom:12px;}
+.health-item:last-child{margin-bottom:0;}
+.health-item-label{
+  font-size:12px;font-weight:700;color:#555;margin-bottom:6px;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+}
+.health-item-hint{font-size:10px;color:#aaa;font-weight:400;}
+/* 활동량 — 2열 그리드 */
+.activity-chips{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.activity-chip{
+  display:flex;flex-direction:column;align-items:center;
+  padding:10px 8px;border:1.5px solid #ddd;border-radius:12px;
+  background:#fff;cursor:pointer;transition:all .15s;text-align:center;
+}
+.activity-chip.on{border-color:#FF6B35;background:#FFF3EE;}
+.ac-icon{font-size:20px;margin-bottom:2px;}
+.ac-label{font-size:12px;font-weight:700;color:#333;}
+.ac-desc{font-size:10px;color:#aaa;margin-top:2px;line-height:1.3;}
+.activity-chip.on .ac-label{color:#FF6B35;}
+/* 임신/수유 칩 */
+.pregnancy-chip{
+  padding:8px 14px;border:1.5px solid #ddd;border-radius:20px;
+  background:#fff;font-size:12px;cursor:pointer;color:#555;
+}
+.pregnancy-chip.on{border-color:#EC407A;background:#FCE4EC;color:#C2185B;font-weight:700;}
+
 /* ── 영양정보 ── */
 .nutri-btn{
   width:100%;padding:13px;border:1.5px solid #B7E5E2;border-radius:var(--rsm);
@@ -1413,89 +1447,140 @@ async function _logClick(type, menu) {
     <div class="health-body">
       <div class="health-notice">
         <strong>🔒 입력 정보는 저장되지 않아요.</strong><br>
-        입력하면 맞춤식 메뉴를 추천합니다. (선택사항)
+        건강 정보를 입력하면 나에게 딱 맞는 메뉴를 추천해드려요.
       </div>
 
-      <!-- 키 / 몸무게 / BMI -->
-      <div class="h-row">
-        <span class="h-label">📏 키 / 몸무게</span>
-        <div class="h-num-row">
-          <input class="h-num-input" id="hHeight" type="number" inputmode="decimal" min="100" max="230" step="0.1" placeholder="키 (cm)" oninput="onHealthInput()">
-          <input class="h-num-input" id="hWeight" type="number" inputmode="decimal" min="25" max="200" step="0.1" placeholder="몸무게 (kg)" oninput="onHealthInput()">
-        </div>
-        <div class="h-bmi-display" id="hBmiDisplay" style="margin-top:8px;display:none;">
-          <span>BMI</span>
-          <span class="h-bmi-num" id="hBmiNum">—</span>
-          <span class="h-bmi-badge" id="hBmiBadge">—</span>
-        </div>
-      </div>
-
-      <!-- 혈압 -->
-      <div class="h-row">
-        <span class="h-label">❤️ 혈압 <span class="h-label-hint h-single">(1개 선택)</span></span>
-        <div class="h-chips" id="hBpChips">
-          <div class="h-chip bp" data-v="정상" onclick="selHealthSingle(this,'bp')">정상</div>
-          <div class="h-chip bp" data-v="경계" onclick="selHealthSingle(this,'bp')">경계 (130–139)</div>
-          <div class="h-chip bp" data-v="고혈압" onclick="selHealthSingle(this,'bp')">고혈압 (140+)</div>
-          <div class="h-chip bp" data-v="혈압약복용" onclick="selHealthSingle(this,'bp')">💊 혈압약 복용 중</div>
+      <!-- 섹션 1 — 기본 신체 정보 -->
+      <div class="health-section">
+        <div class="health-section-title">📏 기본 신체 정보</div>
+        <div class="health-item">
+          <div class="health-item-label">키 / 몸무게</div>
+          <div class="h-num-row">
+            <input class="h-num-input" id="hHeight" type="number" inputmode="decimal" min="100" max="230" step="0.1" placeholder="키 (cm)" oninput="onHealthInput()">
+            <input class="h-num-input" id="hWeight" type="number" inputmode="decimal" min="25" max="200" step="0.1" placeholder="몸무게 (kg)" oninput="onHealthInput()">
+          </div>
+          <div class="h-bmi-display" id="hBmiDisplay" style="margin-top:8px;display:none;">
+            <span>BMI</span>
+            <span class="h-bmi-num" id="hBmiNum">—</span>
+            <span class="h-bmi-badge" id="hBmiBadge">—</span>
+          </div>
         </div>
       </div>
 
-      <!-- 혈당 / 당뇨 -->
-      <div class="h-row">
-        <span class="h-label">🩸 혈당 / 당뇨 <span class="h-label-hint h-single">(1개 선택)</span></span>
-        <div class="h-chips" id="hGluChips">
-          <div class="h-chip glu" data-v="정상" onclick="selHealthSingle(this,'glu')">정상</div>
-          <div class="h-chip glu" data-v="전단계" onclick="selHealthSingle(this,'glu')">전단계</div>
-          <div class="h-chip glu" data-v="당뇨" onclick="selHealthSingle(this,'glu')">당뇨</div>
+      <div class="health-section-divider"></div>
+
+      <!-- 섹션 2 — 건강 상태 -->
+      <div class="health-section">
+        <div class="health-section-title">💊 건강 상태</div>
+
+        <div class="health-item">
+          <div class="health-item-label">❤️ 혈압 <span class="health-item-hint">(1개 선택)</span></div>
+          <div class="h-chips" id="hBpChips">
+            <div class="h-chip bp" data-v="정상" onclick="selHealthSingle(this,'bp')">정상</div>
+            <div class="h-chip bp" data-v="경계" onclick="selHealthSingle(this,'bp')">경계 (130–139)</div>
+            <div class="h-chip bp" data-v="고혈압" onclick="selHealthSingle(this,'bp')">고혈압 (140+)</div>
+            <div class="h-chip bp" data-v="혈압약복용" onclick="selHealthSingle(this,'bp')">💊 혈압약 복용 중</div>
+          </div>
+        </div>
+
+        <div class="health-item">
+          <div class="health-item-label">🩸 혈당 / 당뇨 <span class="health-item-hint">(1개 선택)</span></div>
+          <div class="h-chips" id="hGluChips">
+            <div class="h-chip glu" data-v="정상" onclick="selHealthSingle(this,'glu')">정상</div>
+            <div class="h-chip glu" data-v="전단계" onclick="selHealthSingle(this,'glu')">전단계</div>
+            <div class="h-chip glu" data-v="당뇨" onclick="selHealthSingle(this,'glu')">당뇨</div>
+          </div>
+        </div>
+
+        <div class="health-item">
+          <div class="health-item-label">🥛 콜레스테롤 <span class="health-item-hint">(1개 선택)</span></div>
+          <div class="h-chips" id="hCholChips">
+            <div class="h-chip chol" data-v="정상" onclick="selHealthSingle(this,'chol')">정상</div>
+            <div class="h-chip chol" data-v="경계" onclick="selHealthSingle(this,'chol')">경계</div>
+            <div class="h-chip chol" data-v="높음" onclick="selHealthSingle(this,'chol')">높음</div>
+          </div>
         </div>
       </div>
 
-      <!-- 콜레스테롤 -->
-      <div class="h-row">
-        <span class="h-label">🥛 콜레스테롤 <span class="h-label-hint h-single">(1개 선택)</span></span>
-        <div class="h-chips" id="hCholChips">
-          <div class="h-chip chol" data-v="정상" onclick="selHealthSingle(this,'chol')">정상</div>
-          <div class="h-chip chol" data-v="경계" onclick="selHealthSingle(this,'chol')">경계</div>
-          <div class="h-chip chol" data-v="높음" onclick="selHealthSingle(this,'chol')">높음</div>
+      <div class="health-section-divider"></div>
+
+      <!-- 섹션 3 — 가족력 & 알레르기 -->
+      <div class="health-section">
+        <div class="health-section-title">🧬 가족력 &amp; 알레르기</div>
+
+        <div class="health-item">
+          <div class="health-item-label">👨‍👩‍👧 가족력 <span class="health-item-hint">(중복선택 가능)</span></div>
+          <div class="h-chips multi" id="hFamChips">
+            <div class="h-chip fam" data-v="심혈관질환" onclick="selHealthMulti(this,'fam')">심혈관질환</div>
+            <div class="h-chip fam" data-v="당뇨" onclick="selHealthMulti(this,'fam')">당뇨</div>
+            <div class="h-chip fam" data-v="암" onclick="selHealthMulti(this,'fam')">암</div>
+            <div class="h-chip fam" data-v="고혈압" onclick="selHealthMulti(this,'fam')">고혈압</div>
+            <div class="h-chip fam" data-v="없음" onclick="selHealthMulti(this,'fam',true)">없음</div>
+          </div>
+        </div>
+
+        <div class="health-item">
+          <div class="health-item-label">🚫 알레르기 / 기피 식재료 <span class="health-item-hint">(중복선택 가능)</span></div>
+          <div class="h-chips multi" id="hAlgChips">
+            <div class="h-chip alg" data-v="견과류" onclick="selHealthMulti(this,'alg')">🥜 견과류</div>
+            <div class="h-chip alg" data-v="갑각류" onclick="selHealthMulti(this,'alg')">🦐 갑각류</div>
+            <div class="h-chip alg" data-v="유제품" onclick="selHealthMulti(this,'alg')">🥛 유제품</div>
+            <div class="h-chip alg" data-v="돼지고기" onclick="selHealthMulti(this,'alg')">🐖 돼지고기</div>
+            <div class="h-chip alg" data-v="소고기" onclick="selHealthMulti(this,'alg')">🐄 소고기</div>
+            <div class="h-chip alg" data-v="날것" onclick="selHealthMulti(this,'alg')">🍣 날것</div>
+            <div class="h-chip alg" data-v="없음" onclick="selHealthMulti(this,'alg',true)">없음</div>
+          </div>
         </div>
       </div>
 
-      <!-- 가족력 (다중) -->
-      <div class="h-row">
-        <span class="h-label">👨‍👩‍👧 가족력 <span class="h-label-hint h-multi">(중복선택 가능)</span></span>
-        <div class="h-chips multi" id="hFamChips">
-          <div class="h-chip fam" data-v="심혈관질환" onclick="selHealthMulti(this,'fam')">심혈관질환</div>
-          <div class="h-chip fam" data-v="당뇨" onclick="selHealthMulti(this,'fam')">당뇨</div>
-          <div class="h-chip fam" data-v="암" onclick="selHealthMulti(this,'fam')">암</div>
-          <div class="h-chip fam" data-v="고혈압" onclick="selHealthMulti(this,'fam')">고혈압</div>
-          <div class="h-chip fam" data-v="없음" onclick="selHealthMulti(this,'fam',true)">없음</div>
+      <div class="health-section-divider"></div>
+
+      <!-- 섹션 4 — 생활 패턴 -->
+      <div class="health-section">
+        <div class="health-section-title">🏃 생활 패턴</div>
+
+        <div class="health-item">
+          <div class="health-item-label">평소 활동량 <span class="health-item-hint">(1개 선택)</span></div>
+          <div class="activity-chips" id="hActChips">
+            <button type="button" class="h-chip activity-chip" data-v="sedentary" onclick="selHealthActivity(this)">
+              <span class="ac-icon">🛋️</span><span class="ac-label">비활동</span><span class="ac-desc">주로 앉아서 생활</span>
+            </button>
+            <button type="button" class="h-chip activity-chip" data-v="light" onclick="selHealthActivity(this)">
+              <span class="ac-icon">🚶</span><span class="ac-label">가벼운 활동</span><span class="ac-desc">주 1~3회 운동</span>
+            </button>
+            <button type="button" class="h-chip activity-chip" data-v="moderate" onclick="selHealthActivity(this)">
+              <span class="ac-icon">🏃</span><span class="ac-label">보통 활동</span><span class="ac-desc">주 3~5회 운동</span>
+            </button>
+            <button type="button" class="h-chip activity-chip" data-v="active" onclick="selHealthActivity(this)">
+              <span class="ac-icon">💪</span><span class="ac-label">활발한 활동</span><span class="ac-desc">매일 운동</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="health-item" id="pregnancySection" style="display:none;">
+          <div class="health-item-label">🤰 임신 / 수유 <span class="health-item-hint">(1개 선택)</span></div>
+          <div class="h-chips" id="hPregChips">
+            <button type="button" class="h-chip pregnancy-chip" data-v="" onclick="selHealthPregnancy(this)">해당없음</button>
+            <button type="button" class="h-chip pregnancy-chip" data-v="pregnant" onclick="selHealthPregnancy(this)">🤰 임신 중</button>
+            <button type="button" class="h-chip pregnancy-chip" data-v="nursing" onclick="selHealthPregnancy(this)">🍼 수유 중</button>
+          </div>
         </div>
       </div>
 
-      <!-- 알레르기 / 기피 (다중) -->
-      <div class="h-row">
-        <span class="h-label">🚫 알레르기 / 기피 식재료 <span class="h-label-hint h-multi">(중복선택 가능)</span></span>
-        <div class="h-chips multi" id="hAlgChips">
-          <div class="h-chip alg" data-v="견과류" onclick="selHealthMulti(this,'alg')">🥜 견과류</div>
-          <div class="h-chip alg" data-v="갑각류" onclick="selHealthMulti(this,'alg')">🦐 갑각류</div>
-          <div class="h-chip alg" data-v="유제품" onclick="selHealthMulti(this,'alg')">🥛 유제품</div>
-          <div class="h-chip alg" data-v="돼지고기" onclick="selHealthMulti(this,'alg')">🐖 돼지고기</div>
-          <div class="h-chip alg" data-v="소고기" onclick="selHealthMulti(this,'alg')">🐄 소고기</div>
-          <div class="h-chip alg" data-v="날것" onclick="selHealthMulti(this,'alg')">🍣 날것</div>
-          <div class="h-chip alg" data-v="없음" onclick="selHealthMulti(this,'alg',true)">없음</div>
-        </div>
-      </div>
+      <div class="health-section-divider"></div>
 
-      <!-- 건강목표 -->
-      <div class="h-row">
-        <span class="h-label">🎯 건강 목표 <span class="h-label-hint h-single">(1개 선택)</span></span>
-        <div class="h-chips" id="hGoalChips">
-          <div class="h-chip goal" data-v="체중감량" onclick="selHealthSingle(this,'goal')">체중감량</div>
-          <div class="h-chip goal" data-v="혈압관리" onclick="selHealthSingle(this,'goal')">혈압관리</div>
-          <div class="h-chip goal" data-v="혈당관리" onclick="selHealthSingle(this,'goal')">혈당관리</div>
-          <div class="h-chip goal" data-v="근육증가" onclick="selHealthSingle(this,'goal')">근육증가</div>
-          <div class="h-chip goal" data-v="균형식단" onclick="selHealthSingle(this,'goal')">균형식단</div>
+      <!-- 섹션 5 — 건강 목표 -->
+      <div class="health-section">
+        <div class="health-section-title">🎯 건강 목표</div>
+        <div class="health-item">
+          <div class="health-item-label">목표 <span class="health-item-hint">(1개 선택)</span></div>
+          <div class="h-chips" id="hGoalChips">
+            <div class="h-chip goal" data-v="체중감량" onclick="selHealthSingle(this,'goal')">체중감량</div>
+            <div class="h-chip goal" data-v="혈압관리" onclick="selHealthSingle(this,'goal')">혈압관리</div>
+            <div class="h-chip goal" data-v="혈당관리" onclick="selHealthSingle(this,'goal')">혈당관리</div>
+            <div class="h-chip goal" data-v="근육증가" onclick="selHealthSingle(this,'goal')">근육증가</div>
+            <div class="h-chip goal" data-v="균형식단" onclick="selHealthSingle(this,'goal')">균형식단</div>
+          </div>
         </div>
       </div>
 
@@ -2230,7 +2315,7 @@ function snd(t){
 /* ============================================================
    선택
    ============================================================ */
-function selG(el){document.querySelectorAll("#gRow .tog").forEach(t=>t.classList.remove("sel-m","sel-f","sel-a"));const g=el.dataset.g;el.classList.add(g==="M"?"sel-m":g==="F"?"sel-f":"sel-a");selGend=g;snd("click");}
+function selG(el){document.querySelectorAll("#gRow .tog").forEach(t=>t.classList.remove("sel-m","sel-f","sel-a"));const g=el.dataset.g;el.classList.add(g==="M"?"sel-m":g==="F"?"sel-f":"sel-a");selGend=g;snd("click");if(typeof _togglePregnancySection==="function")_togglePregnancySection();}
 function selA(el){document.querySelectorAll("#aRow .tog").forEach(t=>t.classList.remove("sel-m","sel-f","sel-a"));el.classList.add("sel-a");selAgeV=el.dataset.a;snd("click");}
 function selCatF(el){document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));el.classList.add("active");selCatV=el.dataset.cat;snd("click");}
 
@@ -2435,7 +2520,11 @@ const HEALTH_LS_KEY="fp6_health_v1";
 let selHealth={
   height:null,weight:null,
   bp:null,glu:null,chol:null,goal:null,
-  fam:[],alg:[]
+  fam:[],alg:[],
+  // 활동량: ''|'sedentary'|'light'|'moderate'|'active'
+  activity:"",
+  // 임신/수유: ''|'pregnant'|'nursing' (여성일 때만 의미)
+  pregnancy:""
 };
 function _bmiCategory(bmi){
   if(bmi<18.5)return{label:"저체중",cls:"h-bmi-low"};
@@ -2496,6 +2585,36 @@ function selHealthMulti(el,key,exclusive){
   }
   snd("click");saveHealth();
 }
+// 활동량 — 4개 중 1개 (다시 누르면 해제)
+function selHealthActivity(btn){
+  const v=btn.dataset.v||"";
+  const wasOn=btn.classList.contains("on");
+  document.querySelectorAll("#hActChips .activity-chip").forEach(c=>c.classList.remove("on"));
+  if(!wasOn){btn.classList.add("on");selHealth.activity=v;}
+  else{selHealth.activity="";}
+  snd("click");saveHealth();
+}
+// 임신/수유 — '해당없음'(빈값) 포함 3개 중 1개
+function selHealthPregnancy(btn){
+  const v=btn.dataset.v||"";
+  document.querySelectorAll("#hPregChips .pregnancy-chip").forEach(c=>c.classList.remove("on"));
+  btn.classList.add("on");
+  selHealth.pregnancy=v;
+  snd("click");saveHealth();
+}
+// 성별 변경 시 임신/수유 섹션 표시/숨김 — 여성(F)일 때만 노출
+function _togglePregnancySection(){
+  const sec=document.getElementById("pregnancySection");
+  if(!sec)return;
+  const show=(selGend==="F");
+  sec.style.display=show?"block":"none";
+  if(!show){
+    // 비여성으로 전환되면 임신/수유 값/칩 모두 초기화 (잘못 저장 방지)
+    selHealth.pregnancy="";
+    document.querySelectorAll("#hPregChips .pregnancy-chip").forEach(c=>c.classList.remove("on"));
+  }
+}
+
 function saveHealth(){
   try{localStorage.setItem(HEALTH_LS_KEY,JSON.stringify(selHealth));}catch(e){}
   // 서버 user_health 동기화 — 디바운스 (칩 토글 연타 시 과호출 방지)
@@ -2524,7 +2643,10 @@ function _pushHealthInfo(){
     cholesterol:info.cholesterol,
     familyHistory:info.family,
     allergies:info.allergy,
-    healthGoal:info.goal
+    healthGoal:info.goal,
+    activity:info.activity||"",
+    // 비여성에서는 항상 빈값으로 보내 서버에 잘못된 임신/수유가 박히지 않게 함
+    pregnancy:(selGend==="F"?(info.pregnancy||""):"")
   };
   fetch("/api/user/health-info",{
     method:"POST",
@@ -2543,7 +2665,9 @@ function loadHealth(){
       height:d.height||null,weight:d.weight||null,
       bp:d.bp||null,glu:d.glu||null,chol:d.chol||null,goal:d.goal||null,
       fam:Array.isArray(d.fam)?d.fam:[],
-      alg:Array.isArray(d.alg)?d.alg:[]
+      alg:Array.isArray(d.alg)?d.alg:[],
+      activity:d.activity||"",
+      pregnancy:d.pregnancy||""
     };
     if(selHealth.height)document.getElementById("hHeight").value=selHealth.height;
     if(selHealth.weight)document.getElementById("hWeight").value=selHealth.weight;
@@ -2567,6 +2691,19 @@ function loadHealth(){
     restoreSingle("hGoalChips",selHealth.goal);
     restoreMulti("hFamChips",selHealth.fam);
     restoreMulti("hAlgChips",selHealth.alg);
+    // 활동량 / 임신·수유 — 칩 클래스 동일하게 .on 토글
+    if(selHealth.activity){
+      document.querySelectorAll("#hActChips .activity-chip").forEach(c=>{
+        if(c.dataset.v===selHealth.activity)c.classList.add("on");
+      });
+    }
+    // 임신/수유 섹션은 성별이 F 일 때만 표시 (selG 없이 새로고침된 케이스 보정)
+    if(typeof _togglePregnancySection==="function")_togglePregnancySection();
+    if(selGend==="F" && selHealth.pregnancy!==undefined){
+      document.querySelectorAll("#hPregChips .pregnancy-chip").forEach(c=>{
+        if((c.dataset.v||"")===(selHealth.pregnancy||""))c.classList.add("on");
+      });
+    }
     // 저장된 값이 있으면 자동으로 펼침
     if(getHealthInfo()){
       const card=document.getElementById("healthCard");
@@ -2576,7 +2713,7 @@ function loadHealth(){
   }catch(e){}
 }
 function clearHealth(){
-  selHealth={height:null,weight:null,bp:null,glu:null,chol:null,goal:null,fam:[],alg:[]};
+  selHealth={height:null,weight:null,bp:null,glu:null,chol:null,goal:null,fam:[],alg:[],activity:"",pregnancy:""};
   document.getElementById("hHeight").value="";
   document.getElementById("hWeight").value="";
   document.getElementById("hBmiDisplay").style.display="none";
@@ -2594,7 +2731,9 @@ function toggleHealth(){
 function getHealthInfo(){
   const h=selHealth;
   const bmi=_calcBmi(h.height,h.weight);
-  const has=h.height||h.weight||h.bp||h.glu||h.chol||h.goal||(h.fam&&h.fam.length)||(h.alg&&h.alg.length);
+  const has=h.height||h.weight||h.bp||h.glu||h.chol||h.goal
+          ||(h.fam&&h.fam.length)||(h.alg&&h.alg.length)
+          ||h.activity||h.pregnancy;
   if(!has)return null;
   return{
     height:h.height||null,
@@ -2606,7 +2745,9 @@ function getHealthInfo(){
     cholesterol:h.chol||null,
     goal:h.goal||null,
     family:Array.isArray(h.fam)?h.fam:[],
-    allergy:Array.isArray(h.alg)?h.alg:[]
+    allergy:Array.isArray(h.alg)?h.alg:[],
+    activity:h.activity||"",
+    pregnancy:h.pregnancy||""
   };
 }
 // 페이지 로드 후 자동 복원
@@ -2701,6 +2842,27 @@ async function _restoreHealthFromServer(){
     // 알레르기
     restoreMulti('hAlgChips',d.allergies,'alg');
 
+    // 활동량 — 4개 중 1개
+    if(d.activity && ['sedentary','light','moderate','active'].includes(d.activity)){
+      selHealth.activity=d.activity;
+      document.querySelectorAll('#hActChips .activity-chip').forEach(c=>{
+        c.classList.toggle('on', c.dataset.v===d.activity);
+      });
+    }
+    // 임신/수유 — 성별 F 일 때만 적용. _togglePregnancySection 으로 섹션 표시 후 칩 활성화.
+    if(typeof _togglePregnancySection==='function')_togglePregnancySection();
+    if(selGend==='F' && d.pregnancy && ['pregnant','nursing'].includes(d.pregnancy)){
+      selHealth.pregnancy=d.pregnancy;
+      document.querySelectorAll('#hPregChips .pregnancy-chip').forEach(c=>{
+        c.classList.toggle('on', (c.dataset.v||'')===d.pregnancy);
+      });
+    }else if(selGend==='F'){
+      // 빈값/해당없음 → 첫 번째 '해당없음' 칩 표시
+      document.querySelectorAll('#hPregChips .pregnancy-chip').forEach(c=>{
+        c.classList.toggle('on', (c.dataset.v||'')==='');
+      });
+    }
+
     // localStorage도 최신화 — 다음 방문 빠른 표시 (로컬 포맷 유지)
     try{
       localStorage.setItem(HEALTH_LS_KEY,JSON.stringify({
@@ -2711,7 +2873,9 @@ async function _restoreHealthFromServer(){
         chol:selHealth.chol||null,
         goal:selHealth.goal||null,
         fam:Array.isArray(selHealth.fam)?selHealth.fam:[],
-        alg:Array.isArray(selHealth.alg)?selHealth.alg:[]
+        alg:Array.isArray(selHealth.alg)?selHealth.alg:[],
+        activity:selHealth.activity||"",
+        pregnancy:selHealth.pregnancy||""
       }));
     }catch(e){}
 
