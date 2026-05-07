@@ -301,6 +301,38 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       </div>
     </div>
 
+    <!-- 📱 웹 푸시 현황 -->
+    <div class="section">
+      <div class="sec-head">
+        <div class="sec-title">📱 웹 푸시 현황</div>
+        <span class="sec-badge">실시간</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px;">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;">
+          <div style="font-size:11.5px;color:var(--text2);font-weight:700;">활성 구독자</div>
+          <div id="kPushActive" style="font-size:22px;font-weight:800;color:var(--pr);">0</div>
+          <div id="kPushTotal" style="font-size:11px;color:var(--text2);"></div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;">
+          <div style="font-size:11.5px;color:var(--text2);font-weight:700;">오늘 발송</div>
+          <div id="kPushSentToday" style="font-size:22px;font-weight:800;color:var(--green);">0</div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;">
+          <div style="font-size:11.5px;color:var(--text2);font-weight:700;">누적 발송</div>
+          <div id="kPushSentTotal" style="font-size:22px;font-weight:800;color:#1F5BA8;">0</div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;">
+          <div style="font-size:11.5px;color:var(--text2);font-weight:700;">브라우저</div>
+          <div id="kPushBrowser" style="font-size:13px;font-weight:700;color:var(--text);margin-top:4px;line-height:1.5;">-</div>
+        </div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;">그룹별 활성 구독자</div>
+      <div id="kPushGroupDist" style="display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--text2);">-</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.55;">
+        ⓘ 화/수/목 20:30 KST 자동 발송. 그룹 분류는 카카오 친구톡과 동일 로직(_classifyKakaoGroup) 재사용.
+      </div>
+    </div>
+
     <!-- 🍽️ 식사 실기록 통계 (meal_records / daily_meals) -->
     <div class="section">
       <div class="sec-head">
@@ -583,6 +615,55 @@ async function renderAll(){
   renderFeed(s.recentFeed || []);
   renderMonthChart(s.monthVisits6 || []);
   renderMealStats(s);
+  renderPushStats(s);
+}
+
+/* ============================================================
+   웹 푸시 현황 (push_subscriptions)
+   ============================================================ */
+function renderPushStats(s){
+  const total  = s.pushTotal       || 0;
+  const active = s.pushActive      || 0;
+  const today  = s.pushSentToday   || 0;
+  const all    = s.pushSentTotal   || 0;
+  const byBr   = s.pushByBrowser   || {};
+  const dist   = s.pushGroupDist   || {};
+
+  const elActive    = document.getElementById('kPushActive');
+  const elTotal     = document.getElementById('kPushTotal');
+  const elToday     = document.getElementById('kPushSentToday');
+  const elAll       = document.getElementById('kPushSentTotal');
+  const elBrowser   = document.getElementById('kPushBrowser');
+  const elGroupDist = document.getElementById('kPushGroupDist');
+
+  if (elActive)  elActive.textContent  = active.toLocaleString();
+  if (elTotal)   elTotal.textContent   = total > 0 ? `누적 ${total.toLocaleString()}` : '';
+  if (elToday)   elToday.textContent   = today.toLocaleString();
+  if (elAll)     elAll.textContent     = all.toLocaleString();
+
+  if (elBrowser) {
+    elBrowser.replaceChildren();
+    const entries = Object.entries(byBr);
+    if (!entries.length) {
+      elBrowser.textContent = '구독 없음';
+    } else {
+      const lines = entries.map(([b, n]) => `${b} ${n}`).join(' · ');
+      elBrowser.textContent = lines;
+    }
+  }
+  if (elGroupDist) {
+    elGroupDist.replaceChildren();
+    const order = ['A','B','C','D'];
+    const colors = { A:'#FF6B35', B:'#FFB300', C:'#4CAF7D', D:'#1F5BA8' };
+    const labels = { A:'기록중·미달', B:'기록끊김', C:'21끼·픽헬스미방문', D:'픽헬스사용·기록누락' };
+    for (const g of order) {
+      const n = parseInt(dist[g] || 0, 10) || 0;
+      const span = document.createElement('span');
+      span.style.cssText = `padding:5px 10px;background:${colors[g]}22;border:1px solid ${colors[g]}55;border-radius:50px;font-weight:700;color:${colors[g]};`;
+      span.textContent = `${g} ${n} · ${labels[g]}`;
+      elGroupDist.appendChild(span);
+    }
+  }
 }
 
 /* ============================================================

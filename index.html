@@ -420,6 +420,22 @@ body{
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--border-strong);color:var(--text);padding:12px 22px;border-radius:50px;font-size:13px;font-weight:700;z-index:9999;white-space:nowrap;box-shadow:var(--shadow-lg);animation:toastIn .3s cubic-bezier(.34,1.56,.64,1);}
 .toast.toast-warn{border-color:#FF6B35;color:#B33E0F;background:#FFF4EE;}
 .toast.toast-multi{white-space:normal;max-width:300px;text-align:center;line-height:1.55;border-radius:14px;}
+/* 웹 푸시 권한 요청 토스트 (5/21끼 달성 시 노출, 10초 자동 닫힘) */
+.push-ask-toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+  width:calc(100% - 32px);max-width:380px;background:#fff;
+  border:1.5px solid #FF6B35;border-radius:14px;padding:14px;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 8px 30px rgba(0,0,0,.15);z-index:9998;
+  animation:slideUp .3s ease;
+}
+.pat-icon{font-size:28px;flex-shrink:0;}
+.pat-text{flex:1;min-width:0;}
+.pat-title{font-size:13px;font-weight:800;color:#1F1C18;margin-bottom:2px;}
+.pat-desc{font-size:11px;color:#888;}
+.pat-buttons{display:flex;flex-direction:column;gap:4px;flex-shrink:0;}
+.pat-allow{padding:6px 12px;background:#FF6B35;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.pat-deny {padding:6px 12px;background:#f5f5f5;color:#888;border:none;border-radius:8px;font-size:12px;cursor:pointer;white-space:nowrap;}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(18px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
 /* 카테고리 미선택 가드 — 카드에 짧은 강조 애니메이션 */
 .cat-card-flash{animation:catCardFlash .5s ease both;}
@@ -5705,6 +5721,139 @@ function addKakaoChannel(ev){
 }
 
 updateProg();renderHist();
+
+/* ============================================================
+   🔔 웹 푸시 — 서비스워커 등록 + VAPID 구독 + 권한 요청 토스트
+   ============================================================ */
+let _pushPublicKey = '';
+let _pushAsked = false;
+try { _pushAsked = localStorage.getItem('fp_push_asked') === '1'; } catch(_){}
+fetch('/api/push/vapid-public-key')
+  .then(r => r.json())
+  .then(d => { _pushPublicKey = d.publicKey || ''; })
+  .catch(() => {});
+
+function _urlBase64ToUint8Array(base64String){
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g,'+').replace(/_/g,'/');
+  const raw = window.atob(base64);
+  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+}
+
+function _detectBrowser(){
+  const ua = navigator.userAgent || '';
+  // Edge 가 Chrome 문자열도 포함하므로 Edge 먼저, Safari 는 Chrome 미포함 케이스로 좁힘
+  if (/Edg\//.test(ua)) return 'Edge';
+  if (/Chrome\//.test(ua)) return 'Chrome';
+  if (/Firefox\//.test(ua)) return 'Firefox';
+  if (/Safari\//.test(ua) && !/Chrome\//.test(ua)) return 'Safari';
+  return 'Unknown';
+}
+
+async function _registerPush(){
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    console.log('[push] 미지원 브라우저');
+    return false;
+  }
+  try {
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+    const existing = await reg.pushManager.getSubscription();
+    if (existing) {
+      // 서버에 누락돼 있을 수 있으므로 한 번 더 동기화 (idempotent)
+      try {
+        await fetch('/api/push/subscribe', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ uid: FP_UID, subscription: existing.toJSON(), browser: _detectBrowser() })
+        });
+      } catch(_){}
+      return true;
+    }
+    if (!_pushPublicKey) {
+      const r = await fetch('/api/push/vapid-public-key');
+      const d = await r.json();
+      _pushPublicKey = d.publicKey || '';
+    }
+    if (!_pushPublicKey) { console.warn('[push] VAPID 공개키 미설정 — 구독 불가'); return false; }
+
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: _urlBase64ToUint8Array(_pushPublicKey)
+    });
+    await fetch('/api/push/subscribe', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ uid: FP_UID, subscription: sub.toJSON(), browser: _detectBrowser() })
+    });
+    console.log('[push] 구독 완료');
+    return true;
+  } catch(e){
+    console.warn('[push] 구독 실패:', e?.message);
+    return false;
+  }
+}
+
+async function _askPushPermission(trigger){
+  if (_pushAsked) return;
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') { await _registerPush(); return; }
+  if (Notification.permission === 'denied') return;
+  // 토스트가 이미 떠 있으면 중복 생성 안 함
+  if (document.getElementById('pushAskToast')) return;
+  const t = document.createElement('div');
+  t.id = 'pushAskToast';
+  t.className = 'push-ask-toast';
+  t.innerHTML =
+    '<div class="pat-icon">🔔</div>' +
+    '<div class="pat-text">' +
+      '<div class="pat-title">식사 알림 받기</div>' +
+      '<div class="pat-desc">매일 저녁 맞춤 알림을 받아보세요</div>' +
+    '</div>' +
+    '<div class="pat-buttons">' +
+      '<button class="pat-allow" type="button" onclick="_allowPush()">허용</button>' +
+      '<button class="pat-deny"  type="button" onclick="_denyPush()">나중에</button>' +
+    '</div>';
+  document.body.appendChild(t);
+  // 10초 후 자동 닫힘 → '나중에'와 동일 처리
+  setTimeout(() => {
+    if (document.getElementById('pushAskToast')) _denyPush();
+  }, 10000);
+  if (typeof _ga === 'function') _ga('push_ask_shown', { trigger });
+}
+async function _allowPush(){
+  const t = document.getElementById('pushAskToast'); if (t) t.remove();
+  _pushAsked = true;
+  try { localStorage.setItem('fp_push_asked','1'); }catch(_){}
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') {
+    await _registerPush();
+    if (typeof toast === 'function') toast('알림이 설정됐어요! 🔔');
+    if (typeof _ga === 'function') _ga('push_granted', {});
+  } else if (typeof _ga === 'function') {
+    _ga('push_denied', { native: perm });
+  }
+}
+function _denyPush(){
+  const t = document.getElementById('pushAskToast'); if (t) t.remove();
+  _pushAsked = true;
+  try { localStorage.setItem('fp_push_asked','1'); }catch(_){}
+  if (typeof _ga === 'function') _ga('push_denied', { source: 'toast' });
+}
+
+// loadMealLogs 가 끝날 때 5/21 마일스톤에서 알림 권한 요청 트리거
+// (기존 loadMealLogs 본체에 직접 끼워넣지 않고 wrap 으로 hook — 다른 호출부 영향 최소화)
+(function(){
+  if (typeof loadMealLogs !== 'function') return;
+  const _orig = loadMealLogs;
+  window.loadMealLogs = async function(){
+    const out = await _orig.apply(this, arguments);
+    try {
+      const cnt = parseInt(document.getElementById('mealLogCount')?.textContent || '0', 10) || 0;
+      if (cnt === 5)  _askPushPermission('5끼 달성');
+      if (cnt === 21) _askPushPermission('21끼 달성');
+    } catch(_){}
+    return out;
+  };
+})();
 
 /* ============================================================
    법적 약관 모달 — 이용약관 / 개인정보처리방침 / 건강정보 면책고지
