@@ -492,6 +492,18 @@ body{
 .mli-del:hover{color:#e57373;}
 .meal-log-more-btn{width:100%;padding:10px;background:none;border:1px dashed #ccc;border-radius:10px;color:#888;font-size:12px;cursor:pointer;margin-top:6px;font-family:inherit;}
 .meal-log-more-btn:hover{border-color:#4CAF7D;color:#4CAF7D;}
+/* 식사 기록 CSV 내보내기 */
+.meal-export-section{margin-top:8px;margin-bottom:6px;}
+.meal-export-btn{
+  width:100%;padding:11px;
+  background:linear-gradient(135deg,#1565C0,#1976D2);
+  color:#fff;border:none;border-radius:10px;
+  font-size:13px;font-weight:700;cursor:pointer;margin-bottom:4px;
+  transition:all .15s;
+}
+.meal-export-btn:hover{opacity:.9;transform:translateY(-1px);}
+.meal-export-btn:disabled{opacity:.6;cursor:default;transform:none;}
+.meal-export-hint{font-size:10px;color:#aaa;text-align:center;line-height:1.5;}
 .meal-log-progress{background:#F9FFF9;border:1px solid #E0F0E8;border-radius:10px;padding:12px;margin-top:10px;}
 .mlp-count{font-size:13px;font-weight:700;color:#2E7D32;margin-bottom:8px;}
 .mlp-next{font-size:11.5px;color:#666;margin-top:8px;line-height:1.5;}
@@ -1073,7 +1085,9 @@ body{
   transition:all .18s;
 }
 .channel-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.3);}
-.channel-note{font-size:10px;color:#aaa;text-align:center;margin-top:8px;}
+.channel-note{text-align:center;margin-top:8px;}
+.cn-alert{font-size:12px;font-weight:800;color:#FF6B35;margin-bottom:4px;}
+.cn-desc{font-size:11px;color:#888;line-height:1.6;}
 
 /* ── 식습관 리포트 ── */
 .report-trigger{
@@ -1857,6 +1871,16 @@ async function _logClick(type, menu) {
       </button>
       <div class="ml-deleted-list" id="mealLogDeletedList"></div>
 
+      <!-- 식사 기록 CSV 내보내기 — 기록이 1건 이상일 때만 노출 (loadMealLogs에서 토글) -->
+      <div class="meal-export-section" id="mealExportSection" style="display:none;">
+        <button onclick="exportMealLogs()" class="meal-export-btn" type="button">
+          💾 내 식사 기록 내보내기 (CSV)
+        </button>
+        <div class="meal-export-hint">
+          기록을 CSV 파일로 저장해 백업할 수 있어요. 엑셀에서 열 수 있습니다.
+        </div>
+      </div>
+
       <!-- 전체 초기화 버튼 — 기록이 1건 이상일 때만 노출 (loadMealLogs에서 토글) -->
       <button id="mealLogResetBtn" type="button" onclick="resetMealLogs()"
         style="display:none;width:100%;padding:10px;background:none;border:1px solid #ffcdd2;border-radius:8px;color:#e57373;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;">
@@ -1927,7 +1951,10 @@ async function _logClick(type, menu) {
       21끼 달성 시 픽헬스 맞춤 영양진단이 시작됩니다.
     </div>
     <button class="channel-btn" id="channelBtn" type="button" onclick="linkKakaoChannel('channel_card')">📢 채널 추가하기</button>
-    <div class="channel-note">* 채널 추가 후 매일 저녁 건강리포트를 받아보세요</div>
+    <div class="channel-note">
+      <div class="cn-alert">📅 매일 저녁 8:30 알림을 보내드려요</div>
+      <div class="cn-desc">알림을 받으면 오늘 드신 음식을 기록해보세요.<br>기록이 쌓일수록 더 정확한 건강리포트가 만들어집니다 📊</div>
+    </div>
   </div>
 
 </div>
@@ -4394,6 +4421,8 @@ async function loadMealLogs(){
     updateMealProgress(logs.length);
     const resetBtn=document.getElementById("mealLogResetBtn");
     if(resetBtn)resetBtn.style.display=logs.length?"block":"none";
+    const exportSec=document.getElementById("mealExportSection");
+    if(exportSec)exportSec.style.display=logs.length?"block":"none";
     // 삭제 복구 토글 — 30일 내 삭제 항목 1건 이상이면 노출
     _refreshDeletedToggle();
     // 픽헬스 활성화 카드 갱신
@@ -4404,6 +4433,8 @@ async function loadMealLogs(){
     updateMealProgress(0);
     const resetBtn=document.getElementById("mealLogResetBtn");
     if(resetBtn)resetBtn.style.display="none";
+    const exportSec=document.getElementById("mealExportSection");
+    if(exportSec)exportSec.style.display="none";
     _refreshDeletedToggle();
     verifyPickHealth();
   }
@@ -4540,6 +4571,38 @@ async function deleteMealLog(id){
     _catGuardLikeToast("삭제됐어요 (30일 내 복구 가능)");
   }catch(e){
     _catGuardLikeToast("삭제 실패. 잠시 후 다시 시도");
+  }
+}
+
+/* 식사 기록 CSV 내보내기 — 서버 BOM 포함 응답을 그대로 다운로드 */
+async function exportMealLogs(){
+  if(!FP_UID){
+    _catGuardLikeToast("기록을 불러올 수 없어요. 새로고침 후 다시 시도해주세요.");
+    return;
+  }
+  const btn=document.querySelector(".meal-export-btn");
+  const orig=btn?btn.textContent:"";
+  if(btn){btn.disabled=true;btn.textContent="⏳ 준비 중...";}
+  try{
+    const r=await fetch("/api/meal-logs/export?uid="+encodeURIComponent(FP_UID),{cache:"no-store"});
+    if(!r.ok)throw new Error("server "+r.status);
+    const blob=await r.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    const today=new Date().toISOString().slice(0,10).replace(/-/g,"");
+    a.href=url;
+    a.download=`foodpicker_식사기록_${today}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    _catGuardLikeToast("✅ 식사 기록을 저장했어요!");
+    if(typeof _ga==="function")_ga("meal_log_export",{});
+  }catch(e){
+    console.error("[export]",e);
+    _catGuardLikeToast("⚠️ 내보내기에 실패했어요. 다시 시도해주세요.");
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=orig||"💾 내 식사 기록 내보내기 (CSV)";}
   }
 }
 
