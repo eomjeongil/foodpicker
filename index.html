@@ -5010,6 +5010,15 @@ function _phCloseInvite(){
 function _phGoTo(mode){
   const url=`https://pickhealth.kr?uid=${encodeURIComponent(FP_UID)}&ref=foodpicker${mode==="kakao"?"&login=kakao":""}`;
   if(typeof _ga==="function")_ga("pickhealth_go",{mode});
+  // 픽헬스 방문 기록 — 그룹 분류 시 D그룹(이미 방문)으로 분기시키는 시그널
+  if(FP_UID){
+    fetch("/api/user/pickhealth-visited",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({uid:FP_UID}),
+      keepalive:true
+    }).catch(()=>{});
+  }
   _phCloseInvite();
   window.open(url,"_blank","noopener");
 }
