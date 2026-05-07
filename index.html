@@ -2402,6 +2402,45 @@ function clearLastMeal(){
   if(typeof setLast==="function")setLast("");
   if(typeof toast==="function")toast("직전 식사 정보를 지웠어요");
 }
+// 자동완성용 보조 — 직전 식사 입력창 전용 (맵 카테고리는 일관성 위해 _MLOG_CAT_KCAL 와 동일 키 사용)
+// 이전엔 _dmSearchDB / _dmKcalFor / _dmEsc 가 정의되지 않아 _dmEsc(q) 호출에서 ReferenceError 가 나며
+// 드롭다운이 표시되지 않았다 — 셋 다 여기서 구체화한다.
+const _LM_CAT_KCAL={
+  korean:580, japanese:480, chinese:650, western:700,
+  chicken:750, pizza:800, cafe:250, snack:450,
+  seafood:500, health:380, meat:700, noodle:580,
+  rice:550, season:500, random:500, etc:500, custom:500
+};
+function _dmEsc(s){return String(s||"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function _dmKcalFor(m){
+  if(m && typeof m==="object"){
+    const k=parseInt(m.kcal,10);
+    if(isFinite(k)&&k>=0)return k;
+    return _LM_CAT_KCAL[m.cat]||500;
+  }
+  return _LM_CAT_KCAL[m]||500;
+}
+// DB 검색 — 정확일치(3) > 시작일치(2) > 부분일치(1), 점수 내림차순 + 이름 짧은 순
+function _dmSearchDB(q,limit){
+  if(!Array.isArray(window.DB)||!q)return [];
+  const norm=s=>String(s||"").trim().replace(/\s+/g," ").toLowerCase();
+  const qn=norm(q);
+  if(!qn)return [];
+  const out=[];
+  for(const m of window.DB){
+    const raw=String(m.n||"");
+    if(!raw)continue;
+    const nn=norm(raw);
+    let score=0;
+    if(nn===qn)score=3;
+    else if(nn.startsWith(qn))score=2;
+    else if(nn.includes(qn))score=1;
+    if(score>0)out.push({m,score,len:nn.length});
+  }
+  out.sort((a,b)=>(b.score-a.score)||(a.len-b.len));
+  return out.slice(0,Math.max(1,limit||5)).map(o=>o.m);
+}
+
 function _lmAcRender(query){
   const ac=document.getElementById("lmAc");
   if(!ac)return;
@@ -2413,10 +2452,10 @@ function _lmAcRender(query){
       <span class="dm-ac-name">음식명을 입력하면 DB에서 검색합니다</span>
     </div>`;
   }else{
-    const hits=(typeof _dmSearchDB==="function")?_dmSearchDB(q,5):[];
+    const hits=_dmSearchDB(q,5);
     if(hits.length){
       for(const m of hits){
-        const kcal=(typeof _dmKcalFor==="function")?_dmKcalFor(m):500;
+        const kcal=_dmKcalFor(m);
         html+=`<div class="dm-ac-item" data-name="${_dmEsc(m.n)}" data-cat="${_dmEsc(m.cat||"etc")}" data-kcal="${kcal}" data-src="db">
           <span class="dm-ac-emoji">${_dmEsc(m.e||"🍽️")}</span>
           <span class="dm-ac-name">${_dmEsc(m.n)}</span>
@@ -3987,7 +4026,8 @@ async function loadAiReason(){
         health:health,
         lastMealName: lm?.text || null,
         lastMealKcal: lm?.kcal || null,
-        lastMealCategory: lm?.category || null
+        lastMealCategory: lm?.category || null,
+        lastMealSource: lm?.source || null
       })
     });
     const j=await r.json();
