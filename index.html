@@ -448,6 +448,26 @@ body{
 .fab:hover{transform:scale(1.1);box-shadow:0 12px 32px var(--pg);}
 
 /* ── 식습관 기록 (meal_logs 단일 입력) ── */
+/* 데이터 보호 상태 (카카오 미연동 = 주황 경고 / 연동 = 초록 완료) */
+.data-protect-hint{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:#FFF3E0;border:1px solid #FFCC80;border-radius:10px;margin:8px 0;
+}
+.dph-icon{font-size:20px;flex-shrink:0;}
+.dph-text{flex:1;min-width:0;}
+.dph-title{font-size:12px;font-weight:800;color:#E65100;}
+.dph-desc{font-size:11px;color:#888;margin-top:2px;line-height:1.4;}
+.dph-btn{
+  padding:8px 10px;background:#FEE500;color:#1F1C18;border:none;border-radius:8px;
+  font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;
+}
+.dph-btn:hover{filter:brightness(1.05);}
+.data-protect-done{
+  display:flex;align-items:center;gap:8px;padding:8px 12px;
+  background:#E8F5E9;border:1px solid #A5D6A7;border-radius:10px;
+  margin:8px 0;font-size:12px;
+}
+.dpd-text{color:#2E7D32;font-weight:700;}
 .meal-log-intro{text-align:center;padding:8px 4px 12px;}
 .meal-log-intro-title{font-size:15px;font-weight:800;color:#2E7D32;margin-bottom:6px;letter-spacing:.2px;}
 .meal-log-intro-desc{font-size:12px;color:#666;line-height:1.6;}
@@ -1956,6 +1976,20 @@ async function _logClick(type, menu) {
         </div>
       </div>
 
+      <!-- 데이터 보호 상태 (카카오 미연동 = 경고 / 연동 = 안심) — _refreshDataProtectUI 가 토글 -->
+      <div class="data-protect-hint" id="dataProtectHint" style="display:none;">
+        <span class="dph-icon">⚠️</span>
+        <div class="dph-text">
+          <div class="dph-title">기록이 사라질 수 있어요</div>
+          <div class="dph-desc">기기 교체나 캐시 삭제 시 기록이 초기화될 수 있어요.</div>
+        </div>
+        <button class="dph-btn" type="button" onclick="linkKakaoChannel('data_protect')">🔐 보호하기</button>
+      </div>
+      <div class="data-protect-done" id="dataProtectDone" style="display:none;">
+        <span>🔐</span>
+        <span class="dpd-text">데이터 보호 중 · 어떤 기기에서도 안전해요</span>
+      </div>
+
       <!-- 픽헬스 동기부여 힌트 — 21끼 달성하면 맞춤 솔루션 연동 -->
       <div class="meal-log-pickhealth-hint">
         <span class="mlph-icon">💡</span>
@@ -2074,10 +2108,12 @@ async function _logClick(type, menu) {
       </div>
     </div>
     <div class="channel-desc">
-      먹은 음식을 기록하면 식습관 리포트가 만들어져요.<br>
-      21끼 달성 시 픽헬스 맞춤 영양진단이 시작됩니다.
+      카카오 채널을 추가하면<br>
+      기기가 바뀌거나 앱을 삭제해도<br>
+      내 식사 기록이 자동으로 복구됩니다. 🔐<br>
+      21끼 달성 시 픽헬스 영양진단도 연동돼요.
     </div>
-    <button class="channel-btn" id="channelBtn" type="button" onclick="linkKakaoChannel('channel_card')">📢 채널 추가하기</button>
+    <button class="channel-btn" id="channelBtn" type="button" onclick="linkKakaoChannel('channel_card')">🔐 내 기록 영구 보호하기</button>
     <div class="channel-note">
       <div class="cn-alert">📅 매일 저녁 8:30 알림을 보내드려요</div>
       <div class="cn-desc">알림을 받으면 오늘 드신 음식을 기록해보세요.<br>기록이 쌓일수록 더 정확한 건강리포트가 만들어집니다 📊</div>
@@ -2167,26 +2203,26 @@ async function _logClick(type, menu) {
      onclick="if(event.target===this)closeAchievePopup()">
   <div class="achieve-popup-inner" role="dialog" aria-modal="true" aria-labelledby="achieveTitle">
     <div class="ap-confetti">🎉</div>
-    <div class="ap-title" id="achieveTitle">21끼 달성!</div>
-    <div class="ap-subtitle">신뢰할 수 있는 식습관 분석이<br>시작됐어요 🌟</div>
+    <div class="ap-title" id="achieveTitle">21끼 달성! 🎉</div>
+    <div class="ap-subtitle">이 기록을 영원히 지키세요</div>
 
     <div class="ap-benefits">
-      <div class="ap-benefit-item">✅ 기기가 바뀌어도 데이터 유지</div>
-      <div class="ap-benefit-item">✅ 매일 저녁 맞춤 건강리포트 카톡</div>
-      <div class="ap-benefit-item">✅ 픽헬스 맞춤 영양제 추천 연동</div>
-      <div class="ap-benefit-item">✅ picki.kr 신규 서비스 알림</div>
+      <div class="ap-benefit-item">✅ 기기가 바뀌어도 기록 유지</div>
+      <div class="ap-benefit-item">✅ 캐시 삭제해도 자동 복구</div>
+      <div class="ap-benefit-item">✅ 매일 저녁 건강리포트 카톡</div>
+      <div class="ap-benefit-item">✅ 픽헬스 맞춤 영양진단 연동</div>
     </div>
 
     <button onclick="linkKakaoChannel('21_achieve')" class="ap-kakao-btn" type="button">
       <img src="https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_small.png"
            alt="" style="width:20px;vertical-align:middle;margin-right:6px;">
-      카카오로 1초 연동하기
+      🔐 내 기록 영구 보호하기
     </button>
 
     <button onclick="closeAchievePopup()" class="ap-later-btn" type="button">나중에 하기</button>
 
     <div class="ap-note">
-      * 카카오 채널 추가로 간편하게 연동됩니다<br>
+      * 카카오 채널 추가 한 번으로 어떤 기기에서도 기록이 안전해요<br>
       * 광고성 메시지는 동의 시에만 발송됩니다
     </div>
   </div>
@@ -4565,38 +4601,60 @@ function closeAchievePopup(){
 /* 카카오 채널 연동 — pf.kakao.com/.../friend 새 탭 + 서버 기록
    원래의 SDK 기반 addKakaoChannel과 별도. 이 함수는 21끼 팝업/결과카드 nudge에서 호출. */
 const KAKAO_CHANNEL_URL="https://pf.kakao.com/_xgexjxbX/friend";
+// 데이터 보호 상태 표시 토글 — 미연동: 주황 경고 / 연동: 초록 완료
+function _refreshDataProtectUI(){
+  const linked = (function(){ try{ return localStorage.getItem(FP_LS_KAKAO)==="1"; }catch(_){ return false; } })();
+  const hint = document.getElementById("dataProtectHint");
+  const done = document.getElementById("dataProtectDone");
+  if (hint) hint.style.display = linked ? "none" : "flex";
+  if (done) done.style.display = linked ? "flex" : "none";
+}
+
+// 카카오 연동 후 공통 처리 — 데이터 보호 UI 토글 + 리포트/기록 목록 새로고침
+function _afterKakaoLink(restored){
+  try{
+    localStorage.setItem(FP_LS_KAKAO,"1");
+    localStorage.setItem(FP_LS_ACHIEVED,"1");
+  }catch(_){}
+  if(typeof _refreshDataProtectUI==="function")_refreshDataProtectUI();
+  if(typeof loadMealLogs==="function")loadMealLogs();
+  // 리포트 오버레이가 열려 있으면 새 데이터로 다시 그림
+  if(typeof openReport==="function" && document.getElementById("reportOverlay")?.classList.contains("show")){
+    openReport();
+  }
+  // 다중 라인 토스트 — 복원 케이스는 강조 톤
+  const old=document.getElementById("kakaoLinkedToast");
+  if(old)old.remove();
+  const t=document.createElement("div");
+  t.id="kakaoLinkedToast";
+  t.className="toast toast-multi";
+  t.innerHTML = restored
+    ? "🎉 기록 복구 완료!<br>이전 식사 기록을 불러왔어요.<br>이제 어떤 기기에서도 안전합니다 🔐"
+    : "채널 추가 완료! 🎉<br>매일 저녁 8:30 건강리포트를 보내드릴게요.<br>식사 기록은 앱에서 해주세요 📊";
+  document.body.appendChild(t);
+  setTimeout(()=>{ if(t&&t.parentNode)t.remove(); },3800);
+}
+
 async function linkKakaoChannel(source){
-  const _src=["21_achieve","result_card","report"].includes(source)?source:"manual";
+  const _src=["21_achieve","result_card","report","channel_card","data_protect"].includes(source)?source:"manual";
   // 1) 채널 추가 페이지 — 새 탭으로 열기 (모바일에서도 안전한 사용자-제스처 컨텍스트)
   try{ window.open(KAKAO_CHANNEL_URL,"_blank","noopener"); }catch(_){}
-  // 2) 서버에 출처 기록 (kakaoId 없이도 OK — 채널 추가만 추적)
+  // 2) 서버에 출처 기록 (kakaoId 없이는 restored=false). 응답으로 복원 여부 확인.
+  let restored=false;
   try{
-    await fetch("/api/user/link-kakao",{
+    const r=await fetch("/api/user/link-kakao",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({uid:FP_UID, source:_src}),
       keepalive:true
     });
+    const j=await r.json().catch(()=>({}));
+    restored=!!(j && j.restored);
   }catch(_){}
-  // 3) 로컬 표시 — 이후 nudge / 팝업 비활성화
-  try{
-    localStorage.setItem(FP_LS_KAKAO,"1");
-    localStorage.setItem(FP_LS_ACHIEVED,"1");
-  }catch(_){}
-  // 4) UI 정리 — 팝업 닫고 다단계 토스트 + 식사 기록 섹션으로 자동 스크롤
+  // 3) UI 정리 — 팝업 닫고 토스트 + 식사 기록 섹션으로 자동 스크롤
   const el=document.getElementById("achievePopup");
   if(el)el.style.display="none";
-  // 다중 라인 토스트 (기본 .toast 는 nowrap 이라 <br> 가 잘림 → wrap 허용 변형)
-  (function(){
-    const old=document.getElementById("kakaoLinkedToast");
-    if(old)old.remove();
-    const t=document.createElement("div");
-    t.id="kakaoLinkedToast";
-    t.className="toast toast-multi";
-    t.innerHTML="채널 추가 완료! 🎉<br>매일 저녁 8:30 건강리포트를 보내드릴게요.<br>식사 기록은 앱에서 해주세요 📊";
-    document.body.appendChild(t);
-    setTimeout(()=>{ if(t&&t.parentNode)t.remove(); },3500);
-  })();
+  _afterKakaoLink(restored);
   // 1.5초 후 식사 기록 섹션으로 스크롤 + 펼치기 (이미 펼쳐져 있으면 스크롤만)
   setTimeout(()=>{
     const mealSection=document.getElementById("dailyMealCard")||document.querySelector(".daily-meal-card");
@@ -4608,7 +4666,7 @@ async function linkKakaoChannel(source){
     }
   },1500);
   if(typeof _logCpa==="function")_logCpa("kakao_channel_link");
-  if(typeof _ga==="function")_ga("kakao_link_clicked",{source:_src});
+  if(typeof _ga==="function")_ga("kakao_link_clicked",{source:_src, restored});
 }
 
 // "이전 기록 더 보기" 토글 상태 (loadMealLogs마다 초기화)
@@ -5696,13 +5754,14 @@ function addKakaoChannel(ev){
                   return fetch('/api/user/link-kakao', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ uid: FP_UID, kakaoId })
+                    body: JSON.stringify({ uid: FP_UID, kakaoId, source: 'channel_card' })
                   }).then(r => r.json()).then(j => {
                     if (j && j.success){
-                      try{ localStorage.setItem('fp_kakao_linked','1'); }catch(_){}
-                      if(typeof toast === 'function') toast('카카오 채널 연동 완료! 기기가 바뀌어도 데이터가 유지됩니다 ✅');
+                      // 데이터 영구 보호 — 동일 kakaoId 의 기존 uid 데이터가 새 uid 로 이전된 경우 별도 안내
+                      if (typeof _afterKakaoLink === 'function') _afterKakaoLink(!!j.restored);
+                      else { try{ localStorage.setItem('fp_kakao_linked','1'); }catch(_){} }
                     }
-                    if (typeof _ga === 'function') _ga('kakao_link', { ok: !!(j && j.success) });
+                    if (typeof _ga === 'function') _ga('kakao_link', { ok: !!(j && j.success), restored: !!(j && j.restored) });
                   });
                 })
                 .catch(err => console.warn('[kakao:me] failed:', err && err.message));
@@ -5721,6 +5780,8 @@ function addKakaoChannel(ev){
 }
 
 updateProg();renderHist();
+// 페이지 로드 시 데이터 보호 상태 표시 초기화 (저장된 fp_kakao_linked 반영)
+if (typeof _refreshDataProtectUI === 'function') _refreshDataProtectUI();
 
 /* ============================================================
    🔔 웹 푸시 — 서비스워커 등록 + VAPID 구독 + 권한 요청 토스트
