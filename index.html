@@ -419,6 +419,7 @@ body{
 /* ── TOAST / FAB ── */
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--border-strong);color:var(--text);padding:12px 22px;border-radius:50px;font-size:13px;font-weight:700;z-index:9999;white-space:nowrap;box-shadow:var(--shadow-lg);animation:toastIn .3s cubic-bezier(.34,1.56,.64,1);}
 .toast.toast-warn{border-color:#FF6B35;color:#B33E0F;background:#FFF4EE;}
+.toast.toast-multi{white-space:normal;max-width:300px;text-align:center;line-height:1.55;border-radius:14px;}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(18px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
 /* 카테고리 미선택 가드 — 카드에 짧은 강조 애니메이션 */
 .cat-card-flash{animation:catCardFlash .5s ease both;}
@@ -554,14 +555,6 @@ body{
 .ap-later-btn{width:100%;padding:12px;background:#f5f5f5;color:#888;border:none;border-radius:12px;font-size:13px;cursor:pointer;margin-bottom:12px;}
 .ap-later-btn:hover{background:#eee;color:#666;}
 .ap-note{font-size:10px;color:#aaa;line-height:1.5;}
-/* 결과 카드 하단 카카오 채널 유도 */
-.result-kakao-nudge{display:flex;align-items:center;gap:10px;padding:12px;background:#FFFDE7;border:1px solid #FFF176;border-radius:12px;margin-bottom:14px;}
-.rkn-icon{font-size:24px;flex-shrink:0;}
-.rkn-text{flex:1;min-width:0;}
-.rkn-title{font-size:12px;font-weight:700;color:#1F1C18;}
-.rkn-desc{font-size:11px;color:#888;margin-top:2px;line-height:1.4;}
-.rkn-btn{padding:8px 12px;background:#FEE500;color:#1F1C18;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;transition:transform .15s ease;}
-.rkn-btn:hover{transform:translateY(-1px);}
 /* ── 픽헬스 잠금/활성 카드 — 동기부여 카피 (작업 1) ── */
 .ph-intro{text-align:center;margin-bottom:14px;}
 .ph-intro-logo{font-size:20px;font-weight:900;color:#2E7D32;margin-bottom:4px;}
@@ -1050,27 +1043,37 @@ body{
 }
 .weather-banner.show{display:block;animation:slideDown .35s ease;}
 
-/* ── 카카오 채널 구독 ── */
+/* ── 카카오 채널 구독 (3단계 흐름) ── */
 .channel-card{
   background:linear-gradient(135deg,#FFF8C2,#FEF8A0);
   border:1px solid #F5E07A;border-radius:var(--rsm);
-  padding:14px 15px;margin-bottom:12px;
-  display:flex;align-items:center;gap:11px;box-shadow:var(--shadow-sm);
-  transition:all .18s;
+  padding:16px 15px;margin-bottom:12px;
+  display:flex;flex-direction:column;align-items:stretch;
+  box-shadow:var(--shadow-sm);transition:all .18s;
 }
 .channel-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
-.channel-icon{font-size:30px;flex-shrink:0;}
-.channel-text{flex:1;min-width:0;}
-.channel-title{font-size:13px;font-weight:800;color:#3A1D00;}
-.channel-desc{font-size:11.5px;color:#5A3A14;margin-top:2px;line-height:1.4;}
+.channel-title{
+  font-size:13px;font-weight:800;color:#3A1D00;
+  text-align:center;margin-bottom:12px;line-height:1.4;
+}
+.channel-flow{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;}
+.cf-step{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.cf-icon{font-size:24px;}
+.cf-label{font-size:11px;font-weight:700;color:#444;}
+.cf-arrow{font-size:16px;color:#aaa;margin-top:-8px;}
+.channel-desc{
+  font-size:12px;color:#666;line-height:1.6;
+  margin-bottom:12px;text-align:center;
+}
 .channel-btn{
-  padding:9px 15px;border-radius:50px;border:none;
+  padding:11px 18px;border-radius:50px;border:none;
   background:#3A1D00;color:var(--kakao);
-  font-size:12px;font-weight:800;cursor:pointer;
-  text-decoration:none;flex-shrink:0;white-space:nowrap;
+  font-size:13px;font-weight:800;cursor:pointer;
+  text-decoration:none;text-align:center;display:block;
   transition:all .18s;
 }
 .channel-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.3);}
+.channel-note{font-size:10px;color:#aaa;text-align:center;margin-top:8px;}
 
 /* ── 식습관 리포트 ── */
 .report-trigger{
@@ -1682,16 +1685,6 @@ async function _logClick(type, menu) {
         <div class="related-grid" id="relatedGrid"></div>
       </div>
 
-      <!-- 카카오 채널 추가 유도 — 카카오 미연동 시에만 표시 (refreshKakaoNudge에서 토글) -->
-      <div class="result-kakao-nudge" id="resultKakaoNudge" style="display:none;">
-        <span class="rkn-icon">📱</span>
-        <div class="rkn-text">
-          <div class="rkn-title">이런 추천을 매일 카톡으로 받아보세요</div>
-          <div class="rkn-desc">푸드피커 채널 추가하면 매일 저녁 맞춤 건강리포트 발송</div>
-        </div>
-        <button onclick="linkKakaoChannel('result_card')" class="rkn-btn" type="button">채널 추가</button>
-      </div>
-
       <!-- 영양정보 (lazy-load) — 칼로리·탄단지·good_for·avoid_for까지 -->
       <button class="nutri-btn" id="nutriBtn" onclick="loadNutrition()">
         🥗 영양정보 보기, 추천과 주의 보기
@@ -1910,14 +1903,31 @@ async function _logClick(type, menu) {
     📊 내 식습관으로 내 건강 리포트 보기
   </button>
 
-  <!-- ⑦++ 카카오 채널 구독 -->
+  <!-- ⑦++ 카카오 채널 구독 — 3단계 흐름(식사기록 → 건강리포트 → 픽헬스 영양진단) -->
   <div class="channel-card">
-    <div class="channel-icon">📢</div>
-    <div class="channel-text">
-      <div class="channel-title">매일 추천을 카톡으로</div>
-      <div class="channel-desc">푸드피커 카카오 채널 추가 후 점심·저녁 알림 받기</div>
+    <div class="channel-title">📊 매일 식사기록 → 건강리포트 → 픽헬스 영양진단</div>
+    <div class="channel-flow">
+      <div class="cf-step">
+        <span class="cf-icon">🍽️</span>
+        <span class="cf-label">식사 기록</span>
+      </div>
+      <span class="cf-arrow">→</span>
+      <div class="cf-step">
+        <span class="cf-icon">📊</span>
+        <span class="cf-label">건강 리포트</span>
+      </div>
+      <span class="cf-arrow">→</span>
+      <div class="cf-step">
+        <span class="cf-icon">💊</span>
+        <span class="cf-label">픽헬스 영양진단</span>
+      </div>
     </div>
-    <a class="channel-btn" id="channelBtn" href="https://pf.kakao.com/_xgexjxbX/friend" target="_blank" rel="noopener" onclick="return addKakaoChannel(event);">채널 추가</a>
+    <div class="channel-desc">
+      먹은 음식을 기록하면 식습관 리포트가 만들어져요.<br>
+      21끼 달성 시 픽헬스 맞춤 영양진단이 시작됩니다.
+    </div>
+    <button class="channel-btn" id="channelBtn" type="button" onclick="linkKakaoChannel('channel_card')">📢 채널 추가하기</button>
+    <div class="channel-note">* 채널 추가 후 매일 저녁 건강리포트를 받아보세요</div>
   </div>
 
 </div>
@@ -4343,21 +4353,32 @@ async function linkKakaoChannel(source){
     localStorage.setItem(FP_LS_KAKAO,"1");
     localStorage.setItem(FP_LS_ACHIEVED,"1");
   }catch(_){}
-  // 4) UI 정리 — 팝업 닫고 nudge 숨김 + CPA 추적
+  // 4) UI 정리 — 팝업 닫고 다단계 토스트 + 식사 기록 섹션으로 자동 스크롤
   const el=document.getElementById("achievePopup");
   if(el)el.style.display="none";
-  refreshKakaoNudge();
-  _catGuardLikeToast("카카오 채널 연동 완료! 📱 매일 저녁 건강리포트를 받아보세요");
+  // 다중 라인 토스트 (기본 .toast 는 nowrap 이라 <br> 가 잘림 → wrap 허용 변형)
+  (function(){
+    const old=document.getElementById("kakaoLinkedToast");
+    if(old)old.remove();
+    const t=document.createElement("div");
+    t.id="kakaoLinkedToast";
+    t.className="toast toast-multi";
+    t.innerHTML="채널 추가 완료! 🎉<br>매일 저녁 8:30 건강리포트를 보내드릴게요.<br>식사 기록은 앱에서 해주세요 📊";
+    document.body.appendChild(t);
+    setTimeout(()=>{ if(t&&t.parentNode)t.remove(); },3500);
+  })();
+  // 1.5초 후 식사 기록 섹션으로 스크롤 + 펼치기 (이미 펼쳐져 있으면 스크롤만)
+  setTimeout(()=>{
+    const mealSection=document.getElementById("dailyMealCard")||document.querySelector(".daily-meal-card");
+    if(mealSection){
+      mealSection.scrollIntoView({behavior:"smooth",block:"start"});
+      if(typeof toggleDailyMeal==="function" && !mealSection.classList.contains("open")){
+        toggleDailyMeal();
+      }
+    }
+  },1500);
   if(typeof _logCpa==="function")_logCpa("kakao_channel_link");
   if(typeof _ga==="function")_ga("kakao_link_clicked",{source:_src});
-}
-
-/* 결과 카드 하단 카카오 nudge — 미연동 사용자에게만 노출 */
-function refreshKakaoNudge(){
-  const n=document.getElementById("resultKakaoNudge");
-  if(!n)return;
-  const linked=localStorage.getItem(FP_LS_KAKAO)==="1";
-  n.style.display=linked?"none":"flex";
 }
 
 // "이전 기록 더 보기" 토글 상태 (loadMealLogs마다 초기화)
@@ -5071,8 +5092,6 @@ function showResult(menu,nextMenus){
 
   const rc=document.getElementById("resultCard");
   rc.classList.remove("show");void rc.offsetWidth;rc.classList.add("show");
-  // 결과가 표시될 때 카카오 nudge 상태 새로고침 (카카오 미연동 시에만 노출)
-  refreshKakaoNudge();
   addHist(menu);updateProg();
   // AI 추천 이유 + 함께 먹으면 좋은 음식 — 결과 표시 시 병렬 호출
   // nutrition·story는 사용자가 명시적으로 펼칠 때만 호출.
@@ -5407,7 +5426,6 @@ function addKakaoChannel(ev){
                     if (j && j.success){
                       try{ localStorage.setItem('fp_kakao_linked','1'); }catch(_){}
                       if(typeof toast === 'function') toast('카카오 채널 연동 완료! 기기가 바뀌어도 데이터가 유지됩니다 ✅');
-                      if(typeof refreshKakaoNudge === 'function') refreshKakaoNudge();
                     }
                     if (typeof _ga === 'function') _ga('kakao_link', { ok: !!(j && j.success) });
                   });
