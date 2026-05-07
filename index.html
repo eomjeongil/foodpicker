@@ -631,6 +631,28 @@ body{
 .mlph-sub{display:block;color:#9C27B0;font-size:11px;margin-top:2px;}
 /* 리포트 내 픽헬스 연동 힌트 (작업 3) */
 /* 리포트 최상단 — 21끼 미달 시 노란 카드로 픽헬스 동기 부여 */
+/* 연속 기록 스트릭 카드 (리포트 최상단) + 기록 섹션 스트릭 바 */
+.streak-card{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#FFF8E1,#FFFDE7);border:1.5px solid #FFE082;border-radius:12px;padding:12px 14px;margin-bottom:12px;}
+.streak-emoji{font-size:28px;flex-shrink:0;}
+.streak-text{flex:1;min-width:0;}
+.streak-title{font-size:13px;font-weight:800;color:#E65100;margin-bottom:2px;}
+.streak-sub{font-size:11px;color:#888;}
+.meal-streak-bar{text-align:center;font-size:13px;font-weight:800;color:#E65100;background:#FFF8E1;border-radius:8px;padding:8px;margin:6px 0;}
+/* 추천→기록 원스텝 (결과 카드 내) */
+.quick-log-section{padding:12px 0 4px;border-top:1px solid #f0f0f0;margin-top:8px;}
+.qls-title{font-size:13px;font-weight:800;color:#333;margin-bottom:8px;text-align:center;}
+.qls-meal-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.qls-btn{padding:10px;background:#F9FFF9;border:1.5px solid #A5D6A7;border-radius:10px;font-size:13px;font-weight:700;color:#2E7D32;cursor:pointer;transition:all .15s;font-family:inherit;}
+.qls-btn:hover{background:#E8F5E9;border-color:#4CAF7D;}
+.qls-btn:disabled{opacity:.6;cursor:default;}
+/* 리포트→추천 부족 영양소 카드 하단 버튼 */
+.rd-recommend-btn{width:100%;margin-top:10px;padding:10px;background:linear-gradient(135deg,#FF6B35,#E65100);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+.rd-recommend-btn:hover{filter:brightness(1.05);}
+/* 건강점수 주간 변화 라벨 */
+.hsc-diff{font-size:12px;font-weight:700;margin-top:6px;}
+.hsc-diff.up{color:#4CAF7D;}
+.hsc-diff.down{color:#FF6B35;}
+.hsc-diff-sub{font-size:11px;color:#aaa;font-weight:400;margin-left:4px;}
 .report-top-hint{display:flex;align-items:flex-start;gap:8px;background:#FFFDE7;border:1px solid #FFF176;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:12px;}
 .rth-icon{font-size:18px;flex-shrink:0;}
 .rth-text{flex:1;min-width:0;}
@@ -1852,6 +1874,9 @@ async function _logClick(type, menu) {
         <div class="related-grid" id="relatedGrid"></div>
       </div>
 
+      <!-- 추천→기록 원스텝 — _renderQuickLogBtn 가 채움 (showResult 끝에 호출) -->
+      <div id="quickLogWrap" style="display:none;"></div>
+
       <!-- 영양정보 (lazy-load) — 칼로리·탄단지·good_for·avoid_for까지 -->
       <button class="nutri-btn" id="nutriBtn" onclick="loadNutrition()">
         🥗 영양정보 보기, 추천과 주의 보기
@@ -1981,6 +2006,9 @@ async function _logClick(type, menu) {
           건강 식습관 리포트가 만들어집니다 📊
         </div>
       </div>
+
+      <!-- 연속 기록 스트릭 — loadMealLogs 가 logs 기준으로 갱신 (2일 미만이면 숨김) -->
+      <div id="mealStreakBar" class="meal-streak-bar" style="display:none;"></div>
 
       <!-- 픽헬스 동기부여 힌트 — 21끼 달성하면 맞춤 솔루션 연동 -->
       <div class="meal-log-pickhealth-hint">
@@ -3783,6 +3811,42 @@ function _renderTodayKcalAndExercise(today){
   }
   return html;
 }
+
+/* ── 연속 기록 (스트릭) — 리포트 최상단 카드 + 기록 섹션 상단 바 ── */
+function _renderStreakCard(streak){
+  if(!streak || (parseInt(streak.current,10)||0) < 2) return '';
+  const c=parseInt(streak.current,10)||0;
+  const l=parseInt(streak.longest,10)||c;
+  const emoji = c>=30?'🏆' : c>=14?'🔥' : c>=7?'⚡' : '✨';
+  const msg   = c>=30?'한 달 연속 기록! 대단해요!'
+              : c>=14?'2주 연속! 습관이 만들어지고 있어요!'
+              : c>=7 ?'일주일 연속! 훌륭해요!'
+              : `${c}일 연속 기록 중!`;
+  const sub = (l>c) ? `현재 ${c}일 연속 · 최장 ${l}일` : `현재 ${c}일 연속 · 최고 기록 달성 중! 🎉`;
+  return `<div class="streak-card">
+    <div class="streak-emoji">${emoji}</div>
+    <div class="streak-text">
+      <div class="streak-title">${msg}</div>
+      <div class="streak-sub">${sub}</div>
+    </div>
+  </div>`;
+}
+// loadMealLogs 가 받은 logs(meal_date 내림차순)에서 연속일 즉시 계산. 서버 호출 없이.
+function _calcStreakClient(logs){
+  if(!Array.isArray(logs) || !logs.length) return 0;
+  const dates=[...new Set(logs.map(l=>l.meal_date).filter(Boolean))].sort().reverse();
+  if(!dates.length) return 0;
+  const today=new Date().toISOString().slice(0,10);
+  const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  if(dates[0]!==today && dates[0]!==yesterday) return 0;
+  let s=1;
+  for(let i=0;i<dates.length-1;i++){
+    const diff=Math.round((new Date(dates[i])-new Date(dates[i+1]))/86400000);
+    if(diff===1) s++; else break;
+  }
+  return s;
+}
+
 async function openReport(){
   if(typeof _ga==="function")_ga("report_open",{});
   const overlay=document.getElementById("reportOverlay");
@@ -3813,6 +3877,9 @@ async function openReport(){
   const stage=data.stage||0;
   const a=data.analysis||{};
 
+  // 연속 기록 스트릭 카드 — 2일 이상일 때만 노출. 모든 단계 공통.
+  const _streakCard = _renderStreakCard(data.streak);
+
   // 21끼 미달 시 리포트 최상단에 픽헬스 동기 부여 힌트 (모든 단계 공통)
   const _topHint = (total < 21) ? `<div class="report-top-hint">
     <span class="rth-icon">💡</span>
@@ -3830,6 +3897,7 @@ async function openReport(){
     const pct=Math.max(0,Math.min(100,(total/5)*100));
     const todayBlock=_renderTodayKcalAndExercise(data.today);
     content.innerHTML=`
+      ${_streakCard}
       ${_topHint}
       ${todayBlock}
       <div class="report-empty">
@@ -3852,7 +3920,7 @@ async function openReport(){
     <span style="font-size:12px;color:#666;">총 ${total}끼 기록</span>
   </div>`;
 
-  let html=_topHint+stageHead;
+  let html=_streakCard+_topHint+stageHead;
 
   // [모든 단계 공통] 오늘 칼로리 + 운동 추천 (today 블록)
   html+=_renderTodayKcalAndExercise(data.today);
@@ -3862,7 +3930,8 @@ async function openReport(){
 
   if(total>=5 && detailed){
     // 5끼+ : 건강점수 + 식습관 유형 + 평균 칼로리
-    html+=_renderHealthScoreCard(detailed);
+    // 지난주 점수가 있으면 함께 전달해 ▲/▼ 변화 라벨 노출
+    html+=_renderHealthScoreCard(detailed, a.prev_week_score);
     html+=_renderHabitTypeCard(detailed);
     html+=_renderAvgKcalCard(detailed);
   }else{
@@ -3955,12 +4024,20 @@ async function openReport(){
 /* ── 단계별 정밀 분석 카드 (analysis.detailed 기반) ────────────────
    한국인 영양소 섭취기준 2020 + WHO 권고 기반의 5/10/21/60끼 단계별 카드.
    detailed 가 없으면(이전 응답) 기존 stage-card 분기로 폴백한다. */
-function _renderHealthScoreCard(detailed){
+function _renderHealthScoreCard(detailed, prevScore){
   const score=Math.max(0,Math.min(100,parseInt(detailed.health_score,10)||0));
   const label=score>=90?'훌륭해요! 🌟':
     score>=70?'양호해요 👍':
     score>=50?'개선이 필요해요 ⚠️':'많은 개선이 필요해요 🔴';
   const scoreColor=score>=70?'#4CAF7D':score>=50?'#FFB300':'#FF6B35';
+  // 지난주 점수가 들어왔을 때만 변화 라벨 노출 (null/undefined 면 비표시)
+  const _prev=(prevScore!=null && isFinite(prevScore)) ? Math.max(0,Math.min(100,parseInt(prevScore,10))) : null;
+  const _diff=_prev!=null ? (score - _prev) : null;
+  const diffHtml=(_diff!==null) ? `
+    <div class="hsc-diff ${_diff>=0?'up':'down'}">
+      ${_diff>=0?'▲':'▼'} ${Math.abs(_diff)}점 ${_diff>=0?'향상':'하락'}
+      <span class="hsc-diff-sub">(전주 ${_prev}점)</span>
+    </div>` : '';
   const recK=detailed.recommend_kcal||1800;
   // 5개 항목 각 0~100점 환산 — 색상 임계: 70+ 초록 / 50~70 노랑 / ~50 빨강
   const kcalItem=Math.max(0,Math.min(100,Math.round(100-Math.abs(detailed.avg_daily_kcal-recK)/recK*100)));
@@ -3985,6 +4062,7 @@ function _renderHealthScoreCard(detailed){
     <div class="hsc-score" style="color:${scoreColor};">${score}</div>
     <div class="hsc-total">/ 100점</div>
     <div class="hsc-label">${label}</div>
+    ${diffHtml}
     <div class="hsc-breakdown">${itemHtml}</div>
   </div>`;
 }
@@ -4244,6 +4322,10 @@ function _renderDeficiency(d, idx){
          class="rdf-buy-btn" onclick="_logCpa('food_ingredient')">🛒 구매</a>
     </div>`;
   }).join("");
+  const nutrient=String(d.nutrient||"").trim();
+  const recBtn=nutrient
+    ? `<button class="rd-recommend-btn" type="button" onclick="_recommendForNutrient('${_escAt(nutrient).replace(/'/g,"&#39;")}')">🍽️ ${_escAt(nutrient)} 풍부한 메뉴 추천받기</button>`
+    : '';
   return `<div class="report-deficiency rd-severity-${_escAt(sev)}">
     <div class="rd-header">
       <span class="rd-severity-${_escAt(sev)}">${sevIcon}</span>
@@ -4255,6 +4337,7 @@ function _renderDeficiency(d, idx){
     ${foodCards||""}
     ${d.recommended_menu?`<div class="rd-menu-suggest">💡 추천 메뉴: ${_escAt(d.recommended_menu)}</div>`:""}
     ${d.supplement_note?`<div class="rd-supplement-note">💊 ${_escAt(d.supplement_note)}</div>`:""}
+    ${recBtn}
   </div>`;
 }
 function closeReport(){
@@ -4682,6 +4765,20 @@ async function loadMealLogs(){
     _refreshDeletedToggle();
     // 픽헬스 활성화 카드 갱신
     verifyPickHealth();
+    // 연속 기록 바 — 2일 이상에서만 표시 (서버 호출 없이 logs 만으로 즉시 계산)
+    try{
+      const streakEl=document.getElementById("mealStreakBar");
+      if(streakEl){
+        const s=_calcStreakClient(logs);
+        if(s>=2){
+          const e=s>=30?'🏆':s>=14?'🔥':s>=7?'⚡':'✨';
+          streakEl.textContent=`${e} ${s}일 연속 기록 중!`;
+          streakEl.style.display="block";
+        }else{
+          streakEl.style.display="none";
+        }
+      }
+    }catch(_){}
   }catch(e){
     console.warn("[meal-log:list] failed:",e?.message);
     renderMealLogList([], {});
@@ -4690,6 +4787,8 @@ async function loadMealLogs(){
     if(resetBtn)resetBtn.style.display="none";
     const exportSec=document.getElementById("mealExportSection");
     if(exportSec)exportSec.style.display="none";
+    const streakEl=document.getElementById("mealStreakBar");
+    if(streakEl)streakEl.style.display="none";
     _refreshDeletedToggle();
     verifyPickHealth();
   }
@@ -5370,6 +5469,93 @@ function directPick(){
 /* ============================================================
    결과 표시
    ============================================================ */
+/* ── 리포트→추천 — 부족 영양소 카드의 "메뉴 추천받기" 버튼 핸들러 ── */
+function _recommendForNutrient(nutrient){
+  // 1) 리포트 오버레이 닫기 (자연스럽게 메뉴 추천 흐름으로 진입)
+  const overlay=document.getElementById("reportOverlay");
+  if(overlay)overlay.classList.remove("show");
+  // 2) 영양소 → 카테고리 매핑 + 칩 활성화
+  const catMap={
+    '단백질':'health',
+    '오메가3':'seafood',
+    '오메가-3':'seafood',
+    '칼슘':'health',
+    '철분':'health',
+    '비타민C':'health',
+    '비타민':'health',
+    '식이섬유':'health',
+    '식이섬유·비타민':'health'
+  };
+  const cat=catMap[nutrient]||'health';
+  // 우리 시스템의 카테고리 그룹 키는 kfood/asian/wfood/health/cafe — health/seafood 둘 중 health 그룹으로 매핑.
+  // (seafood 는 별도 그룹이 없어 한식 그룹의 음식이 자연스럽게 노출됨)
+  const groupCat = (cat==='seafood' || cat==='health') ? 'health' : 'kfood';
+  if(typeof selCatV!=="undefined")selCatV=groupCat;
+  document.querySelectorAll(".chip").forEach(c=>{
+    c.classList.toggle("active", c.dataset.cat===groupCat);
+  });
+  if(typeof toast==="function")toast(`${nutrient} 풍부한 메뉴를 찾아볼게요! 🔍`);
+  if(typeof _ga==="function")_ga("recommend_for_nutrient",{nutrient, group:groupCat});
+  // 3) 추천 실행 — 오버레이가 닫히는 시간 확보 후
+  setTimeout(()=>{ if(typeof pickMenu==="function")pickMenu(); }, 500);
+}
+
+/* ── 추천→기록 원스텝 — 결과 카드 하단에 끼니 4종 빠른 기록 버튼 ── */
+function _renderQuickLogBtn(){
+  if(!curMenu)return;
+  const wrap=document.getElementById("quickLogWrap");
+  if(!wrap)return;
+  wrap.innerHTML=`
+    <div class="quick-log-section">
+      <div class="qls-title">이 메뉴 드시나요?</div>
+      <div class="qls-meal-btns">
+        <button class="qls-btn" type="button" onclick="_quickLog('breakfast')">🌅 아침</button>
+        <button class="qls-btn" type="button" onclick="_quickLog('lunch')">☀️ 점심</button>
+        <button class="qls-btn" type="button" onclick="_quickLog('dinner')">🌙 저녁</button>
+        <button class="qls-btn" type="button" onclick="_quickLog('snack')">🍪 간식</button>
+      </div>
+    </div>`;
+  wrap.style.display="block";
+}
+async function _quickLog(mealType){
+  if(!curMenu){toast("먼저 메뉴를 추천받아 주세요!");return;}
+  const today=new Date().toISOString().slice(0,10);
+  // 즉시 더블클릭 방지 — 클릭한 버튼만 disable
+  const btns=document.querySelectorAll("#quickLogWrap .qls-btn");
+  btns.forEach(b=>b.disabled=true);
+  try{
+    const r=await fetch("/api/meal-log",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        uid:FP_UID,
+        menuName:curMenu.n,
+        mealType,
+        mealDate:today,
+        kcal:parseInt(curMenu.kcal,10)||0,
+        category:curMenu.cat||"",
+        // 서버 화이트리스트(`db|manual`)에 맞춰 manual 로 기록 — recommend 출처는 GA 이벤트로 별도 추적
+        source:"manual"
+      })
+    });
+    const j=await r.json().catch(()=>({}));
+    if(j && j.duplicate){
+      if(typeof toast==="function")toast("이미 기록된 메뉴예요 📋");
+    }else if(j && j.success){
+      if(typeof toast==="function")toast(`${curMenu.n} 기록됐어요! 📊`);
+      if(typeof loadMealLogs==="function")loadMealLogs();
+    }else{
+      if(typeof toast==="function")toast(j?.error||"기록에 실패했어요. 다시 시도해주세요.");
+    }
+    if(typeof _ga==="function")_ga("quick_log_from_recommend",{menu:curMenu.n, meal_type:mealType, dup:!!j?.duplicate});
+  }catch(e){
+    if(typeof toast==="function")toast("기록에 실패했어요. 다시 시도해주세요.");
+  }finally{
+    const wrap=document.getElementById("quickLogWrap");
+    if(wrap){wrap.style.display="none";wrap.innerHTML="";}
+  }
+}
+
 function showResult(menu,nextMenus){
   curMenu=menu;
   // 새 결과 표시 — AI/영양/궁합 모두 reset (이전 결과 잔영 방지). 모든 호출 경로 공통.
@@ -5423,6 +5609,10 @@ function showResult(menu,nextMenus){
   // AI 추천 이유 + 함께 먹으면 좋은 음식 — 결과 표시 시 병렬 호출
   // nutrition·story는 사용자가 명시적으로 펼칠 때만 호출.
   Promise.all([loadAiReason(), loadFoodCompanion()]).catch(()=>{});
+  // 추천→기록 원스텝 — 끼니 4종 버튼 노출 (FP_UID 있을 때만)
+  if(typeof FP_UID!=="undefined" && FP_UID && typeof _renderQuickLogBtn==="function"){
+    _renderQuickLogBtn();
+  }
 
   // GA4: 메뉴 추천 이벤트 전송
   _ga("menu_recommend", {
