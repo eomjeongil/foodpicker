@@ -596,6 +596,39 @@ body{
 .rs-label{font-size:14px;color:#888;}
 .rs-bar-wrap{flex:1;background:#eee;border-radius:20px;height:8px;overflow:hidden;margin-left:10px;align-self:center;}
 .rs-bar{height:100%;border-radius:20px;background:linear-gradient(90deg,#FFB300,#FF6B35);transition:width .5s ease;}
+/* ── 단계별 리포트 추가 카드 (건강점수/주간추이/베스트워스트/목표진행) ── */
+.health-score-card{text-align:center;padding:16px;background:linear-gradient(135deg,#FFF8E1,#FFFDE7);border-radius:14px;margin-bottom:12px;border:1px solid #FFE082;}
+.hsc-score{font-size:52px;font-weight:900;color:#FF6B35;line-height:1;}
+.hsc-total{font-size:16px;color:#888;}
+.hsc-label{font-size:14px;font-weight:700;margin-top:4px;}
+.hsc-breakdown{margin-top:12px;text-align:left;}
+.hsc-item{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;}
+.hsc-item-name{width:70px;color:#666;}
+.hsc-item-bar-wrap{flex:1;background:#eee;border-radius:10px;height:6px;overflow:hidden;}
+.hsc-item-bar{height:100%;border-radius:10px;transition:width .5s ease;}
+.hsc-item-score{width:30px;text-align:right;font-weight:700;color:#444;}
+.weekly-trend{background:#fff;border:1px solid #eee;border-radius:12px;padding:14px;margin-bottom:12px;}
+.wt-title{font-size:13px;font-weight:800;margin-bottom:10px;}
+.wt-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:12px;}
+.wt-date{width:24px;color:#888;}
+.wt-bar-wrap{flex:1;background:#f5f5f5;border-radius:6px;height:14px;overflow:hidden;position:relative;}
+.wt-bar{height:100%;border-radius:6px;transition:width .5s ease;}
+.wt-bar-ok{background:#4CAF7D;}
+.wt-bar-over{background:#FF6B35;}
+.wt-bar-under{background:#FFB300;}
+.wt-kcal{width:70px;text-align:right;font-weight:700;color:#444;}
+.wt-recommend-line{font-size:10px;color:#aaa;text-align:right;margin-top:4px;}
+.best-worst-card{display:flex;gap:8px;margin-bottom:12px;}
+.bw-card{flex:1;padding:10px;border-radius:10px;font-size:11px;}
+.bw-best{background:#E8F5E9;border:1px solid #A5D6A7;}
+.bw-worst{background:#FFF3E0;border:1px solid #FFCC80;}
+.bw-title{font-size:12px;font-weight:800;margin-bottom:4px;}
+.goal-progress{background:#fff;border:1px solid #eee;border-radius:12px;padding:14px;margin-bottom:12px;}
+.gp-item{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;}
+.gp-name{flex:1;color:#555;}
+.gp-bar-wrap{width:100px;background:#eee;border-radius:10px;height:6px;overflow:hidden;}
+.gp-bar{height:100%;border-radius:10px;background:linear-gradient(90deg,#4CAF7D,#2E9E6B);}
+.gp-pct{width:35px;text-align:right;font-weight:700;color:#4CAF7D;}
 .report-deficiency{background:#fff;border:1px solid #eee;border-radius:12px;padding:14px;margin-bottom:10px;}
 .rd-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .rd-severity-high{font-size:14px;}
