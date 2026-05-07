@@ -3355,27 +3355,38 @@ async function openReport(){
   // [모든 단계 공통] 오늘 칼로리 + 운동 추천 (today 블록)
   html+=_renderTodayKcalAndExercise(data.today);
 
-  // [모든 단계 공통] 평균 칼로리 + TOP 메뉴
-  const topMenus=Array.isArray(a.top_menus)?a.top_menus:[];
-  html+=`<div class="report-stage-card">
-    <h4>📊 핵심 지표</h4>
-    <div class="rsc-row"><span class="lbl">한 끼 평균 칼로리</span><span class="val">${a.avg_kcal||0} kcal</span></div>
-    ${topMenus.length?`<div class="rsc-row" style="display:block;"><div class="lbl" style="margin-bottom:4px;">자주 먹은 메뉴 TOP${topMenus.length}</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">
-        ${topMenus.map(m=>`<span style="background:#E8F5E9;color:#2E7D32;padding:4px 10px;border-radius:50px;font-size:12px;font-weight:700;">${_escAt(m.name)} (${m.count})</span>`).join("")}
-      </div>
-    </div>`:""}
-    ${a.nutrition_comment?`<div class="rsc-note" style="font-style:normal;color:#444;margin-top:8px;">💡 ${_escAt(a.nutrition_comment)}</div>`:""}
-  </div>`;
+  // detailed 가 있으면 정밀 분석 카드를 사용, 없으면 기존 legacy 카드 분기로 폴백.
+  const detailed=a.detailed||null;
 
-  // [모든 단계 공통] 식습관 평가 — good/bad/habit_type/health_score
-  html+=_renderHabitEvaluation(a.habit_evaluation);
+  if(total>=5 && detailed){
+    // 5끼+ : 건강점수 + 식습관 유형 + 평균 칼로리
+    html+=_renderHealthScoreCard(detailed);
+    html+=_renderHabitTypeCard(detailed);
+    html+=_renderAvgKcalCard(detailed);
+  }else{
+    // legacy: 평균 칼로리 + TOP 메뉴 + 식습관 평가
+    const topMenus=Array.isArray(a.top_menus)?a.top_menus:[];
+    html+=`<div class="report-stage-card">
+      <h4>📊 핵심 지표</h4>
+      <div class="rsc-row"><span class="lbl">한 끼 평균 칼로리</span><span class="val">${a.avg_kcal||0} kcal</span></div>
+      ${topMenus.length?`<div class="rsc-row" style="display:block;"><div class="lbl" style="margin-bottom:4px;">자주 먹은 메뉴 TOP${topMenus.length}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">
+          ${topMenus.map(m=>`<span style="background:#E8F5E9;color:#2E7D32;padding:4px 10px;border-radius:50px;font-size:12px;font-weight:700;">${_escAt(m.name)} (${m.count})</span>`).join("")}
+        </div>
+      </div>`:""}
+      ${a.nutrition_comment?`<div class="rsc-note" style="font-style:normal;color:#444;margin-top:8px;">💡 ${_escAt(a.nutrition_comment)}</div>`:""}
+    </div>`;
+    html+=_renderHabitEvaluation(a.habit_evaluation);
+  }
 
   // [모든 단계 공통] 부족 영양소 + 식품 추천 — 비동기 로드
   html+=`<div id="deficiencyMount" class="rd-loading">🧪 영양소 분석 중...</div>`;
 
-  // [stage 2+] 끼니별 분포 + 나트륨 + 개선 제안
-  if(stage>=2){
+  if(total>=10 && detailed){
+    // 10끼+ : 끼니별 분포 + 카테고리 TOP5 + 나트륨 경고
+    html+=_renderPatternCards(detailed);
+  }else if(stage>=2){
+    // legacy: 끼니별 분포 + 나트륨 + 개선 제안
     const dist=a.meal_type_dist||{};
     const slots=[["breakfast","🌅 아침"],["lunch","☀️ 점심"],["dinner","🌙 저녁"],["snack","🍪 간식"]];
     html+=`<div class="report-stage-card">
@@ -3388,8 +3399,11 @@ async function openReport(){
     </div>`;
   }
 
-  // [stage 3+] 주간 추이 — habit_type/잘한·아쉬운은 위 habit_evaluation 카드에서 이미 노출
-  if(stage>=3){
+  if(total>=21 && detailed){
+    // 21끼+ : 주간 추이 + 베스트/워스트
+    html+=_renderWeeklyCards(detailed);
+  }else if(stage>=3){
+    // legacy: 주간 추이
     const trend=Array.isArray(a.weekly_trend)?a.weekly_trend:[];
     if(trend.length){
       const max=trend.reduce((m,t)=>Math.max(m,t.kcal||0),0)||1;
@@ -3406,8 +3420,11 @@ async function openReport(){
     }
   }
 
-  // [stage 4] 월간 베스트/워스트 + 목표 진행 + 다음달 목표
-  if(stage>=4){
+  if(total>=60 && detailed){
+    // 60끼+ : 목표 달성률 + 다음달 목표
+    html+=_renderGoalCards(detailed);
+  }else if(stage>=4){
+    // legacy: 월간 베스트/워스트 + 목표 진행 + 다음달 목표
     html+=`<div class="report-stage-card">
       <h4>🏆 월간 심층 분석</h4>
       ${a.monthly_best?`<div class="rsc-note" style="font-style:normal;color:#2E7D32;">🥇 <strong>베스트 식단:</strong> ${_escAt(a.monthly_best)}</div>`:""}
@@ -3431,6 +3448,217 @@ async function openReport(){
   verifyPickHealth();
   // 비동기로 부족 영양소 + 식품 추천 분석 (Claude AI 또는 휴리스틱)
   loadNutritionAnalysis();
+}
+
+/* ── 단계별 정밀 분석 카드 (analysis.detailed 기반) ────────────────
+   한국인 영양소 섭취기준 2020 + WHO 권고 기반의 5/10/21/60끼 단계별 카드.
+   detailed 가 없으면(이전 응답) 기존 stage-card 분기로 폴백한다. */
+function _renderHealthScoreCard(detailed){
+  const score=Math.max(0,Math.min(100,parseInt(detailed.health_score,10)||0));
+  const label=score>=90?'훌륭해요! 🌟':
+    score>=70?'양호해요 👍':
+    score>=50?'개선이 필요해요 ⚠️':'많은 개선이 필요해요 🔴';
+  const scoreColor=score>=70?'#4CAF7D':score>=50?'#FFB300':'#FF6B35';
+  const recK=detailed.recommend_kcal||1800;
+  // 5개 항목 각 0~100점 환산 — 색상 임계: 70+ 초록 / 50~70 노랑 / ~50 빨강
+  const kcalItem=Math.max(0,Math.min(100,Math.round(100-Math.abs(detailed.avg_daily_kcal-recK)/recK*100)));
+  const items=[
+    {name:'칼로리', score: kcalItem},
+    {name:'단백질', score: detailed.protein_low?40:100},
+    {name:'나트륨', score: detailed.sodium_high?40:100},
+    {name:'채소',   score: detailed.veg_low?40:100},
+    {name:'규칙성', score: Math.max(0,Math.min(100,parseInt(detailed.regularity_pct,10)||0))}
+  ];
+  const itemHtml=items.map(it=>{
+    const barColor=it.score>=70?'#4CAF7D':it.score>=50?'#FFB300':'#FF6B35';
+    return `<div class="hsc-item">
+      <div class="hsc-item-name">${_escAt(it.name)}</div>
+      <div class="hsc-item-bar-wrap">
+        <div class="hsc-item-bar" style="width:${it.score}%;background:${barColor};"></div>
+      </div>
+      <div class="hsc-item-score">${it.score}</div>
+    </div>`;
+  }).join('');
+  return `<div class="health-score-card">
+    <div class="hsc-score" style="color:${scoreColor};">${score}</div>
+    <div class="hsc-total">/ 100점</div>
+    <div class="hsc-label">${label}</div>
+    <div class="hsc-breakdown">${itemHtml}</div>
+  </div>`;
+}
+
+function _renderHabitTypeCard(detailed){
+  const goods=Array.isArray(detailed.good_points)?detailed.good_points:[];
+  const bads =Array.isArray(detailed.bad_points)?detailed.bad_points:[];
+  const goodHtml=goods.length
+    ? goods.map(p=>`<div class="report-good-item">✅ ${_escAt(p)}</div>`).join('')
+    : `<div class="report-good-item" style="opacity:.6;">기록을 더 쌓으면 잘한 것을 찾아드려요</div>`;
+  const badHtml =bads.length
+    ? bads.map(p=>`<div class="report-bad-item">⚠️ ${_escAt(p)}</div>`).join('')
+    : `<div class="report-bad-item" style="opacity:.6;">현재 큰 문제는 보이지 않아요</div>`;
+  return `<div class="report-section" style="margin-bottom:12px;">
+    <div class="report-section-title">📋 내 식습관 평가</div>
+    <div class="report-habit-type">🏷️ ${_escAt(detailed.habit_type||'분석 중')}</div>
+    ${goodHtml}${badHtml}
+    <div style="font-size:10px;color:#aaa;margin-top:6px;">* 한국인 영양소 섭취기준 2020 기준</div>
+  </div>`;
+}
+
+function _renderAvgKcalCard(detailed){
+  const recK=detailed.recommend_kcal||1800;
+  const avg=detailed.avg_daily_kcal||0;
+  const pct=Math.min(150,Math.round(avg/recK*100));
+  const barColor=pct>110?'#FF6B35':pct<80?'#FFB300':'#4CAF7D';
+  const statusText=pct>110
+    ? `+${avg-recK}kcal 초과 ⚠️`
+    : pct<80
+      ? `-${recK-avg}kcal 부족 ⚠️`
+      : '적정 범위 ✅';
+  return `<div class="report-section" style="margin-bottom:12px;">
+    <div class="report-section-title">📊 평균 칼로리 (일 기준)</div>
+    <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:8px;">
+      <span style="font-size:24px;font-weight:900;color:#1F1C18;">${avg}kcal</span>
+      <span style="font-size:12px;color:#888;">/ 권장 ${recK}kcal</span>
+    </div>
+    <div class="rtk-gauge-wrap">
+      <div class="rtk-gauge-bar" style="width:${Math.min(100,pct)}%;background:${barColor};"></div>
+    </div>
+    <div style="font-size:12px;font-weight:700;color:${barColor};text-align:right;margin-top:4px;">${statusText}</div>
+    <div style="font-size:10px;color:#aaa;margin-top:4px;">* 한국인 영양소 섭취기준 2020 / 성별·나이·BMI·목표 반영</div>
+  </div>`;
+}
+
+function _renderPatternCards(detailed){
+  const dist=detailed.meal_type_dist||{};
+  const slots=[
+    {k:'breakfast',e:'🌅',n:'아침'},
+    {k:'lunch',    e:'☀️',n:'점심'},
+    {k:'dinner',   e:'🌙',n:'저녁'},
+    {k:'snack',    e:'🍪',n:'간식'}
+  ];
+  const distHtml=slots.map(m=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:12px;">
+      <span style="width:60px;">${m.e} ${m.n}</span>
+      <div style="flex:1;background:#eee;border-radius:6px;height:8px;overflow:hidden;">
+        <div style="width:${dist[m.k]||0}%;height:100%;background:#4CAF7D;border-radius:6px;"></div>
+      </div>
+      <span style="width:30px;text-align:right;font-weight:700;">${dist[m.k]||0}%</span>
+    </div>`).join('');
+
+  const cats=Array.isArray(detailed.top_categories)?detailed.top_categories.slice(0,5):[];
+  const catHtml=cats.map((c,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:12px;">
+      <span style="width:24px;color:#888;">${i+1}위</span>
+      <span style="flex:1;">${_escAt(c.cat||'')}</span>
+      <div style="width:80px;background:#eee;border-radius:6px;height:6px;overflow:hidden;">
+        <div style="width:${c.pct||0}%;height:100%;background:#FF6B35;border-radius:6px;"></div>
+      </div>
+      <span style="width:30px;text-align:right;font-weight:700;">${c.pct||0}%</span>
+    </div>`).join('');
+
+  const sodiumWarn=detailed.sodium_high?`
+    <div style="background:#FFF3E0;border:1px solid #FFCC80;border-radius:10px;padding:10px;margin-top:8px;font-size:12px;">
+      <div style="font-weight:800;color:#E65100;margin-bottom:4px;">🧂 나트륨 주의</div>
+      <div style="color:#555;">면류·국물 요리 비중이 ${detailed.sodium_risk_pct||0}%예요. 나트륨 과다 경향이 있습니다.</div>
+      <div style="color:#888;font-size:10px;margin-top:4px;">* WHO 하루 2,000mg 미만 권고</div>
+    </div>`:'';
+
+  return `<div class="report-section" style="margin-bottom:12px;">
+    <div class="report-section-title">🍽️ 끼니별 분포</div>
+    ${distHtml}
+  </div>
+  <div class="report-section" style="margin-bottom:12px;">
+    <div class="report-section-title">📌 자주 먹은 음식 유형</div>
+    ${catHtml}
+    ${sodiumWarn}
+  </div>`;
+}
+
+function _renderWeeklyCards(detailed){
+  const trend=Array.isArray(detailed.weekly_trend)?detailed.weekly_trend:[];
+  const recK=detailed.recommend_kcal||1800;
+  if(!trend.length)return '';
+  const maxKcal=Math.max(...trend.map(d=>d.kcal||0), recK);
+  const trendHtml=trend.map(d=>{
+    const k=d.kcal||0;
+    const pct=Math.round(k/maxKcal*100);
+    const barCls=k>recK*1.1?'wt-bar-over':(k<recK*0.8&&k>0?'wt-bar-under':'wt-bar-ok');
+    const dateLabel=(d.date||'').slice(5);
+    return `<div class="wt-row">
+      <div class="wt-date">${_escAt(dateLabel)}</div>
+      <div class="wt-bar-wrap">
+        <div class="wt-bar ${barCls}" style="width:${pct}%;"></div>
+      </div>
+      <div class="wt-kcal">${k?k+'kcal':'-'}</div>
+    </div>`;
+  }).join('');
+
+  const bw=[];
+  if(detailed.best_day){
+    bw.push(`<div class="bw-card bw-best">
+      <div class="bw-title">😊 베스트 식사</div>
+      <div style="color:#2E7D32;font-weight:700;">${_escAt((detailed.best_day.date||'').slice(5))}</div>
+      <div style="margin-top:4px;color:#333;">${_escAt(detailed.best_day.menus||'-')}</div>
+      <div style="color:#4CAF7D;margin-top:4px;">균형 잡힌 식단 ✅</div>
+    </div>`);
+  }
+  if(detailed.worst_day){
+    bw.push(`<div class="bw-card bw-worst">
+      <div class="bw-title">😅 아쉬운 식사</div>
+      <div style="color:#E65100;font-weight:700;">${_escAt((detailed.worst_day.date||'').slice(5))}</div>
+      <div style="margin-top:4px;color:#333;">${_escAt(detailed.worst_day.menus||'-')}</div>
+      <div style="color:#FF8F00;margin-top:4px;">영양 불균형 ⚠️</div>
+    </div>`);
+  }
+
+  return `<div class="weekly-trend">
+    <div class="wt-title">📈 최근 7일 칼로리 추이</div>
+    ${trendHtml}
+    <div class="wt-recommend-line">권장: ${recK}kcal</div>
+  </div>
+  ${bw.length?`<div class="best-worst-card">${bw.join('')}</div>`:''}`;
+}
+
+function _renderGoalCards(detailed){
+  if(!detailed.goal_progress)return '';
+  const gp=detailed.goal_progress;
+  const items=[
+    {name:'칼로리 관리', pct: parseInt(gp.kcal_pct,10)||0},
+    {name:'단백질 유지', pct: parseInt(gp.protein_pct,10)||0},
+    {name:'나트륨 관리', pct: parseInt(gp.sodium_pct,10)||0}
+  ];
+  const gpHtml=items.map(it=>`
+    <div class="gp-item">
+      <div class="gp-name">${_escAt(it.name)}</div>
+      <div class="gp-bar-wrap">
+        <div class="gp-bar" style="width:${Math.max(0,Math.min(100,it.pct))}%;"></div>
+      </div>
+      <div class="gp-pct">${Math.max(0,Math.min(100,it.pct))}%</div>
+    </div>`).join('');
+
+  const nextGoals=[
+    detailed.protein_low ? '단백질 식품 주 4회 이상 (계란/두부/닭가슴살)' : null,
+    detailed.sodium_high ? '저염 메뉴 주 3회 이상 선택' : null,
+    detailed.veg_low     ? '채소 반찬 매끼 추가' : null,
+    detailed.omega3_low  ? '등푸른생선 주 2회 섭취' : null
+  ].filter(Boolean).slice(0,3);
+
+  const nextHtml=nextGoals.length
+    ? nextGoals.map((g,i)=>`<div style="padding:6px 0;font-size:12px;color:#444;border-bottom:1px solid #f5f5f5;">${i+1}. ${_escAt(g)}</div>`).join('')
+    : `<div style="padding:6px 0;font-size:12px;color:#888;">현재 패턴을 꾸준히 유지하세요 ✨</div>`;
+
+  return `<div class="goal-progress">
+    <div class="wt-title">🎯 ${_escAt(gp.goal||'건강목표')} 목표 달성률</div>
+    ${gpHtml}
+    <div style="text-align:center;margin-top:8px;">
+      <span style="font-size:20px;font-weight:900;color:#4CAF7D;">${Math.max(0,Math.min(100,parseInt(gp.overall,10)||0))}%</span>
+      <span style="font-size:12px;color:#888;"> 달성 중</span>
+    </div>
+  </div>
+  <div class="report-section" style="margin-bottom:12px;">
+    <div class="report-section-title">💡 다음달 목표 제안</div>
+    ${nextHtml}
+  </div>`;
 }
 
 /* ── 식습관 평가 카드 (good/bad/habit_type/health_score) ── */
