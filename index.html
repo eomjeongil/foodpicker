@@ -7,7 +7,11 @@
 <meta name="theme-color" content="#FF6B35">
 <meta property="og:title" content="오늘은 뭐 먹을까? 🍽️">
 <meta property="og:description" content="AI가 나에게 딱 맞는 오늘 메뉴를 추천해드려요">
-<link rel="manifest" href="#" id="manifestLink">
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="푸드피커">
+<link rel="apple-touch-icon" href="/icon-192.svg">
 <title>오늘은 뭐 먹을까? 🍽️</title>
 <!--
   ╔══════════════════════════════════════════════════╗
@@ -6354,5 +6358,7 @@ document.addEventListener('keydown',e=>{
 </script>
 <script src="fruit-db.js"></script>
 <script src="fruit-card.js"></script>
+<script>window.PWA_OPTIONS={name:"푸드피커",color:"#FF6B35"};</script>
+<script src="/pwa-install.js" defer></script>
 </body>
 </html>
