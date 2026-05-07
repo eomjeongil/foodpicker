@@ -1150,39 +1150,25 @@ body{
 }
 .weather-banner.show{display:block;animation:slideDown .35s ease;}
 
-/* ── 카카오 채널 구독 (3단계 흐름) ── */
-.channel-card{
-  background:linear-gradient(135deg,#FFF8C2,#FEF8A0);
-  border:1px solid #F5E07A;border-radius:var(--rsm);
-  padding:16px 15px;margin-bottom:12px;
-  display:flex;flex-direction:column;align-items:stretch;
-  box-shadow:var(--shadow-sm);transition:all .18s;
+/* ── 카카오 채널 구독 (가로 컴팩트 레이아웃) ── */
+.channel-card-compact{
+  display:flex;align-items:center;gap:12px;
+  background:#FFFDE7;border:1.5px solid #FFE082;border-radius:14px;
+  padding:12px 14px;margin-bottom:8px;
 }
-.channel-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
-.channel-title{
-  font-size:13px;font-weight:800;color:#3A1D00;
-  text-align:center;margin-bottom:12px;line-height:1.4;
+.ccc-left{flex:1;min-width:0;}
+.ccc-flow{font-size:18px;margin-bottom:4px;display:flex;align-items:center;gap:4px;}
+.ccc-arrow{font-size:12px;color:#aaa;}
+.ccc-title{font-size:11px;font-weight:800;color:#F57F17;margin-bottom:4px;}
+.ccc-desc{font-size:11px;color:#666;line-height:1.5;}
+.ccc-right{flex-shrink:0;}
+.ccc-btn{
+  width:56px;height:56px;background:#FEE500;border:none;border-radius:12px;
+  font-size:11px;font-weight:800;color:#1F1C18;cursor:pointer;line-height:1.4;text-align:center;
+  font-family:inherit;
 }
-.channel-flow{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;}
-.cf-step{display:flex;flex-direction:column;align-items:center;gap:4px;}
-.cf-icon{font-size:24px;}
-.cf-label{font-size:11px;font-weight:700;color:#444;}
-.cf-arrow{font-size:16px;color:#aaa;margin-top:-8px;}
-.channel-desc{
-  font-size:12px;color:#666;line-height:1.6;
-  margin-bottom:12px;text-align:center;
-}
-.channel-btn{
-  padding:11px 18px;border-radius:50px;border:none;
-  background:#3A1D00;color:var(--kakao);
-  font-size:13px;font-weight:800;cursor:pointer;
-  text-decoration:none;text-align:center;display:block;
-  transition:all .18s;
-}
-.channel-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.3);}
-.channel-note{text-align:center;margin-top:8px;}
-.cn-alert{font-size:12px;font-weight:800;color:#FF6B35;margin-bottom:4px;}
-.cn-desc{font-size:11px;color:#888;line-height:1.6;}
+.ccc-btn:hover{filter:brightness(.95);}
+.ccc-note{font-size:11px;color:#888;text-align:center;line-height:1.6;padding:0 4px;margin-bottom:12px;}
 
 /* ── 식습관 리포트 ── */
 .report-trigger{
@@ -2108,37 +2094,22 @@ async function _logClick(type, menu) {
     📊 내 식습관으로 내 건강 리포트 보기
   </button>
 
-  <!-- ⑦++ 카카오 채널 구독 — 3단계 흐름(식사기록 → 건강리포트 → 픽헬스 영양진단) -->
-  <div class="channel-card">
-    <div class="channel-title">📊 매일 식사기록 → 건강리포트 → 픽헬스 영양진단</div>
-    <div class="channel-flow">
-      <div class="cf-step">
-        <span class="cf-icon">🍽️</span>
-        <span class="cf-label">식사 기록</span>
+  <!-- ⑦++ 카카오 채널 구독 — 가로 컴팩트 (식사기록 → 건강리포트 → 픽헬스) -->
+  <div class="channel-card-compact">
+    <div class="ccc-left">
+      <div class="ccc-flow">
+        🍽️<span class="ccc-arrow">→</span>
+        📊<span class="ccc-arrow">→</span>
+        💊
       </div>
-      <span class="cf-arrow">→</span>
-      <div class="cf-step">
-        <span class="cf-icon">📊</span>
-        <span class="cf-label">건강 리포트</span>
-      </div>
-      <span class="cf-arrow">→</span>
-      <div class="cf-step">
-        <span class="cf-icon">💊</span>
-        <span class="cf-label">픽헬스 영양진단</span>
-      </div>
+      <div class="ccc-title">식사기록 → 건강리포트 → 픽헬스</div>
+      <div class="ccc-desc">채널 추가하면 기기가 바뀌어도 기록이 자동 복구돼요 🔐</div>
     </div>
-    <div class="channel-desc">
-      카카오 채널을 추가하면<br>
-      기기가 바뀌거나 앱을 삭제해도<br>
-      내 식사 기록이 자동으로 복구됩니다. 🔐<br>
-      21끼 달성 시 픽헬스 영양진단도 연동돼요.
-    </div>
-    <button class="channel-btn" id="channelBtn" type="button" onclick="linkKakaoChannel('channel_card')">🔐 내 기록 영구 보호하기</button>
-    <div class="channel-note">
-      <div class="cn-alert">📅 매일 저녁 8:30 알림을 보내드려요</div>
-      <div class="cn-desc">알림을 받으면 오늘 드신 음식을 기록해보세요.<br>기록이 쌓일수록 더 정확한 건강리포트가 만들어집니다 📊</div>
+    <div class="ccc-right">
+      <button class="ccc-btn" id="channelBtn" type="button" onclick="linkKakaoChannel('channel_card')">🔐<br>영구<br>보호</button>
     </div>
   </div>
+  <div class="ccc-note">📅 매일 저녁 8:30 알림 · 알림을 받으면 오늘 드신 음식을 기록해보세요</div>
 
 </div>
 
@@ -3812,22 +3783,34 @@ function _renderTodayKcalAndExercise(today){
   return html;
 }
 
-/* ── 연속 기록 (스트릭) — 리포트 최상단 카드 + 기록 섹션 상단 바 ── */
+/* ── 연속 기록 (스트릭) — 리포트 최상단 카드 + 기록 섹션 상단 바 ──
+   표기 통일: "이번 주 N끼 · N일 연속" 한 줄. 연속일 0~1 이지만 이번주 기록이
+   있으면 "📊 이번 주 N끼 기록 중" 으로 노출 (월요일 기준 weekMeals). */
 function _renderStreakCard(streak){
-  if(!streak || (parseInt(streak.current,10)||0) < 2) return '';
+  if(!streak)return '';
   const c=parseInt(streak.current,10)||0;
   const l=parseInt(streak.longest,10)||c;
-  const emoji = c>=30?'🏆' : c>=14?'🔥' : c>=7?'⚡' : '✨';
-  const msg   = c>=30?'한 달 연속 기록! 대단해요!'
-              : c>=14?'2주 연속! 습관이 만들어지고 있어요!'
-              : c>=7 ?'일주일 연속! 훌륭해요!'
-              : `${c}일 연속 기록 중!`;
-  const sub = (l>c) ? `현재 ${c}일 연속 · 최장 ${l}일` : `현재 ${c}일 연속 · 최고 기록 달성 중! 🎉`;
+  const w=parseInt(streak.weekMeals,10)||0;
+  // 이번주 기록이 0이면 표시 안 함 (사용자가 보기에 의미 없음)
+  if(w<1) return '';
+  if(c>=2){
+    const emoji = c>=30?'🏆' : c>=14?'🔥' : c>=7?'⚡' : '✨';
+    const title = `이번 주 ${w}끼 · ${c}일 연속!`;
+    const sub = (l>c) ? `현재 ${c}일 연속 · 최장 ${l}일` : `현재 ${c}일 연속 · 최고 기록 달성 중! 🎉`;
+    return `<div class="streak-card">
+      <div class="streak-emoji">${emoji}</div>
+      <div class="streak-text">
+        <div class="streak-title">${title}</div>
+        <div class="streak-sub">${sub}</div>
+      </div>
+    </div>`;
+  }
+  // 연속일 부족하지만 이번주 기록은 있는 경우 — 회색 톤 카드 (📊)
   return `<div class="streak-card">
-    <div class="streak-emoji">${emoji}</div>
+    <div class="streak-emoji">📊</div>
     <div class="streak-text">
-      <div class="streak-title">${msg}</div>
-      <div class="streak-sub">${sub}</div>
+      <div class="streak-title">이번 주 ${w}끼 기록 중</div>
+      <div class="streak-sub">매일 한 끼라도 기록하면 연속 기록이 시작돼요</div>
     </div>
   </div>`;
 }
@@ -4694,6 +4677,9 @@ function _afterKakaoLink(restored){
     localStorage.setItem(FP_LS_KAKAO,"1");
     localStorage.setItem(FP_LS_ACHIEVED,"1");
   }catch(_){}
+  // 연동 직후 즉시 내보내기 버튼 숨김 (loadMealLogs 가 갱신해도 깜빡임 방지)
+  const exportSec=document.getElementById("mealExportSection");
+  if(exportSec)exportSec.style.display="none";
   if(typeof loadMealLogs==="function")loadMealLogs();
   // 리포트 오버레이가 열려 있으면 새 데이터로 다시 그림
   if(typeof openReport==="function" && document.getElementById("reportOverlay")?.classList.contains("show")){
@@ -4760,19 +4746,33 @@ async function loadMealLogs(){
     const resetBtn=document.getElementById("mealLogResetBtn");
     if(resetBtn)resetBtn.style.display=logs.length?"block":"none";
     const exportSec=document.getElementById("mealExportSection");
-    if(exportSec)exportSec.style.display=logs.length?"block":"none";
+    // 카카오 연동 사용자는 서버에서 자동 백업되므로 CSV 내보내기 버튼 숨김
+    const isKakaoLinked = (function(){ try{ return localStorage.getItem(FP_LS_KAKAO)==="1"; }catch(_){ return false; } })();
+    if(exportSec)exportSec.style.display = (logs.length && !isKakaoLinked) ? "block" : "none";
     // 삭제 복구 토글 — 30일 내 삭제 항목 1건 이상이면 노출
     _refreshDeletedToggle();
     // 픽헬스 활성화 카드 갱신
     verifyPickHealth();
-    // 연속 기록 바 — 2일 이상에서만 표시 (서버 호출 없이 logs 만으로 즉시 계산)
+    // 스트릭 바 — 끼니 수 + 연속일을 한 줄로 통일.
+    // 2일 이상 연속이면 "이번 주 N끼 · N일 연속", 아니면 1끼라도 있으면 "📊 총 N끼 기록 중".
     try{
       const streakEl=document.getElementById("mealStreakBar");
       if(streakEl){
         const s=_calcStreakClient(logs);
+        // 이번 주(월요일 기준) 끼니 수
+        const _now=new Date();
+        const _day=_now.getDay();
+        const _offset=(_day===0?6:_day-1);
+        _now.setDate(_now.getDate()-_offset);
+        const _monday=_now.toISOString().slice(0,10);
+        const weekMeals=logs.filter(l=>l && l.meal_date && l.meal_date>=_monday).length;
+        const totalMeals=logs.length;
         if(s>=2){
           const e=s>=30?'🏆':s>=14?'🔥':s>=7?'⚡':'✨';
-          streakEl.textContent=`${e} ${s}일 연속 기록 중!`;
+          streakEl.textContent=`${e} 이번 주 ${weekMeals}끼 · ${s}일 연속`;
+          streakEl.style.display="block";
+        }else if(totalMeals>0){
+          streakEl.textContent=`📊 총 ${totalMeals}끼 기록 중`;
           streakEl.style.display="block";
         }else{
           streakEl.style.display="none";
