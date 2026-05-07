@@ -2564,6 +2564,128 @@ if (document.readyState === 'loading') {
   setTimeout(loadHealth, 0);
 }
 
+// 서버 user_health에서 건강정보 자동 복원 — 재방문/기기 변경 시 localStorage 미존재해도 동기화.
+// 정책: localStorage가 우선 적용된 후, 서버 값으로 덮어써 어느 디바이스든 최신 상태 유지.
+async function _restoreHealthFromServer(){
+  if(!FP_UID)return;
+  try{
+    const r=await fetch('/api/user/health-info?uid='+encodeURIComponent(FP_UID),{cache:'no-store'});
+    if(!r.ok)return;
+    const j=await r.json();
+    if(!j||!j.exists||!j.data)return;
+    const d=j.data;
+
+    // 성별 복원 — #gRow .tog (sel-m/sel-f/sel-a)
+    if(d.gender && ['M','F','N'].includes(d.gender)){
+      selGend=d.gender;
+      document.querySelectorAll('#gRow .tog').forEach(t=>{
+        t.classList.remove('sel-m','sel-f','sel-a');
+        if(t.dataset.g===d.gender){
+          t.classList.add(d.gender==='M'?'sel-m':d.gender==='F'?'sel-f':'sel-a');
+        }
+      });
+    }
+
+    // 연령 복원 — #aRow .tog (sel-a)
+    if(d.age){
+      selAgeV=String(d.age);
+      document.querySelectorAll('#aRow .tog').forEach(t=>{
+        t.classList.remove('sel-m','sel-f','sel-a');
+        if(t.dataset.a===String(d.age))t.classList.add('sel-a');
+      });
+    }
+
+    // 키/몸무게 복원
+    if(d.height!=null){
+      const hEl=document.getElementById('hHeight');
+      if(hEl)hEl.value=d.height;
+      selHealth.height=parseFloat(d.height)||null;
+    }
+    if(d.weight!=null){
+      const wEl=document.getElementById('hWeight');
+      if(wEl)wEl.value=d.weight;
+      selHealth.weight=parseFloat(d.weight)||null;
+    }
+    // BMI 표시 갱신 (height/weight 둘 다 있을 때만)
+    if(typeof onHealthInput==='function')onHealthInput();
+
+    // 단일 선택 칩 복원 헬퍼
+    const restoreSingle=(rowId,val,stateKey)=>{
+      if(!val)return;
+      let matched=false;
+      document.querySelectorAll(`#${rowId} .h-chip`).forEach(c=>{
+        const on=c.dataset.v===val;
+        c.classList.toggle('on',on);
+        if(on)matched=true;
+      });
+      if(matched)selHealth[stateKey]=val;
+    };
+    // 다중 선택 칩 복원 헬퍼 (CSV → 배열)
+    const restoreMulti=(rowId,csv,stateKey)=>{
+      if(!csv)return;
+      const arr=String(csv).split(',').map(s=>s.trim()).filter(Boolean);
+      if(!arr.length)return;
+      document.querySelectorAll(`#${rowId} .h-chip`).forEach(c=>{
+        c.classList.toggle('on',arr.includes(c.dataset.v));
+      });
+      // "없음"은 selHealth 배열에 포함하지 않음 (기존 selHealthMulti 정책과 동일)
+      selHealth[stateKey]=arr.filter(v=>v!=='없음');
+    };
+
+    // 혈압: blood_pressure_meds가 켜져 있으면 '혈압약복용' 칩을 강제 선택 (UI 단일 모델)
+    let bpVal=d.blood_pressure||null;
+    if(d.blood_pressure_meds)bpVal='혈압약복용';
+    restoreSingle('hBpChips',bpVal,'bp');
+
+    // 혈당
+    restoreSingle('hGluChips',d.blood_sugar,'glu');
+    // 콜레스테롤
+    restoreSingle('hCholChips',d.cholesterol,'chol');
+    // 건강목표
+    restoreSingle('hGoalChips',d.health_goal,'goal');
+
+    // 가족력
+    restoreMulti('hFamChips',d.family_history,'fam');
+    // 알레르기
+    restoreMulti('hAlgChips',d.allergies,'alg');
+
+    // localStorage도 최신화 — 다음 방문 빠른 표시 (로컬 포맷 유지)
+    try{
+      localStorage.setItem(HEALTH_LS_KEY,JSON.stringify({
+        height:selHealth.height||null,
+        weight:selHealth.weight||null,
+        bp:selHealth.bp||null,
+        glu:selHealth.glu||null,
+        chol:selHealth.chol||null,
+        goal:selHealth.goal||null,
+        fam:Array.isArray(selHealth.fam)?selHealth.fam:[],
+        alg:Array.isArray(selHealth.alg)?selHealth.alg:[]
+      }));
+    }catch(e){}
+
+    // 저장된 값이 있으면 카드 자동 펼치기 (loadHealth와 동일 정책)
+    if(typeof getHealthInfo==='function' && getHealthInfo()){
+      const card=document.getElementById('healthCard');
+      if(card){
+        card.classList.add('open');
+        const btn=card.querySelector('.health-toggle');
+        if(btn)btn.setAttribute('aria-expanded','true');
+      }
+    }
+
+    console.log('[health] 서버에서 건강정보 복원 완료');
+  }catch(e){
+    console.warn('[health] 서버 복원 실패, localStorage 사용:',e?.message||e);
+  }
+}
+
+// DB 로드 완료 후 서버 복원 호출 — DB가 늦게 와도 칩/입력은 즉시 반영
+if(typeof _dbLoadPromise!=='undefined' && _dbLoadPromise && typeof _dbLoadPromise.then==='function'){
+  _dbLoadPromise.then(()=>_restoreHealthFromServer()).catch(()=>_restoreHealthFromServer());
+}else{
+  setTimeout(_restoreHealthFromServer,0);
+}
+
 /* 영양정보 lazy-load + 토글 (영양: 빠른 응답 / 이야기: 별도 엔드포인트) */
 let _nutriCache=null;
 let _storyCache=null;
