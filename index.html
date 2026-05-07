@@ -448,26 +448,6 @@ body{
 .fab:hover{transform:scale(1.1);box-shadow:0 12px 32px var(--pg);}
 
 /* ── 식습관 기록 (meal_logs 단일 입력) ── */
-/* 데이터 보호 상태 (카카오 미연동 = 주황 경고 / 연동 = 초록 완료) */
-.data-protect-hint{
-  display:flex;align-items:center;gap:10px;padding:10px 12px;
-  background:#FFF3E0;border:1px solid #FFCC80;border-radius:10px;margin:8px 0;
-}
-.dph-icon{font-size:20px;flex-shrink:0;}
-.dph-text{flex:1;min-width:0;}
-.dph-title{font-size:12px;font-weight:800;color:#E65100;}
-.dph-desc{font-size:11px;color:#888;margin-top:2px;line-height:1.4;}
-.dph-btn{
-  padding:8px 10px;background:#FEE500;color:#1F1C18;border:none;border-radius:8px;
-  font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;
-}
-.dph-btn:hover{filter:brightness(1.05);}
-.data-protect-done{
-  display:flex;align-items:center;gap:8px;padding:8px 12px;
-  background:#E8F5E9;border:1px solid #A5D6A7;border-radius:10px;
-  margin:8px 0;font-size:12px;
-}
-.dpd-text{color:#2E7D32;font-weight:700;}
 .meal-log-intro{text-align:center;padding:8px 4px 12px;}
 .meal-log-intro-title{font-size:15px;font-weight:800;color:#2E7D32;margin-bottom:6px;letter-spacing:.2px;}
 .meal-log-intro-desc{font-size:12px;color:#666;line-height:1.6;}
@@ -626,11 +606,20 @@ body{
 .ph-preview-item:last-child{border-bottom:none;}
 .ph-unlock-note{font-size:10px;color:#aaa;text-align:center;margin-top:8px;}
 /* 기록 섹션 상단 픽헬스 동기부여 힌트 (작업 2) */
-.meal-log-pickhealth-hint{display:flex;align-items:flex-start;gap:8px;background:#F3E5F5;border-radius:10px;padding:10px 12px;margin:10px 0;font-size:12px;color:#6A1B9A;line-height:1.5;}
+/* 픽헬스 힌트 — 5끼 이상 기록 시에만 .visible 클래스로 노출 (입력창 가리지 않게) */
+.meal-log-pickhealth-hint{display:none;align-items:flex-start;gap:8px;background:#F3E5F5;border-radius:10px;padding:10px 12px;margin:10px 0;font-size:12px;color:#6A1B9A;line-height:1.5;}
+.meal-log-pickhealth-hint.visible{display:flex;}
 .mlph-icon{font-size:16px;flex-shrink:0;line-height:1.2;}
 .mlph-text strong{color:#4A148C;}
 .mlph-sub{display:block;color:#9C27B0;font-size:11px;margin-top:2px;}
 /* 리포트 내 픽헬스 연동 힌트 (작업 3) */
+/* 리포트 최상단 — 21끼 미달 시 노란 카드로 픽헬스 동기 부여 */
+.report-top-hint{display:flex;align-items:flex-start;gap:8px;background:#FFFDE7;border:1px solid #FFF176;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:12px;}
+.rth-icon{font-size:18px;flex-shrink:0;}
+.rth-text{flex:1;min-width:0;}
+.rth-title{font-weight:800;color:#F57F17;margin-bottom:2px;font-size:13px;}
+.rth-desc{color:#555;line-height:1.5;}
+.rth-sub{display:block;color:#9C27B0;font-size:11px;margin-top:2px;}
 .report-pickhealth-hint{background:#F3E5F5;border:1px solid #CE93D8;border-radius:10px;padding:10px 12px;font-size:12px;color:#6A1B9A;line-height:1.6;margin-top:10px;}
 .report-pickhealth-hint.activated{background:#E8F5E9;border-color:#A5D6A7;color:#2E7D32;}
 /* ── 리포트 식습관 평가 + 부족 영양소 ── */
@@ -1974,20 +1963,6 @@ async function _logClick(type, menu) {
           기록이 쌓일수록 나만의 정확한<br>
           건강 식습관 리포트가 만들어집니다 📊
         </div>
-      </div>
-
-      <!-- 데이터 보호 상태 (카카오 미연동 = 경고 / 연동 = 안심) — _refreshDataProtectUI 가 토글 -->
-      <div class="data-protect-hint" id="dataProtectHint" style="display:none;">
-        <span class="dph-icon">⚠️</span>
-        <div class="dph-text">
-          <div class="dph-title">기록이 사라질 수 있어요</div>
-          <div class="dph-desc">기기 교체나 캐시 삭제 시 기록이 초기화될 수 있어요.</div>
-        </div>
-        <button class="dph-btn" type="button" onclick="linkKakaoChannel('data_protect')">🔐 보호하기</button>
-      </div>
-      <div class="data-protect-done" id="dataProtectDone" style="display:none;">
-        <span>🔐</span>
-        <span class="dpd-text">데이터 보호 중 · 어떤 기기에서도 안전해요</span>
       </div>
 
       <!-- 픽헬스 동기부여 힌트 — 21끼 달성하면 맞춤 솔루션 연동 -->
@@ -3821,12 +3796,24 @@ async function openReport(){
   const stage=data.stage||0;
   const a=data.analysis||{};
 
+  // 21끼 미달 시 리포트 최상단에 픽헬스 동기 부여 힌트 (모든 단계 공통)
+  const _topHint = (total < 21) ? `<div class="report-top-hint">
+    <span class="rth-icon">💡</span>
+    <div class="rth-text">
+      <div class="rth-title">21끼를 기록하면</div>
+      <div class="rth-desc">픽헬스에서 내 식습관 기반 맞춤 건강 솔루션을 받을 수 있어요.
+        <span class="rth-sub">(영양제 전에 음식으로 먼저 채워드려요)</span>
+      </div>
+    </div>
+  </div>` : '';
+
   // stage 0 — 진행 바 + CTA + (오늘 기록이 있으면 today 블록도 함께)
   if(stage===0){
     const need=data.meals_to_next||5;
     const pct=Math.max(0,Math.min(100,(total/5)*100));
     const todayBlock=_renderTodayKcalAndExercise(data.today);
     content.innerHTML=`
+      ${_topHint}
       ${todayBlock}
       <div class="report-empty">
         <div style="font-size:42px;margin-bottom:10px;">🍽️</div>
@@ -3848,7 +3835,7 @@ async function openReport(){
     <span style="font-size:12px;color:#666;">총 ${total}끼 기록</span>
   </div>`;
 
-  let html=stageHead;
+  let html=_topHint+stageHead;
 
   // [모든 단계 공통] 오늘 칼로리 + 운동 추천 (today 블록)
   html+=_renderTodayKcalAndExercise(data.today);
@@ -4601,22 +4588,12 @@ function closeAchievePopup(){
 /* 카카오 채널 연동 — pf.kakao.com/.../friend 새 탭 + 서버 기록
    원래의 SDK 기반 addKakaoChannel과 별도. 이 함수는 21끼 팝업/결과카드 nudge에서 호출. */
 const KAKAO_CHANNEL_URL="https://pf.kakao.com/_xgexjxbX/friend";
-// 데이터 보호 상태 표시 토글 — 미연동: 주황 경고 / 연동: 초록 완료
-function _refreshDataProtectUI(){
-  const linked = (function(){ try{ return localStorage.getItem(FP_LS_KAKAO)==="1"; }catch(_){ return false; } })();
-  const hint = document.getElementById("dataProtectHint");
-  const done = document.getElementById("dataProtectDone");
-  if (hint) hint.style.display = linked ? "none" : "flex";
-  if (done) done.style.display = linked ? "flex" : "none";
-}
-
-// 카카오 연동 후 공통 처리 — 데이터 보호 UI 토글 + 리포트/기록 목록 새로고침
+// 카카오 연동 후 공통 처리 — 리포트/기록 목록 새로고침
 function _afterKakaoLink(restored){
   try{
     localStorage.setItem(FP_LS_KAKAO,"1");
     localStorage.setItem(FP_LS_ACHIEVED,"1");
   }catch(_){}
-  if(typeof _refreshDataProtectUI==="function")_refreshDataProtectUI();
   if(typeof loadMealLogs==="function")loadMealLogs();
   // 리포트 오버레이가 열려 있으면 새 데이터로 다시 그림
   if(typeof openReport==="function" && document.getElementById("reportOverlay")?.classList.contains("show")){
@@ -4636,7 +4613,7 @@ function _afterKakaoLink(restored){
 }
 
 async function linkKakaoChannel(source){
-  const _src=["21_achieve","result_card","report","channel_card","data_protect"].includes(source)?source:"manual";
+  const _src=["21_achieve","result_card","report","channel_card"].includes(source)?source:"manual";
   // 1) 채널 추가 페이지 — 새 탭으로 열기 (모바일에서도 안전한 사용자-제스처 컨텍스트)
   try{ window.open(KAKAO_CHANNEL_URL,"_blank","noopener"); }catch(_){}
   // 2) 서버에 출처 기록 (kakaoId 없이는 restored=false). 응답으로 복원 여부 확인.
@@ -4684,6 +4661,10 @@ async function loadMealLogs(){
     if(resetBtn)resetBtn.style.display=logs.length?"block":"none";
     const exportSec=document.getElementById("mealExportSection");
     if(exportSec)exportSec.style.display=logs.length?"block":"none";
+    // 픽헬스 힌트 — 5끼 이상에서만 노출 (입력창을 처음부터 가리지 않게)
+    document.querySelectorAll(".meal-log-pickhealth-hint").forEach(el=>{
+      el.classList.toggle("visible", logs.length >= 5);
+    });
     // 삭제 복구 토글 — 30일 내 삭제 항목 1건 이상이면 노출
     _refreshDeletedToggle();
     // 픽헬스 활성화 카드 갱신
@@ -4696,6 +4677,7 @@ async function loadMealLogs(){
     if(resetBtn)resetBtn.style.display="none";
     const exportSec=document.getElementById("mealExportSection");
     if(exportSec)exportSec.style.display="none";
+    document.querySelectorAll(".meal-log-pickhealth-hint").forEach(el=>el.classList.remove("visible"));
     _refreshDeletedToggle();
     verifyPickHealth();
   }
@@ -5780,8 +5762,6 @@ function addKakaoChannel(ev){
 }
 
 updateProg();renderHist();
-// 페이지 로드 시 데이터 보호 상태 표시 초기화 (저장된 fp_kakao_linked 반영)
-if (typeof _refreshDataProtectUI === 'function') _refreshDataProtectUI();
 
 /* ============================================================
    🔔 웹 푸시 — 서비스워커 등록 + VAPID 구독 + 권한 요청 토스트
