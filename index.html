@@ -460,6 +460,14 @@ body{
 .mlp-btn.active{border-color:#4CAF7D;color:#2E7D32;background:#E8F5E9;font-weight:800;}
 .mlp-save-btn{width:100%;margin-top:16px;padding:14px;background:linear-gradient(135deg,#4CAF7D,#2E9E6B);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(76,175,125,.3);}
 .mlp-cancel-btn{width:100%;margin-top:8px;padding:12px;background:#f5f5f5;color:#888;border:none;border-radius:10px;font-size:13px;cursor:pointer;}
+/* 반찬 빠른 추가 (팝업 내) + 기록 목록 인라인 태그 */
+.side-dish-section{margin:12px 0;padding-top:12px;border-top:1px solid #f0f0f0;}
+.sds-title{font-size:13px;font-weight:700;color:#333;margin-bottom:8px;}
+.sds-hint{font-size:11px;color:#aaa;font-weight:400;}
+.sds-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.sds-chip{padding:6px 12px;border:1.5px solid #ddd;border-radius:20px;background:#fff;font-size:12px;cursor:pointer;transition:all .15s;color:#555;}
+.sds-chip.on{border-color:#4CAF7D;background:#E8F5E9;color:#2E7D32;font-weight:700;}
+.mli-sides{font-size:11px;color:#888;margin-left:4px;flex-shrink:0;white-space:nowrap;}
 .meal-log-list{display:flex;flex-direction:column;gap:6px;}
 .meal-log-list-empty{padding:18px;text-align:center;color:#aaa;font-size:12px;}
 /* 날짜별 그룹 + 접기 */
@@ -1795,6 +1803,17 @@ async function _logClick(type, menu) {
         <button class="mlp-btn active" data-meal="lunch" onclick="selectLogMeal(this)" type="button">☀️ 점심</button>
         <button class="mlp-btn" data-meal="dinner" onclick="selectLogMeal(this)" type="button">🌙 저녁</button>
         <button class="mlp-btn" data-meal="snack" onclick="selectLogMeal(this)" type="button">🍪 간식</button>
+      </div>
+      <div class="side-dish-section">
+        <div class="sds-title">반찬도 드셨나요? <span class="sds-hint">(선택)</span></div>
+        <div class="sds-chips" id="sdsChips">
+          <button class="sds-chip" data-side="채소반찬" onclick="toggleSideDish(this)" type="button">🥬 채소반찬</button>
+          <button class="sds-chip" data-side="계란류"   onclick="toggleSideDish(this)" type="button">🥚 계란류</button>
+          <button class="sds-chip" data-side="생선류"   onclick="toggleSideDish(this)" type="button">🐟 생선류</button>
+          <button class="sds-chip" data-side="두부콩류" onclick="toggleSideDish(this)" type="button">🫘 두부/콩류</button>
+          <button class="sds-chip" data-side="육류"     onclick="toggleSideDish(this)" type="button">🥩 육류</button>
+          <button class="sds-chip" data-side="김치류"   onclick="toggleSideDish(this)" type="button">🥢 김치류</button>
+        </div>
       </div>
       <button onclick="saveMealLog()" class="mlp-save-btn" type="button">기록 저장</button>
       <button onclick="closeMealLogPopup()" class="mlp-cancel-btn" type="button">취소</button>
@@ -3981,9 +4000,26 @@ function openMealLogAddPopup(){
   popup.style.display="flex";
 }
 
+/* ── 반찬 빠른 추가 ──
+   서버 _sideDishNutritionBonus 와 토큰 6종 일치(채소반찬/계란류/생선류/두부콩류/육류/김치류). */
+const _SIDE_EMOJI={'채소반찬':'🥬','계란류':'🥚','생선류':'🐟','두부콩류':'🫘','육류':'🥩','김치류':'🥢'};
+const _SIDE_SHORT={'채소반찬':'채소','계란류':'계란','생선류':'생선','두부콩류':'두부','육류':'육류','김치류':'김치'};
+const _selectedSideDishes=new Set();
+function toggleSideDish(btn){
+  const v=btn.dataset.side;
+  if(!v)return;
+  if(_selectedSideDishes.has(v)){_selectedSideDishes.delete(v);btn.classList.remove("on");}
+  else{_selectedSideDishes.add(v);btn.classList.add("on");}
+}
+function _resetSideDishChips(){
+  _selectedSideDishes.clear();
+  document.querySelectorAll("#sdsChips .sds-chip.on").forEach(c=>c.classList.remove("on"));
+}
+
 function closeMealLogPopup(){
   const popup=document.getElementById("mealLogPopup");
   if(popup)popup.style.display="none";
+  _resetSideDishChips();
 }
 
 function selectLogDate(btn){
@@ -4016,7 +4052,9 @@ async function saveMealLog(){
     mealDate,
     kcal:_mealLogSelected.kcal||0,
     category:_mealLogSelected.category||"",
-    source:_mealLogSelected.source||"manual"
+    source:_mealLogSelected.source||"manual",
+    // 반찬 (서버에서 화이트리스트 검증, 최대 100자)
+    side_dishes:[..._selectedSideDishes].join(",")
   };
   try{
     const r=await fetch("/api/meal-log",{
@@ -4033,10 +4071,11 @@ async function saveMealLog(){
       return;
     }
     closeMealLogPopup();
-    // 입력창 초기화
+    // 입력창 + 반찬 칩 초기화
     const inp=document.getElementById("mealLogInput");
     if(inp)inp.value="";
     _mealLogSelected=null;
+    _resetSideDishChips();
     _catGuardLikeToast(j.duplicate?"이미 기록되어 있어요":"기록됐어요! 📊");
     // 목록·진행 바 갱신
     loadMealLogs();
@@ -4223,9 +4262,15 @@ function renderMealLogList(logs, byDate){
             const kor=_MLOG_TYPE_KOR[t]||t;
             const kcal=l.kcal||_MLOG_CAT_KCAL[l.menu_category]||500;
             const src=l.source==="db"?"DB ✓":"직접입력";
+            // 반찬 태그 (있을 때만): 🥬채소 🥚계란 …
+            const sides=(l.side_dishes||"").split(",").map(s=>s.trim()).filter(s=>_SIDE_EMOJI[s]);
+            const sidesHtml=sides.length
+              ? `<span class="mli-sides" title="반찬">${sides.map(s=>`${_SIDE_EMOJI[s]}${_SIDE_SHORT[s]}`).join(" ")}</span>`
+              : "";
             return `<div class="meal-log-item">
               <span class="mli-meal-icon" title="${_mlogEsc(kor)}">${emoji}</span>
               <span class="mli-name">${_mlogEsc(l.menu_name)}</span>
+              ${sidesHtml}
               <span class="mli-kcal">${kcal}kcal</span>
               <span class="mli-source">${src}</span>
               <button class="mli-del" type="button" onclick="deleteMealLog(${l.id})" aria-label="삭제">×</button>
