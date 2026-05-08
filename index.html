@@ -2123,8 +2123,8 @@ async function _logClick(type, menu) {
       </button>
       <div class="ml-deleted-list" id="mealLogDeletedList"></div>
 
-      <!-- 식사 기록 CSV 내보내기 — 기록이 1건 이상일 때만 노출 (loadMealLogs에서 토글) -->
-      <div class="meal-export-section" id="mealExportSection" style="display:none;">
+      <!-- 식사 기록 CSV 내보내기 — 영구 숨김 (정책: 사용자에게 노출하지 않음. 향후 복구 가능) -->
+      <div class="meal-export-section" id="mealExportSection" style="display:none !important;" data-force-hidden="1">
         <button onclick="exportMealLogs()" class="meal-export-btn" type="button">
           💾 내 식사 기록 내보내기 (CSV)
         </button>
@@ -2133,8 +2133,8 @@ async function _logClick(type, menu) {
         </div>
       </div>
 
-      <!-- 전체 초기화 버튼 — 기록이 1건 이상일 때만 노출 (loadMealLogs에서 토글) -->
-      <button id="mealLogResetBtn" type="button" onclick="resetMealLogs()"
+      <!-- 전체 초기화 버튼 — 영구 숨김 (정책: 사용자에게 노출하지 않음. 함수는 보존, 향후 복구 가능) -->
+      <button id="mealLogResetBtn" type="button" onclick="resetMealLogs()" data-force-hidden="1"
         style="display:none;width:100%;padding:10px;background:none;border:1px solid #ffcdd2;border-radius:8px;color:#e57373;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;">
         🗑️ 전체 기록 초기화
       </button>
@@ -2190,7 +2190,7 @@ async function _logClick(type, menu) {
         <span class="ccc-icon">💊</span>
       </div>
       <div class="ccc-title">식사기록 → 건강리포트 → 픽헬스</div>
-      <div class="ccc-desc">채널 추가하면 기기가 바뀌어도 기록이 자동 복구돼요 🔐</div>
+      <div class="ccc-desc">소중한 식습관 기록을 안전하게 보존하기 위해<br>카카오 로그인을 권장합니다.<br>별도 회원가입이 아닌, 기록 보호를 위한 간편 인증이에요 🔐</div>
     </div>
     <div class="ccc-right">
       <button class="ccc-btn" id="channelBtn" type="button" onclick="linkKakaoChannel('channel_card')">🔐<br>영구<br>보호</button>
@@ -5117,11 +5117,11 @@ async function loadMealLogs(){
     renderMealLogList(logs, byDate);
     updateMealProgress(logs.length);
     const resetBtn=document.getElementById("mealLogResetBtn");
-    if(resetBtn)resetBtn.style.display=logs.length?"block":"none";
+    // 전체 초기화 버튼 영구 숨김 (정책 변경 — UI 노출 중단, 함수는 보존)
+    if(resetBtn)resetBtn.style.display="none";
     const exportSec=document.getElementById("mealExportSection");
-    // 카카오 연동 사용자는 서버에서 자동 백업되므로 CSV 내보내기 버튼 숨김
-    const isKakaoLinked = (function(){ try{ return localStorage.getItem(FP_LS_KAKAO)==="1"; }catch(_){ return false; } })();
-    if(exportSec)exportSec.style.display = (logs.length && !isKakaoLinked) ? "block" : "none";
+    // CSV 내보내기 버튼 영구 숨김 (정책 변경 — UI 노출 중단, 함수는 보존)
+    if(exportSec)exportSec.style.display="none";
     // 삭제 복구 토글 — 30일 내 삭제 항목 1건 이상이면 노출
     _refreshDeletedToggle();
     // 픽헬스 활성화 카드 갱신
