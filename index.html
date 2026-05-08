@@ -12,6 +12,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="픽푸드">
 <link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="icon" type="image/png" href="/icon-192.png">
+<link rel="shortcut icon" href="/icon-192.png">
 <title>오늘은 뭐 먹을까? 🍽️</title>
 <!--
   ╔══════════════════════════════════════════════════╗
@@ -895,9 +897,12 @@ body{
 .h-chip.glu.on{background:#FFE5D6;border-color:var(--orange);color:#B47A0F;}
 .h-chip.chol.on{background:#FFF4D2;border-color:var(--gold);color:#B47A0F;}
 .h-chip.goal.on{background:#DDF1E1;border-color:var(--green);color:#2E7E47;}
-/* 다중선택 — 가족력 / 알레르기 */
+/* 다중선택 — 가족력 / 알레르기 / 생활습관 */
 .h-chip.fam.on{background:#FCE2E8;border-color:#E63988;color:#A8235E;}
 .h-chip.alg.on{background:#F4E6FF;border-color:var(--purple);color:#5A2DA8;}
+.h-chip.lifestyle.on{background:#E8F0FF;border-color:#3949AB;color:#1A237E;}
+/* 별도 토글 — 혈압약 복용 (혈압 상태와 독립). 약 계열 빨강 톤. */
+.h-chip.bp-meds.on{background:#FFE0DA;border-color:var(--red);color:#C2392C;}
 .h-clear{
   margin-top:4px;font-size:12px;color:var(--text3);
   background:none;border:none;cursor:pointer;text-decoration:underline;
@@ -5899,21 +5904,13 @@ async function _quickLog(mealType){
   let success=false;
   let lastErr='';
   try{
-    let {status, j}=await _post(mealType);
-    // 같은 끼니 슬롯이 이미 차 있으면 ('snack' 으로 폴백 후 재시도) — 누적 기록을 막지 않게.
-    if(status===409 && j && j.code==='DUPLICATE' && mealType!=='snack'){
-      if(typeof _ga==="function")_ga("quick_log_slot_full",{menu:curMenu.n, meal_type:mealType});
-      ({status, j}=await _post('snack'));
-      mealType='snack';
-    }
-    if(status>=200 && status<300 && j && j.success){
-      if(j.duplicate){
-        dup=true;
-        if(typeof toast==="function")toast("이미 기록된 메뉴예요 📋");
-      }else{
-        success=true;
-        if(typeof toast==="function")toast(`✅ ${curMenu.n} 기록됐어요!`);
-      }
+    const {status, j}=await _post(mealType);
+    if(status===409 && j && j.code==='DUPLICATE'){
+      dup=true;
+      if(typeof toast==="function")toast("오늘 이미 기록된 메뉴예요 📋");
+    }else if(status>=200 && status<300 && j && j.success){
+      success=true;
+      if(typeof toast==="function")toast(`✅ ${curMenu.n} 기록됐어요!`);
     }else{
       lastErr=(j&&j.error)||`HTTP ${status}`;
       if(typeof toast==="function")toast(j?.error||"기록에 실패했어요. 다시 시도해주세요.");
