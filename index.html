@@ -1578,7 +1578,7 @@ async function _logClick(type, menu) {
 <!-- HERO -->
 <div class="hero">
   <span class="hero-icon">🍽️</span>
-  <h1>맞춤 메뉴 추천으로 나의 식습관을<br>알고, 개선하고, 건강해지자</h1>
+  <h1>오늘은 뭐 먹을까</h1>
   <p class="hero-sub">내 건강정보를 기반으로 한 맞춤 메뉴 추천</p>
   <div class="badge-row">
 
@@ -1620,15 +1620,6 @@ async function _logClick(type, menu) {
     </div>
   </div>
 
-  <!-- ① 직접 입력 — 직전 식사는 컨텍스트 칩 아래 별도 카드로 이동됨 -->
-  <div class="card">
-    <div class="sl">✏️ 추천받지 않고 내가 직접 입력하기</div>
-    <div class="irow">
-      <input class="minput" id="directInput" type="search" name="search-direct-pick" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="예: 김치찌개, 스테이크, 마라탕..." onkeydown="if(event.key==='Enter') directPick()" style="flex:1;min-width:0;">
-      <button class="bgo" onclick="directPick()" style="flex-shrink:0;">바로 →</button>
-    </div>
-  </div>
-
   <!-- 📋 기본 정보를 선택해 주세요 (필수 5개) -->
   <div class="basic-info-header" style="margin:14px 0 8px;padding:10px 4px;font-size:14px;font-weight:800;color:#FF6B35;letter-spacing:.3px;">
     📋 기본 정보를 선택해 주세요
@@ -1640,7 +1631,6 @@ async function _logClick(type, menu) {
     <div class="trow" id="gRow">
       <div class="tog" data-g="M" onclick="selG(this)">👨 남성</div>
       <div class="tog" data-g="F" onclick="selG(this)">👩 여성</div>
-      <div class="tog" data-g="N" onclick="selG(this)">선택안함</div>
     </div>
   </div>
 
@@ -1657,31 +1647,16 @@ async function _logClick(type, menu) {
     </div>
   </div>
 
-  <!-- ③++ 직전 식사 (선택 · 추천 영양 균형 반영) -->
-  <div class="card last-meal-card">
-    <div class="sl" style="color:#FF6B35;font-weight:700;">🍽️ 직전 식사가 뭐였나요? <span style="font-size:11px;color:var(--text3);font-weight:700;margin-left:4px;">(선택사항)</span></div>
-    <div class="dm-row" style="display:flex;align-items:center;gap:8px;margin-top:8px;">
-      <div class="dm-acwrap">
-        <input id="lmInput" type="search" name="search-meal-prev" maxlength="200" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="직전에 드신 음식을 검색하세요"
-          style="width:100%;padding:10px 12px;border:1px solid #FFE3CC;border-radius:10px;font-size:13px;background:#fff;outline:none;">
-        <div class="dm-ac" id="lmAc"></div>
-      </div>
-      <span class="dm-tag" id="lmTag"></span>
-      <button type="button" id="lmClear" onclick="clearLastMeal()"
-        style="display:none;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text2);font-size:11.5px;font-weight:700;cursor:pointer;">지우기</button>
-    </div>
-  </div>
-
-  <!-- ④ 건강목표 (필수) -->
+  <!-- ④ 건강목표 (필수, 최대 2개) -->
   <div class="card">
-    <div class="sl">🎯 건강 목표 <span class="health-item-hint">(1개 선택)</span></div>
-    <div class="h-chips" id="hGoalChips" style="margin-top:8px;">
-      <div class="h-chip goal" data-v="체중감량" onclick="selHealthSingle(this,'goal')">체중감량</div>
-      <div class="h-chip goal" data-v="근육증가" onclick="selHealthSingle(this,'goal')">근육증가</div>
-      <div class="h-chip goal" data-v="건강유지" onclick="selHealthSingle(this,'goal')">건강유지</div>
-      <div class="h-chip goal" data-v="피로회복" onclick="selHealthSingle(this,'goal')">피로회복</div>
-      <div class="h-chip goal" data-v="혈당관리" onclick="selHealthSingle(this,'goal')">혈당관리</div>
-      <div class="h-chip goal" data-v="소화개선" onclick="selHealthSingle(this,'goal')">소화개선</div>
+    <div class="sl">🎯 건강 목표 <span class="health-item-hint">(2개까지 선택 가능)</span></div>
+    <div class="h-chips multi" id="hGoalChips" style="margin-top:8px;">
+      <div class="h-chip goal" data-v="체중감량" onclick="selHealthGoal(this)">체중감량</div>
+      <div class="h-chip goal" data-v="근육증가" onclick="selHealthGoal(this)">근육증가</div>
+      <div class="h-chip goal" data-v="건강유지" onclick="selHealthGoal(this)">건강유지</div>
+      <div class="h-chip goal" data-v="피로회복" onclick="selHealthGoal(this)">피로회복</div>
+      <div class="h-chip goal" data-v="혈당관리" onclick="selHealthGoal(this)">혈당관리</div>
+      <div class="h-chip goal" data-v="소화개선" onclick="selHealthGoal(this)">소화개선</div>
     </div>
   </div>
 
@@ -2907,7 +2882,9 @@ async function withdrawHealthConsent(){
 }
 let selHealth={
   height:null,weight:null,
-  bp:null,glu:null,chol:null,goal:null,
+  bp:null,glu:null,chol:null,
+  // 건강목표 — 최대 2개 다중 선택 (배열). 단일 선택 호환을 위해 selHealthGoal 사용.
+  goal:[],
   fam:[],alg:[],
   // 활동량: ''|'sedentary'|'light'|'moderate'|'active'
   activity:"",
@@ -2916,6 +2893,25 @@ let selHealth={
   // 생활 습관 (다중): 흡연/음주/수면부족/스트레스높음/해당없음
   lifestyle:[]
 };
+// 건강목표 — 최대 2개 토글. 이미 2개일 때 신규 클릭은 토스트.
+function selHealthGoal(el){
+  const v=el.dataset.v;
+  const arr=Array.isArray(selHealth.goal)?selHealth.goal.slice():[];
+  const i=arr.indexOf(v);
+  if(i>=0){
+    arr.splice(i,1);
+    el.classList.remove("on");
+  }else{
+    if(arr.length>=2){
+      if(typeof toast==="function")toast("최대 2개까지 선택할 수 있어요");
+      return;
+    }
+    arr.push(v);
+    el.classList.add("on");
+  }
+  selHealth.goal=arr;
+  snd("click");saveHealth();
+}
 function _bmiCategory(bmi){
   if(bmi<18.5)return{label:"저체중",cls:"h-bmi-low"};
   if(bmi<23)  return{label:"정상",  cls:"h-bmi-normal"};
@@ -3054,9 +3050,14 @@ function loadHealth(){
     if(!raw)return;
     const d=JSON.parse(raw);
     if(!d||typeof d!=="object")return;
+    // 건강목표 — 신/구 데이터 호환: 배열 그대로, 문자열은 콤마로 분리, 빈 값은 빈 배열
+    const _goalArr=Array.isArray(d.goal)
+      ? d.goal.filter(Boolean)
+      : (typeof d.goal==='string' && d.goal ? d.goal.split(',').map(s=>s.trim()).filter(Boolean) : []);
     selHealth={
       height:d.height||null,weight:d.weight||null,
-      bp:d.bp||null,glu:d.glu||null,chol:d.chol||null,goal:d.goal||null,
+      bp:d.bp||null,glu:d.glu||null,chol:d.chol||null,
+      goal:_goalArr.slice(0,2),
       fam:Array.isArray(d.fam)?d.fam:[],
       alg:Array.isArray(d.alg)?d.alg:[],
       activity:d.activity||"",
@@ -3082,7 +3083,7 @@ function loadHealth(){
     restoreSingle("hBpChips",selHealth.bp);
     restoreSingle("hGluChips",selHealth.glu);
     restoreSingle("hCholChips",selHealth.chol);
-    restoreSingle("hGoalChips",selHealth.goal);
+    restoreMulti("hGoalChips",selHealth.goal);
     restoreMulti("hFamChips",selHealth.fam);
     restoreMulti("hAlgChips",selHealth.alg);
     restoreMulti("hLifestyleChips",selHealth.lifestyle);
@@ -3108,7 +3109,7 @@ function loadHealth(){
   }catch(e){}
 }
 function clearHealth(){
-  selHealth={height:null,weight:null,bp:null,glu:null,chol:null,goal:null,fam:[],alg:[],activity:"",pregnancy:"",lifestyle:[]};
+  selHealth={height:null,weight:null,bp:null,glu:null,chol:null,goal:[],fam:[],alg:[],activity:"",pregnancy:"",lifestyle:[]};
   document.getElementById("hHeight").value="";
   document.getElementById("hWeight").value="";
   document.getElementById("hBmiDisplay").style.display="none";
@@ -3128,7 +3129,8 @@ function toggleHealth(){
 function getHealthInfo(){
   const h=selHealth;
   const bmi=_calcBmi(h.height,h.weight);
-  const has=h.height||h.weight||h.bp||h.glu||h.chol||h.goal
+  const goalArr=Array.isArray(h.goal)?h.goal.filter(Boolean):(h.goal?[h.goal]:[]);
+  const has=h.height||h.weight||h.bp||h.glu||h.chol||goalArr.length
           ||(h.fam&&h.fam.length)||(h.alg&&h.alg.length)
           ||h.activity||h.pregnancy||(h.lifestyle&&h.lifestyle.length);
   if(!has)return null;
@@ -3140,7 +3142,7 @@ function getHealthInfo(){
     bp:h.bp||null,
     glucose:h.glu||null,
     cholesterol:h.chol||null,
-    goal:h.goal||null,
+    goal:goalArr,
     family:Array.isArray(h.fam)?h.fam:[],
     allergy:Array.isArray(h.alg)?h.alg:[],
     activity:h.activity||"",
@@ -3152,8 +3154,11 @@ function getHealthInfo(){
 function _getHealthInfo(){return getHealthInfo();}
 function renderHealthBadge(){
   const info=_getHealthInfo();
-  if(!info||!info.goal)return '';
-  return `<div class="health-badge" style="margin:0 0 10px;padding:9px 12px;border-radius:10px;background:linear-gradient(135deg,#FFF4E8,#FFE9D4);border:1px solid #FFD4A8;color:#B85C1A;font-size:12px;font-weight:800;text-align:center;">✨ ${info.goal} 목표를 고려한 추천이에요</div>`;
+  if(!info)return '';
+  const goals=Array.isArray(info.goal)?info.goal.filter(Boolean):(info.goal?[info.goal]:[]);
+  if(!goals.length)return '';
+  const label=goals.length>=2?goals.join(' · '):goals[0];
+  return `<div class="health-badge" style="margin:0 0 10px;padding:9px 12px;border-radius:10px;background:linear-gradient(135deg,#FFF4E8,#FFE9D4);border:1px solid #FFD4A8;color:#B85C1A;font-size:12px;font-weight:800;text-align:center;">✨ ${label} 목표를 고려한 추천이에요</div>`;
 }
 // 카테고리 카드로 부드럽게 스크롤 (자연어 입력/다시추천 흐름 공통 사용)
 function scrollToCategory(){
@@ -3279,8 +3284,16 @@ async function _restoreHealthFromServer(){
     restoreSingle('hGluChips',d.blood_sugar,'glu');
     // 콜레스테롤
     restoreSingle('hCholChips',d.cholesterol,'chol');
-    // 건강목표
-    restoreSingle('hGoalChips',d.health_goal,'goal');
+    // 건강목표 — 다중(최대 2개) CSV → 배열
+    restoreMulti('hGoalChips',d.health_goal,'goal');
+    // 2개 초과로 들어온 경우 안전 컷오프
+    if(Array.isArray(selHealth.goal)&&selHealth.goal.length>2){
+      selHealth.goal=selHealth.goal.slice(0,2);
+      const allow=new Set(selHealth.goal);
+      document.querySelectorAll('#hGoalChips .h-chip').forEach(c=>{
+        c.classList.toggle('on', allow.has(c.dataset.v));
+      });
+    }
 
     // 가족력
     restoreMulti('hFamChips',d.family_history,'fam');
@@ -3318,7 +3331,7 @@ async function _restoreHealthFromServer(){
         bp:selHealth.bp||null,
         glu:selHealth.glu||null,
         chol:selHealth.chol||null,
-        goal:selHealth.goal||null,
+        goal:Array.isArray(selHealth.goal)?selHealth.goal:[],
         fam:Array.isArray(selHealth.fam)?selHealth.fam:[],
         alg:Array.isArray(selHealth.alg)?selHealth.alg:[],
         activity:selHealth.activity||"",
@@ -5508,10 +5521,8 @@ function toggleDailyMeal(){
 }
 function quickPickAlt(name){
   if(!name)return;
-  const inp=document.getElementById("directInput");
-  if(inp)inp.value=name;
   if(typeof _ga==="function")_ga("ai_alt_pick",{name});
-  if(typeof directPick==="function")directPick();
+  if(typeof directPick==="function")directPick(name);
   setTimeout(()=>{document.getElementById("resultCard")?.scrollIntoView({behavior:"smooth",block:"start"});},120);
 }
 
@@ -5735,12 +5746,16 @@ function resetAll(){
   if(typeof _ga==="function")_ga("reset_all",{});
 }
 
-function directPick(){
+function directPick(nameArg){
   if (!_dbReady || !DB.length) {
     if (typeof toast === 'function') toast('⏳ 메뉴 DB 로드 중...');
     return;
   }
-  const val=document.getElementById("directInput").value.trim();
+  // 직접입력 카드는 제거됐지만 quickPickAlt(AI 대안 클릭) 경로 호환을 위해 인자 우선 사용
+  const inpEl=document.getElementById("directInput");
+  const val=(typeof nameArg==='string'&&nameArg.trim())
+    ? nameArg.trim()
+    : (inpEl ? (inpEl.value||'').trim() : '');
   if(!val){toast("메뉴 이름을 입력해주세요 😊");return;}
   snd("click");
   const match=DB.find(m=>m.n.includes(val)||val.includes(m.n));
@@ -5750,7 +5765,7 @@ function directPick(){
       related:[{icon:"🛒",label:val+" 밀키트",sub:"쿠팡 검색",q:val+" 밀키트",cls:"rel-milkit",tag:"HOT"},{icon:"🥬",label:val+" 재료",sub:"신선 식재료",q:val+" 재료",cls:"rel-ingred",tag:null},{icon:"🫙",label:val+" 소스",sub:"전용 소스",q:val+" 소스",cls:"rel-sauce",tag:null},{icon:"🍳",label:"조리 도구",sub:"필요한 주방 도구",q:"주방 도구",cls:"rel-tool",tag:null}]};
     showResult(custom,scoredPool(DB.filter(m=>!used.includes(m.n))).slice(0,3));
   }
-  document.getElementById("directInput").value="";
+  if(inpEl)inpEl.value="";
 }
 
 /* ============================================================
@@ -5787,14 +5802,22 @@ function _recommendForNutrient(nutrient){
   setTimeout(()=>{ if(typeof pickMenu==="function")pickMenu(); }, 500);
 }
 
-/* ── 추천→선택/다시추천 — "이 메뉴를 드실 건가요?" + ✅선택/🔄다시추천 ── */
+/* ── 추천→선택/다시추천 — "「{메뉴명}」 드실 건가요?" + ✅선택/🔄다시추천 ── */
+function _escHtml(s){
+  return String(s||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
 function _renderQuickLogBtn(){
   if(!curMenu)return;
   const wrap=document.getElementById("quickLogWrap");
   if(!wrap)return;
+  // 메뉴명 동적 삽입 — curMenu.n 우선, 없으면 fallback
+  const menuName=(curMenu&&curMenu.n)?String(curMenu.n).trim():'';
+  const titleHtml=menuName
+    ? `<span style="color:#FF6B35;">「${_escHtml(menuName)}」</span> 드실 건가요?`
+    : `이 메뉴를 드실 건가요?`;
   wrap.innerHTML=`
     <div class="qls-section" style="text-align:center;">
-      <div class="qls-title" style="font-size:15px;font-weight:800;color:#FF6B35;margin-bottom:10px;">이 메뉴를 드실 건가요?</div>
+      <div class="qls-title" style="font-size:15px;font-weight:800;color:#7A6E62;margin-bottom:10px;">${titleHtml}</div>
       <div class="qls-meal-btns" style="display:flex;gap:8px;">
         <button id="selectThisMenu" class="btn-select-menu qls-btn" type="button" onclick="_selectThisMenu()" style="flex:2;padding:14px;border:none;border-radius:11px;background:linear-gradient(135deg,#4CAF7D,#2E9E6B);color:#fff;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(76,175,125,.28);">✅ 이 메뉴로 선택</button>
         <button id="retryRecommend" class="btn-retry qls-btn" type="button" onclick="_retryRecommend()" style="flex:1;padding:14px;border:1.5px solid #FFE3CC;border-radius:11px;background:#fff;color:#FF6B35;font-size:14px;font-weight:800;cursor:pointer;">🔄 다시 추천</button>
