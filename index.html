@@ -525,8 +525,7 @@ body{
 .mli-meal-icon{font-size:18px;flex-shrink:0;}
 .mli-name{flex:1;font-size:14px;font-weight:700;color:#1F1C18;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .mli-kcal{font-size:13px;font-weight:700;color:#FF6B35;flex-shrink:0;}
-.mli-source{font-size:11px;color:#aaa;flex-shrink:0;}
-.mli-del{background:none;border:none;color:#ddd;font-size:20px;cursor:pointer;padding:0 5px;line-height:1;flex-shrink:0;}
+.mli-del{background:none;border:none;color:#ff6b6b;font-size:12px;cursor:pointer;padding:0 5px;line-height:1;flex-shrink:0;}
 .mli-del:hover{color:#e57373;}
 .meal-log-more-btn{width:100%;padding:12px;background:none;border:1px dashed #ccc;border-radius:10px;color:#888;font-size:13px;cursor:pointer;margin-top:6px;font-family:inherit;}
 .meal-log-more-btn:hover{border-color:#4CAF7D;color:#4CAF7D;}
@@ -1727,12 +1726,16 @@ async function _logClick(type, menu) {
         <div class="health-section-title">💊 건강 상태</div>
 
         <div class="health-item">
-          <div class="health-item-label">❤️ 혈압 <span class="health-item-hint">(1개 선택)</span></div>
+          <div class="health-item-label">❤️ 혈압 <span class="health-item-hint">(상태 1개 + 약 복용은 별도 토글)</span></div>
           <div class="h-chips" id="hBpChips">
             <div class="h-chip bp" data-v="정상" onclick="selHealthSingle(this,'bp')">정상</div>
             <div class="h-chip bp" data-v="높음" onclick="selHealthSingle(this,'bp')">높음</div>
             <div class="h-chip bp" data-v="낮음" onclick="selHealthSingle(this,'bp')">낮음</div>
             <div class="h-chip bp" data-v="모름" onclick="selHealthSingle(this,'bp')">모름</div>
+          </div>
+          <!-- 혈압약 복용 — 상태(높음/낮음/모름)와 중복 선택 가능. 단독 토글로 처리. -->
+          <div class="h-chips" id="hBpMedsChips" style="margin-top:6px;">
+            <div class="h-chip bp-meds" data-v="meds" onclick="selHealthBpMeds(this)">💊 혈압약 복용중</div>
           </div>
         </div>
 
@@ -1750,6 +1753,7 @@ async function _logClick(type, menu) {
           <div class="health-item-label">🥛 콜레스테롤 <span class="health-item-hint">(1개 선택)</span></div>
           <div class="h-chips" id="hCholChips">
             <div class="h-chip chol" data-v="정상" onclick="selHealthSingle(this,'chol')">정상</div>
+            <div class="h-chip chol" data-v="경계" onclick="selHealthSingle(this,'chol')">경계</div>
             <div class="h-chip chol" data-v="높음" onclick="selHealthSingle(this,'chol')">높음</div>
             <div class="h-chip chol" data-v="모름" onclick="selHealthSingle(this,'chol')">모름</div>
           </div>
@@ -2875,7 +2879,9 @@ async function withdrawHealthConsent(){
 }
 let selHealth={
   height:null,weight:null,
-  bp:null,glu:null,chol:null,
+  // bp: 정상/높음/낮음/모름 (단일), bpMeds: true/false (혈압약 복용 — 별도 토글)
+  bp:null,bpMeds:false,
+  glu:null,chol:null,
   // 건강목표 — 최대 2개 다중 선택 (배열). 단일 선택 호환을 위해 selHealthGoal 사용.
   goal:[],
   fam:[],alg:[],
@@ -2886,6 +2892,13 @@ let selHealth={
   // 생활 습관 (다중): 흡연/음주/수면부족/스트레스높음/해당없음
   lifestyle:[]
 };
+// 혈압약 복용 토글 — 상태(bp)와 독립. 클릭 시 on/off, 칩 .on 클래스 동기.
+function selHealthBpMeds(el){
+  const wasOn=el.classList.contains("on");
+  if(wasOn){el.classList.remove("on");selHealth.bpMeds=false;}
+  else{el.classList.add("on");selHealth.bpMeds=true;}
+  snd("click");saveHealth();
+}
 // 건강목표 — 최대 2개 토글. 이미 2개일 때 신규 클릭은 토스트.
 function selHealthGoal(el){
   const v=el.dataset.v;
@@ -3047,9 +3060,14 @@ function loadHealth(){
     const _goalArr=Array.isArray(d.goal)
       ? d.goal.filter(Boolean)
       : (typeof d.goal==='string' && d.goal ? d.goal.split(',').map(s=>s.trim()).filter(Boolean) : []);
+    // 혈압약 복용 — 신/구 데이터 호환: bpMeds(boolean) 우선, 없으면 옛 'bp=혈압약복용' 단일칩 모델 흡수
+    let _bpVal=d.bp||null;
+    let _bpMeds=!!d.bpMeds;
+    if(_bpVal==='혈압약복용'){_bpMeds=true;_bpVal=null;}
     selHealth={
       height:d.height||null,weight:d.weight||null,
-      bp:d.bp||null,glu:d.glu||null,chol:d.chol||null,
+      bp:_bpVal,bpMeds:_bpMeds,
+      glu:d.glu||null,chol:d.chol||null,
       goal:_goalArr.slice(0,2),
       fam:Array.isArray(d.fam)?d.fam:[],
       alg:Array.isArray(d.alg)?d.alg:[],
@@ -3080,6 +3098,11 @@ function loadHealth(){
     restoreMulti("hFamChips",selHealth.fam);
     restoreMulti("hAlgChips",selHealth.alg);
     restoreMulti("hLifestyleChips",selHealth.lifestyle);
+    // 혈압약 복용 — 별도 토글 칩 활성화
+    if(selHealth.bpMeds){
+      const m=document.querySelector('#hBpMedsChips .h-chip');
+      if(m)m.classList.add('on');
+    }
     // 활동량 / 임신·수유 — 칩 클래스 동일하게 .on 토글
     if(selHealth.activity){
       document.querySelectorAll("#hActChips .activity-chip").forEach(c=>{
@@ -3102,11 +3125,11 @@ function loadHealth(){
   }catch(e){}
 }
 function clearHealth(){
-  selHealth={height:null,weight:null,bp:null,glu:null,chol:null,goal:[],fam:[],alg:[],activity:"",pregnancy:"",lifestyle:[]};
+  selHealth={height:null,weight:null,bp:null,bpMeds:false,glu:null,chol:null,goal:[],fam:[],alg:[],activity:"",pregnancy:"",lifestyle:[]};
   document.getElementById("hHeight").value="";
   document.getElementById("hWeight").value="";
   document.getElementById("hBmiDisplay").style.display="none";
-  document.querySelectorAll("#healthCard .h-chip.on, #hGoalChips .h-chip.on, #hActChips .h-chip.on, #hAlgChips .h-chip.on").forEach(c=>c.classList.remove("on"));
+  document.querySelectorAll("#healthCard .h-chip.on, #hGoalChips .h-chip.on, #hActChips .h-chip.on, #hAlgChips .h-chip.on, #hBpMedsChips .h-chip.on").forEach(c=>c.classList.remove("on"));
   try{localStorage.removeItem(HEALTH_LS_KEY);}catch(e){}
   toast("건강정보를 모두 지웠어요");
 }
@@ -3123,7 +3146,7 @@ function getHealthInfo(){
   const h=selHealth;
   const bmi=_calcBmi(h.height,h.weight);
   const goalArr=Array.isArray(h.goal)?h.goal.filter(Boolean):(h.goal?[h.goal]:[]);
-  const has=h.height||h.weight||h.bp||h.glu||h.chol||goalArr.length
+  const has=h.height||h.weight||h.bp||h.bpMeds||h.glu||h.chol||goalArr.length
           ||(h.fam&&h.fam.length)||(h.alg&&h.alg.length)
           ||h.activity||h.pregnancy||(h.lifestyle&&h.lifestyle.length);
   if(!has)return null;
@@ -3133,6 +3156,7 @@ function getHealthInfo(){
     bmi:bmi,
     bmiCategory:bmi?_bmiCategory(bmi).label:null,
     bp:h.bp||null,
+    bpMeds:!!h.bpMeds,
     glucose:h.glu||null,
     cholesterol:h.chol||null,
     goal:goalArr,
@@ -3268,10 +3292,19 @@ async function _restoreHealthFromServer(){
       selHealth[stateKey]=arr.filter(v=>v!=='없음');
     };
 
-    // 혈압: blood_pressure_meds가 켜져 있으면 '혈압약복용' 칩을 강제 선택 (UI 단일 모델)
+    // 혈압: 상태(bp)와 약 복용(bpMeds)을 분리해 각각 복원.
+    // 레거시 '혈압약복용' 단일 칩 데이터가 들어오면 약 복용으로만 흡수하고 상태는 '높음'으로 추정.
     let bpVal=d.blood_pressure||null;
-    if(d.blood_pressure_meds)bpVal='혈압약복용';
+    let bpMeds=!!d.blood_pressure_meds;
+    if(bpVal==='혈압약복용'){bpMeds=true;bpVal='높음';}
     restoreSingle('hBpChips',bpVal,'bp');
+    if(bpMeds){
+      const m=document.querySelector('#hBpMedsChips .h-chip');
+      if(m)m.classList.add('on');
+      selHealth.bpMeds=true;
+    }else{
+      selHealth.bpMeds=false;
+    }
 
     // 혈당
     restoreSingle('hGluChips',d.blood_sugar,'glu');
@@ -3322,6 +3355,7 @@ async function _restoreHealthFromServer(){
         height:selHealth.height||null,
         weight:selHealth.weight||null,
         bp:selHealth.bp||null,
+        bpMeds:!!selHealth.bpMeds,
         glu:selHealth.glu||null,
         chol:selHealth.chol||null,
         goal:Array.isArray(selHealth.goal)?selHealth.goal:[],
@@ -5133,7 +5167,6 @@ function renderMealLogList(logs, byDate){
             const emoji=_MLOG_TYPE_EMOJI[t]||"🍽️";
             const kor=_MLOG_TYPE_KOR[t]||t;
             const kcal=l.kcal||_LM_CAT_KCAL[l.menu_category]||500;
-            const src=l.source==="db"?"DB ✓":"직접입력";
             // 반찬 태그 (있을 때만): 🥬채소 🥚계란 …
             const sides=(l.side_dishes||"").split(",").map(s=>s.trim()).filter(s=>_SIDE_EMOJI[s]);
             const sidesHtml=sides.length
@@ -5144,8 +5177,7 @@ function renderMealLogList(logs, byDate){
               <span class="mli-name">${_mlogEsc(l.menu_name)}</span>
               ${sidesHtml}
               <span class="mli-kcal">${kcal}kcal</span>
-              <span class="mli-source">${src}</span>
-              <button class="mli-del" type="button" onclick="deleteMealLog(${l.id})" aria-label="삭제">×</button>
+              <button class="mli-del" type="button" onclick="deleteMealLog(${l.id})" aria-label="삭제">삭제</button>
             </div>`;
           }).join("")}
         </div>
