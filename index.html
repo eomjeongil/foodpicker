@@ -649,6 +649,8 @@ body{
 .qls-btn{padding:12px;background:#F9FFF9;border:1.5px solid #A5D6A7;border-radius:10px;font-size:14px;font-weight:700;color:#2E7D32;cursor:pointer;transition:all .15s;font-family:inherit;}
 .qls-btn:hover{background:#E8F5E9;border-color:#4CAF7D;}
 .qls-btn:disabled{opacity:.6;cursor:default;}
+.qls-btn-unknown{grid-column:1/-1;background:#f5f5f5;border-color:#ddd;color:#888;}
+.qls-btn-unknown:hover{background:#eee;border-color:#ccc;}
 /* 리포트→추천 부족 영양소 카드 하단 버튼 */
 .rd-recommend-btn{width:100%;margin-top:10px;padding:12px;background:linear-gradient(135deg,#FF6B35,#E65100);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
 .rd-recommend-btn:hover{filter:brightness(1.05);}
@@ -778,19 +780,19 @@ body{
 .health-toggle{
   width:100%;display:flex;align-items:center;justify-content:center;text-align:center;
   padding:18px 22px;border:none;border-radius:14px;cursor:pointer;font-family:inherit;
-  background:linear-gradient(135deg,#FF6B35,#FF8C42);
+  background:linear-gradient(135deg,#4CAF7D,#2E9E6B);
   color:#fff;font-weight:800;font-size:16px;letter-spacing:.3px;line-height:1.5;
-  box-shadow:0 6px 20px rgba(255,107,53,.35);
+  box-shadow:0 6px 20px rgba(76,175,125,.35);
   transition:transform .18s ease, box-shadow .18s ease, filter .18s;
 }
-.health-toggle:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(255,107,53,.45);filter:brightness(1.03);}
-.health-toggle:active{transform:translateY(0);box-shadow:0 4px 14px rgba(255,107,53,.3);}
+.health-toggle:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(76,175,125,.45);filter:brightness(1.03);}
+.health-toggle:active{transform:translateY(0);box-shadow:0 4px 14px rgba(76,175,125,.3);}
 .health-toggle .ht-state{display:inline-flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;}
 .health-toggle .ht-hint{font-size:11.5px;font-weight:700;color:rgba(255,255,255,.92);letter-spacing:.2px;}
 .health-toggle .ht-open{display:none;}
 .health-card.open .health-toggle{
-  background:linear-gradient(135deg,#E8552A,#F0763B);
-  box-shadow:0 4px 14px rgba(255,107,53,.3);
+  background:linear-gradient(135deg,#2E9E6B,#1B7A52);
+  box-shadow:0 4px 14px rgba(76,175,125,.3);
 }
 .health-card.open .ht-closed{display:none;}
 .health-card.open .ht-open{display:inline-flex;}
@@ -1161,8 +1163,9 @@ body{
   padding:14px 16px;margin-bottom:8px;
 }
 .ccc-left{flex:1;min-width:0;}
-.ccc-flow{font-size:20px;margin-bottom:4px;display:flex;align-items:center;gap:4px;}
-.ccc-arrow{font-size:13px;color:#aaa;}
+.ccc-flow{margin-bottom:4px;display:flex;align-items:center;gap:4px;line-height:1;}
+.ccc-icon{font-size:20px;line-height:1;display:inline-flex;align-items:center;}
+.ccc-arrow{font-size:13px;color:#bbb;line-height:1;display:inline-flex;align-items:center;margin:0 2px;}
 .ccc-title{font-size:12px;font-weight:800;color:#F57F17;margin-bottom:4px;}
 .ccc-desc{font-size:12px;color:#666;line-height:1.5;}
 .ccc-right{flex-shrink:0;}
@@ -1527,9 +1530,9 @@ async function _logClick(type, menu) {
   <h1>오늘은 뭐 먹을까?</h1>
   <p class="hero-sub">성별·연령·날씨·계절·시간대 맞춤 AI 메뉴 추천</p>
   <div class="badge-row">
-    <span class="badge b-gold" id="menuCountBadge">🗂️ 1073개 메뉴 DB</span>
+    
     <span class="badge b-mint">📡 날씨·계절 연동</span>
-    <span class="badge b-green">🛍️ 연관상품 직링크</span>
+    
   </div>
 </div>
 
@@ -1568,7 +1571,7 @@ async function _logClick(type, menu) {
 
   <!-- ① 직접 입력 — 직전 식사는 컨텍스트 칩 아래 별도 카드로 이동됨 -->
   <div class="card">
-    <div class="sl">✏️ 먹고 싶은 메뉴 직접 입력</div>
+    <div class="sl">✏️ 추천받지 않고 내가 직접 입력하기</div>
     <div class="irow">
       <input class="minput" id="directInput" type="search" name="search-direct-pick" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="예: 김치찌개, 스테이크, 마라탕..." onkeydown="if(event.key==='Enter') directPick()" style="flex:1;min-width:0;">
       <button class="bgo" onclick="directPick()" style="flex-shrink:0;">바로 →</button>
@@ -1581,7 +1584,7 @@ async function _logClick(type, menu) {
     <div class="trow" id="gRow">
       <div class="tog" data-g="M" onclick="selG(this)">👨 남성</div>
       <div class="tog" data-g="F" onclick="selG(this)">👩 여성</div>
-      <div class="tog sel-a" data-g="N" onclick="selG(this)">🙂 무관</div>
+      
     </div>
   </div>
 
@@ -1597,12 +1600,27 @@ async function _logClick(type, menu) {
     </div>
   </div>
 
+  <!-- ③++ 직전 식사 (선택 · 추천 영양 균형 반영) -->
+  <div class="card last-meal-card">
+    <div class="sl" style="color:#FF6B35;font-weight:700;">🍽️ 직전 식사가 뭐였나요? <span style="font-size:11px;color:var(--text3);font-weight:700;margin-left:4px;">(선택사항)</span></div>
+    <div class="dm-row" style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+      <div class="dm-acwrap">
+        <input id="lmInput" type="search" name="search-meal-prev" maxlength="200" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="직전에 드신 음식을 검색하세요"
+          style="width:100%;padding:10px 12px;border:1px solid #FFE3CC;border-radius:10px;font-size:13px;background:#fff;outline:none;">
+        <div class="dm-ac" id="lmAc"></div>
+      </div>
+      <span class="dm-tag" id="lmTag"></span>
+      <button type="button" id="lmClear" onclick="clearLastMeal()"
+        style="display:none;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text2);font-size:11.5px;font-weight:700;cursor:pointer;">지우기</button>
+    </div>
+  </div>
+
   <!-- ③½ 건강정보 (선택 · 접이식) -->
   <div class="card health-card" id="healthCard">
     <button type="button" class="health-toggle" onclick="toggleHealth()" aria-expanded="false">
       <span class="ht-state ht-closed">
         💚 건강정보 입력 (선택) ▼
-        <span class="ht-hint">*입력하면 맞춤식 메뉴를 추천합니다</span>
+        <span class="ht-hint">이 정보는 맞춤 메뉴추천은 물론 개인 건강데이터 추출의 중요 근거가 됩니다</span>
       </span>
       <span class="ht-state ht-open">💚 건강정보 입력 중 ▲</span>
     </button>
@@ -1770,21 +1788,6 @@ async function _logClick(type, menu) {
     </div>
   </div>
 
-  <!-- ③++ 직전 식사 (선택 · 추천 영양 균형 반영) -->
-  <div class="card last-meal-card">
-    <div class="sl" style="color:#FF6B35;font-weight:700;">🍽️ 직전 식사가 뭐였나요? <span style="font-size:11px;color:var(--text3);font-weight:700;margin-left:4px;">(선택사항)</span></div>
-    <div class="dm-row" style="display:flex;align-items:center;gap:8px;margin-top:8px;">
-      <div class="dm-acwrap">
-        <input id="lmInput" type="search" name="search-meal-prev" maxlength="200" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="직전에 드신 음식을 검색하세요"
-          style="width:100%;padding:10px 12px;border:1px solid #FFE3CC;border-radius:10px;font-size:13px;background:#fff;outline:none;">
-        <div class="dm-ac" id="lmAc"></div>
-      </div>
-      <span class="dm-tag" id="lmTag"></span>
-      <button type="button" id="lmClear" onclick="clearLastMeal()"
-        style="display:none;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text2);font-size:11.5px;font-weight:700;cursor:pointer;">지우기</button>
-    </div>
-  </div>
-
   <!-- ④ 카테고리 (5개 그룹 · 미선택이 기본) -->
   <div class="card" id="catCard">
     <div class="sl">🍱 카테고리</div>
@@ -1837,7 +1840,7 @@ async function _logClick(type, menu) {
 
       <!-- 🎯 AI 대안 메뉴 (왜 이 메뉴 바로 아래로 이동, 클릭 시 directPick) -->
       <div class="ai-alts-section" id="aiAltsSection" style="display:none;">
-        <div class="ai-alts-title">다른 추천 메뉴 — 탭하면 바로 추천</div>
+        <div class="ai-alts-title">다음 순위 추천메뉴 — 탭하면 1순위 메뉴로...</div>
         <div class="ai-alts-list" id="aiAltsList"></div>
       </div>
 
@@ -1846,7 +1849,7 @@ async function _logClick(type, menu) {
         <button onclick="pickAgain()" style="width:100%;padding:15px;border:1.5px solid #FFE3CC;border-radius:13px;background:#fff;color:#7A6E62;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 2px 8px rgba(255,107,53,.06);"
           onmouseover="this.style.borderColor='#FF6B35';this.style.color='#FF6B35'"
           onmouseout="this.style.borderColor='#FFE3CC';this.style.color='#7A6E62'">
-          🔁 다시 선택하기
+          🔁 다른 메뉴 추천 요청하기
         </button>
       </div>
       <!-- 처음부터 다시 선택하기 — 모든 입력 초기화 -->
@@ -1854,7 +1857,7 @@ async function _logClick(type, menu) {
         <button onclick="resetAll()" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:13px;background:#fff;color:#7A6E62;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;"
           onmouseover="this.style.borderColor='#FF6B35';this.style.color='#FF6B35'"
           onmouseout="this.style.borderColor='#ddd';this.style.color='#7A6E62'">
-          🔄 처음부터 다시 선택하기
+          🔄 처음부터 다시 추천 요청하기
         </button>
       </div>
 
@@ -2098,13 +2101,15 @@ async function _logClick(type, menu) {
     📊 내 식습관으로 내 건강 리포트 보기
   </button>
 
-  <!-- ⑦++ 카카오 채널 구독 — 가로 컴팩트 (식사기록 → 건강리포트 → 픽헬스) -->
+  <!-- ⑦++ 카카오 채널 구독 — 가로 컴팩트 -->
   <div class="channel-card-compact">
     <div class="ccc-left">
       <div class="ccc-flow">
-        🍽️<span class="ccc-arrow">→</span>
-        📊<span class="ccc-arrow">→</span>
-        💊
+        <span class="ccc-icon">🍽️</span>
+        <span class="ccc-arrow">→</span>
+        <span class="ccc-icon">📊</span>
+        <span class="ccc-arrow">→</span>
+        <span class="ccc-icon">💊</span>
       </div>
       <div class="ccc-title">식사기록 → 건강리포트 → 픽헬스</div>
       <div class="ccc-desc">채널 추가하면 기기가 바뀌어도 기록이 자동 복구돼요 🔐</div>
@@ -2489,9 +2494,6 @@ const _dbLoadPromise = fetch(DB_URL, { cache: 'force-cache' })
     _dbReady = true;
     // top-level `let`은 window에 바인딩되지 않음 — 자동완성/일일 기록 모듈이 window.DB 참조하므로 명시적으로 노출
     window.DB = DB;
-    // 메뉴 카운트 배지 동적 업데이트 (DB 추가/감소에 자동 반영)
-    const badge = document.getElementById('menuCountBadge');
-    if (badge) badge.textContent = `🗂️ ${DB.length.toLocaleString()}개 메뉴 DB`;
     console.log('[DB] loaded', DB.length, 'menus from', DB_URL);
   })
   .catch(e => {
@@ -2513,7 +2515,7 @@ const CAT_GROUP_MAP={
 };
 const CAT_GROUP_KR={kfood:"한식",asian:"아시안",wfood:"양식",health:"건강식",cafe:"간식/음료"};
 const TAG_CLS={HOT:"tag-hot",NEW:"tag-new",SALE:"tag-sale"};
-let selGend="N",selAgeV="30",selCatV="",curMenu=null;
+let selGend="",selAgeV="30",selCatV="",curMenu=null;
 let used=JSON.parse(localStorage.getItem("fp6_used")||"[]");
 let hist=JSON.parse(localStorage.getItem("fp6_hist")||"[]");
 
@@ -4354,7 +4356,7 @@ function _aiShowError(){
   const txt=document.getElementById("aiReasonText");
   const altsList=document.getElementById("aiAltsList");
   if(txt)txt.innerHTML='<div class="err-state"><span class="err-state-msg">⚠️ AI 분석을 불러오지 못했어요</span><button class="err-retry-btn" onclick="loadAiReason()">↻ 재시도</button></div>';
-  if(altsList)altsList.innerHTML='<div class="err-state"><span class="err-state-msg">⚠️ 다른 추천을 불러오지 못했어요</span><button class="err-retry-btn" onclick="loadAiReason()">↻ 재시도</button></div>';
+  if(altsList)altsList.innerHTML='<div class="err-state"><span class="err-state-msg">⚠️ 다음 순위 추천을 불러오지 못했어요</span><button class="err-retry-btn" onclick="loadAiReason()">↻ 재시도</button></div>';
 }
 async function loadAiReason(){
   if(!curMenu)return;
@@ -5391,10 +5393,9 @@ function pickAgain(){
 /* ── 처음부터 다시 선택하기 — 모든 입력/상태 초기화 ── */
 function resetAll(){
   // 1) 컨텍스트 토글 — 초기 기본값으로 복원
-  selGend="N";
+  selGend="";
   document.querySelectorAll("#gRow .tog").forEach(t=>{
     t.classList.remove("sel-m","sel-f","sel-a");
-    if(t.dataset.g==="N")t.classList.add("sel-a");
   });
   selAgeV="30";
   document.querySelectorAll("#aRow .tog").forEach(t=>{
@@ -5511,18 +5512,20 @@ function _renderQuickLogBtn(){
   if(!wrap)return;
   wrap.innerHTML=`
     <div class="quick-log-section">
-      <div class="qls-title">이 메뉴 드시나요?</div>
+      <div class="qls-title">이 메뉴를 드신다면 언제 드시나요?</div>
       <div class="qls-meal-btns">
         <button class="qls-btn" type="button" onclick="_quickLog('breakfast')">🌅 아침</button>
         <button class="qls-btn" type="button" onclick="_quickLog('lunch')">☀️ 점심</button>
         <button class="qls-btn" type="button" onclick="_quickLog('dinner')">🌙 저녁</button>
-        <button class="qls-btn" type="button" onclick="_quickLog('snack')">🍪 간식</button>
+        <button class="qls-btn" type="button" onclick="_quickLog('snack')">🍪 간식(야식)</button>
+        <button class="qls-btn qls-btn-unknown" type="button" onclick="_quickLog('unknown')">❓ 미확정</button>
       </div>
     </div>`;
   wrap.style.display="block";
 }
 async function _quickLog(mealType){
   if(!curMenu){toast("먼저 메뉴를 추천받아 주세요!");return;}
+  if(mealType==='unknown')mealType='dinner';
   const today=new Date().toISOString().slice(0,10);
   // 즉시 더블클릭 방지 — 클릭한 버튼만 disable
   const btns=document.querySelectorAll("#quickLogWrap .qls-btn");
