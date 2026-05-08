@@ -643,13 +643,44 @@ body{
 .streak-sub{font-size:12px;color:#888;}
 .meal-streak-bar{text-align:center;font-size:14px;font-weight:800;color:#E65100;background:#FFF8E1;border-radius:8px;padding:9px;margin:6px 0;}
 /* 추천→기록 원스텝 (결과 카드 내) */
-.quick-log-section{padding:14px 0 5px;border-top:1px solid #f0f0f0;margin-top:8px;}
-.qls-title{font-size:14px;font-weight:800;color:#333;margin-bottom:8px;text-align:center;}
-.qls-meal-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-.qls-btn{padding:12px;background:#F9FFF9;border:1.5px solid #A5D6A7;border-radius:10px;font-size:14px;font-weight:700;color:#2E7D32;cursor:pointer;transition:all .15s;font-family:inherit;}
-.qls-btn:hover{background:#E8F5E9;border-color:#4CAF7D;}
+.qls-section{padding:14px 0 6px;border-top:1px solid #f0f0f0;margin-top:8px;}
+.qls-title{font-size:14px;font-weight:800;color:#333;margin-bottom:10px;text-align:center;}
+.qls-meal-btns{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  grid-template-rows:auto auto;
+  gap:8px;
+}
+.qls-btn{
+  padding:12px 6px;
+  background:#F0FFF4;
+  border:1.5px solid #A5D6A7;
+  border-radius:12px;
+  font-size:13px;
+  font-weight:700;
+  color:#2E7D32;
+  cursor:pointer;
+  transition:all .15s;
+  font-family:inherit;
+  text-align:center;
+  white-space:nowrap;
+}
+.qls-btn:hover{background:#E8F5E9;border-color:#4CAF7D;transform:translateY(-1px);}
+.qls-btn:active{transform:translateY(0);}
 .qls-btn:disabled{opacity:.6;cursor:default;}
-.qls-btn-unknown{grid-column:1/-1;background:#F0FFF4;border:1.5px dashed #A5D6A7;color:#2E7D32;}
+.qls-btn:nth-child(1){grid-column:1/2;grid-row:1;}
+.qls-btn:nth-child(2){grid-column:2/3;grid-row:1;}
+.qls-btn:nth-child(3){grid-column:1/2;grid-row:2;}
+.qls-btn:nth-child(4){grid-column:2/3;grid-row:2;}
+.qls-btn-unknown{
+  grid-column:3/4;
+  grid-row:2;
+  background:#F0FFF4;
+  border:1.5px dashed #A5D6A7;
+  color:#2E7D32;
+  font-size:12px;
+  padding:12px 4px;
+}
 .qls-btn-unknown:hover{background:#E8F5E9;border-color:#4CAF7D;transform:translateY(-1px);}
 /* 리포트→추천 부족 영양소 카드 하단 버튼 */
 .rd-recommend-btn{width:100%;margin-top:10px;padding:12px;background:linear-gradient(135deg,#FF6B35,#E65100);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
@@ -930,17 +961,28 @@ body{
 }
 .pregnancy-chip.on{border-color:#EC407A;background:#FCE4EC;color:#C2185B;font-weight:700;}
 
-/* ── 영양정보 ── */
+/* ── 영양정보 (파란 계열) ── */
 .nutri-btn{
-  width:100%;padding:15px;border:1.5px solid #B7E5E2;border-radius:var(--rsm);
-  background:linear-gradient(135deg,#F4FBFA,#E8F7F5);
-  color:#1F8C82;font-size:13.5px;font-weight:800;cursor:pointer;
+  width:100%;padding:15px;border:2px solid #90CAF9;border-radius:var(--rsm);
+  background:linear-gradient(135deg,#E3F2FD,#BBDEFB);
+  color:#1565C0;font-size:14px;font-weight:800;cursor:pointer;
   display:flex;align-items:center;justify-content:center;gap:8px;
   margin-bottom:10px;transition:all .18s;
-  box-shadow:0 4px 12px rgba(46,196,182,.14);
+  box-shadow:0 4px 12px rgba(21,101,192,.14);
 }
-.nutri-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(46,196,182,.22);}
+.nutri-btn:hover{transform:translateY(-2px);background:linear-gradient(135deg,#BBDEFB,#90CAF9);border-color:#42A5F5;box-shadow:0 6px 16px rgba(21,101,192,.22);}
 .nutri-btn.loading{opacity:.7;cursor:wait;}
+/* ── 음식 이야기 (보라 계열) ── */
+.story-btn{
+  width:100%;padding:15px;border:2px solid #CE93D8;border-radius:var(--rsm);
+  background:linear-gradient(135deg,#F3E5F5,#E1BEE7);
+  color:#6A1B9A;font-size:14px;font-weight:800;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-bottom:10px;transition:all .18s;
+  box-shadow:0 4px 12px rgba(106,27,154,.14);
+}
+.story-btn:hover{transform:translateY(-2px);background:linear-gradient(135deg,#E1BEE7,#CE93D8);border-color:#AB47BC;box-shadow:0 6px 16px rgba(106,27,154,.22);}
+.story-btn.loading{opacity:.7;cursor:wait;}
 .nutri-section{display:none;margin-bottom:10px;}
 .nutri-section.show{display:block;animation:slideUp .35s ease both;}
 .nutri-card{
@@ -1892,7 +1934,7 @@ async function _logClick(type, menu) {
       </div>
 
       <!-- 이 음식 이야기 (6항목 카드 — 유래/지역/제철/사실/세계/트렌드) -->
-      <button class="nutri-btn" id="storyBtn" onclick="loadStory()" style="margin-top:8px;">
+      <button class="story-btn" id="storyBtn" onclick="loadStory()" style="margin-top:8px;">
         📖 이 음식 이야기
       </button>
       <div class="nutri-section" id="storySection">
@@ -5511,7 +5553,7 @@ function _renderQuickLogBtn(){
   const wrap=document.getElementById("quickLogWrap");
   if(!wrap)return;
   wrap.innerHTML=`
-    <div class="quick-log-section">
+    <div class="qls-section">
       <div class="qls-title">이 메뉴를 드신다면 언제 드시나요?</div>
       <div class="qls-meal-btns">
         <button class="qls-btn" type="button" onclick="_quickLog('breakfast')">🌅 아침</button>
