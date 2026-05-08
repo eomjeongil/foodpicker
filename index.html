@@ -5411,6 +5411,27 @@ function getLastCat(){
   const m=DB.find(x=>x.n.includes(lastMeal)||lastMeal.includes(x.n));
   return m?m.cat:null;
 }
+/* ── Phase 3 메타데이터 기반 추천 가중치 ── */
+function _getTimeSlot(){
+  const h=new Date().getHours();
+  if(h>=6 && h<10) return "아침";
+  if(h>=10 && h<15) return "점심";
+  if(h>=15 && h<18) return "간식";
+  if(h>=18 && h<22) return "저녁";
+  return "간식"; // 심야
+}
+function _metaBonus(menu){
+  let bonus=0;
+  // 시간대 매칭 (+1.2)
+  if(Array.isArray(menu.time) && menu.time.includes(_getTimeSlot())) bonus+=1.2;
+  // 날씨 매칭 (+1.0) — wxCode 가 한글 키워드이거나 코드일 수 있어 둘 다 시도
+  if(Array.isArray(menu.weather) && typeof wxCode!=="undefined"){
+    const wxKr = (typeof WX_INFO!=="undefined" && WX_INFO[wxCode] && WX_INFO[wxCode].label) || "";
+    if(wxKr && menu.weather.includes(wxKr)) bonus+=1.0;
+  }
+  return bonus;
+}
+
 function scoredPool(pool){
   const keys=personaKey();
   const mealBonus=MEAL_INFO[mealTime].bonus;
@@ -5422,6 +5443,7 @@ function scoredPool(pool){
     if(wxBonus.includes(m.cat))sc+=1.8;
     if(seasonBonus.includes(m.cat))sc+=1.2;
     if(m.season===curSeason)sc+=3.0;
+    sc+=_metaBonus(m); // Phase 3 메타데이터 가중치 (time/weather)
     const lastCat=getLastCat();
 if(lastCat&&m.cat===lastCat)sc-=3.0;
 sc+=(Math.random()-.5)*1.2;
