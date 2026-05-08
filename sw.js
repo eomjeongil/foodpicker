@@ -1,4 +1,4 @@
-/* FoodPicker Service Worker — 웹 푸시 수신/클릭/구독 변경 처리.
+/* PickFood Service Worker — 웹 푸시 수신/클릭/구독 변경 처리.
    범위는 sw.js 가 위치한 도메인 루트(/) 전체. cache-control 은 Express 정적 서빙에 위임. */
 
 self.addEventListener('push', e => {
@@ -9,7 +9,7 @@ self.addEventListener('push', e => {
   }
   e.waitUntil(
     self.registration.showNotification(
-      data.title || '푸드피커',
+      data.title || '픽푸드',
       {
         body: data.body || '',
         icon: data.icon || '/icon-192.svg',
