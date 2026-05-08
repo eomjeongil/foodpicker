@@ -525,8 +525,8 @@ body{
 .mli-meal-icon{font-size:18px;flex-shrink:0;}
 .mli-name{flex:1;font-size:14px;font-weight:700;color:#1F1C18;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .mli-kcal{font-size:13px;font-weight:700;color:#FF6B35;flex-shrink:0;}
-.mli-del{background:none;border:none;color:#ff6b6b;font-size:12px;cursor:pointer;padding:0 5px;line-height:1;flex-shrink:0;}
-.mli-del:hover{color:#e57373;}
+.mli-del{background:#fff;border:1px solid #FFCDD2;border-radius:6px;color:#D6645B;font-size:11.5px;font-weight:800;cursor:pointer;padding:5px 9px;line-height:1;flex-shrink:0;letter-spacing:.3px;}
+.mli-del:hover{background:#FFF5F5;border-color:#E57373;color:#E57373;}
 .meal-log-more-btn{width:100%;padding:12px;background:none;border:1px dashed #ccc;border-radius:10px;color:#888;font-size:13px;cursor:pointer;margin-top:6px;font-family:inherit;}
 .meal-log-more-btn:hover{border-color:#4CAF7D;color:#4CAF7D;}
 /* 식사 기록 CSV 내보내기 */
@@ -4786,14 +4786,15 @@ function mealLogSearch(query){
         <span class="mld-meta">${kcal}kcal</span>
       </div>`;
     }
+    ac.innerHTML=html;
+    ac.style.display="block";
+    ac.classList.add("show");
+  }else{
+    // DB 미일치 — 드롭다운 숨김 (직접입력 옵션 제거). Enter / 추가 + 버튼으로 popup 진입.
+    ac.style.display="none";
+    ac.innerHTML="";
+    ac.classList.remove("show");
   }
-  html+=`<div class="mld-item" data-name="${_mlogEsc(q)}" data-src="manual" onmousedown="_mealLogPickHit(event)">
-    <span class="mld-emoji">✏️</span>
-    <span class="mld-name mld-manual">DB에 없는 메뉴예요. '${_mlogEsc(q)}' 직접 입력하기</span>
-  </div>`;
-  ac.innerHTML=html;
-  ac.style.display="block";
-  ac.classList.add("show");
 }
 
 function _mealLogPickHit(ev){
