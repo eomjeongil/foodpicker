@@ -124,7 +124,7 @@ function _renderFruitCard(menuName, data) {
 /* ── AI API 호출 (DB 미등록 메뉴) ───────────────── */
 async function _getFruitByAI(menuName) {
   try {
-    const res = await fetch("https://foodpicker.kr/api/fruit-match", {
+    const res = await fetch("https://pickfood.kr/api/fruit-match", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ menuName })

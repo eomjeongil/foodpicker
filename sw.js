@@ -24,7 +24,7 @@ self.addEventListener('push', e => {
 
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  const url = (e.notification.data && e.notification.data.url) || 'https://foodpicker.kr';
+  const url = (e.notification.data && e.notification.data.url) || 'https://pickfood.kr';
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true })
       .then(windowClients => {

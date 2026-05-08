@@ -1,6 +1,6 @@
 {
-  "name": "푸드피커",
-  "short_name": "푸드피커",
+  "name": "픽푸드",
+  "short_name": "픽푸드",
   "description": "AI 기반 맞춤 메뉴 추천 + 식습관 건강 관리",
   "start_url": "/",
   "display": "standalone",

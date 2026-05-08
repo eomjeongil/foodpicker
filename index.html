@@ -10,7 +10,7 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="푸드피커">
+<meta name="apple-mobile-web-app-title" content="픽푸드">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <title>오늘은 뭐 먹을까? 🍽️</title>
 <!--
@@ -1535,7 +1535,7 @@ function _getOrCreateUid() {
 const FP_UID = _getOrCreateUid();
 
 async function _sendStat(endpoint, data) {
-  try { await fetch("https://foodpicker.kr/" + endpoint, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...data, uid: FP_UID})}); } catch(e) {}
+  try { await fetch("https://pickfood.kr/" + endpoint, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...data, uid: FP_UID})}); } catch(e) {}
 }
 window.addEventListener("load", () => {
   // 첫 방문 등록 + 재방문 last_seen 갱신
@@ -1546,10 +1546,10 @@ window.addEventListener("load", () => {
 
 <script>
 async function _logMenu(menu, category, gender, age) {
-  try { await fetch('https://foodpicker.kr/api/log-menu', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({menu,category,gender,age,uid:FP_UID})}); } catch(e) {}
+  try { await fetch('https://pickfood.kr/api/log-menu', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({menu,category,gender,age,uid:FP_UID})}); } catch(e) {}
 }
 async function _logClick(type, menu) {
-  try { await fetch('https://foodpicker.kr/api/log-click', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,menu,uid:FP_UID})}); } catch(e) {}
+  try { await fetch('https://pickfood.kr/api/log-click', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,menu,uid:FP_UID})}); } catch(e) {}
 }
 </script>
 </head>
@@ -2282,7 +2282,7 @@ const _cfg = (()=>{
   const _a = "11782769-27ea-48c3-ab3f-ebdab57227a0"; // ← 재발급 키로 교체
   const _b = "food_picker_v6";
   const _c = "YOUR_KAKAO_JS_KEY";               // ← 카카오 JS 키
-  const _d = "https://foodpicker.kr";       // ← 배포 URL
+  const _d = "https://pickfood.kr";       // ← 배포 URL
   const _e = "9efcbf6d4b73d6427db514cdfa6fc821";                    // ← OpenWeatherMap 키
   return {p:_a, s:_b, k:_c, u:_d, w:_e};
 })();
@@ -3526,7 +3526,7 @@ function shareWebApi(){
   snd("share");
   const sc=parseInt(localStorage.getItem("fp6_click_share")||"0")+1;
   localStorage.setItem("fp6_click_share",String(sc));
-  const text=`오늘 저녁은 ${curMenu.n} ${curMenu.e||""}으로 정했어! foodpicker.kr에서 추천받았어요 🍽️`;
+  const text=`오늘 저녁은 ${curMenu.n} ${curMenu.e||""}으로 정했어! pickfood.kr에서 추천받았어요 🍽️`;
   if(navigator.share){
     navigator.share({title:"오늘은 뭐 먹을까?",text,url:_cfg.u}).catch(()=>{});
   }else{
@@ -5797,7 +5797,7 @@ function openYoutube(){
 
 /* (다이어트/쿠킹 CPA 아코디언 제거 — fp-ad-slot-2/3 으로 대체) */
 
-/* ── foodpicker.kr 광고 배너 슬롯 (3종) ── */
+/* ── pickfood.kr 광고 배너 슬롯 (3종) ── */
 let _fpAdCache = null;
 async function loadFpAdSlots(){
   try{
@@ -6310,7 +6310,7 @@ const _LEGAL_CONTENT={
         <div class="legal-article">
           <div class="legal-article-title">7. 개인정보 처리 담당</div>
           <div class="legal-article-body">
-            서비스명: FoodPicker (foodpicker.kr)<br>
+            서비스명: PickFood (pickfood.kr)<br>
             운영: picki.kr<br>
             문의: 카카오 채널 메시지로 문의해주세요
           </div>
@@ -6403,7 +6403,7 @@ document.addEventListener('keydown',e=>{
 </script>
 <script src="fruit-db.js"></script>
 <script src="fruit-card.js"></script>
-<script>window.PWA_OPTIONS={name:"푸드피커",color:"#FF6B35"};</script>
+<script>window.PWA_OPTIONS={name:"픽푸드",color:"#FF6B35"};</script>
 <script src="/pwa-install.js" defer></script>
 </body>
 </html>
