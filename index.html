@@ -1578,12 +1578,12 @@ async function _logClick(type, menu) {
 <!-- HERO -->
 <div class="hero">
   <span class="hero-icon">🍽️</span>
-  <h1>오늘은 뭐 먹을까?</h1>
-  <p class="hero-sub">성별·연령·날씨·계절·시간대 맞춤 AI 메뉴 추천</p>
+  <h1>맞춤 메뉴 추천으로 나의 식습관을<br>알고, 개선하고, 건강해지자</h1>
+  <p class="hero-sub">내 건강정보를 기반으로 한 맞춤 메뉴 추천</p>
   <div class="badge-row">
-    
+
     <span class="badge b-mint">📡 날씨·계절 연동</span>
-    
+
   </div>
 </div>
 
@@ -1629,13 +1629,18 @@ async function _logClick(type, menu) {
     </div>
   </div>
 
+  <!-- 📋 기본 정보를 선택해 주세요 (필수 5개) -->
+  <div class="basic-info-header" style="margin:14px 0 8px;padding:10px 4px;font-size:14px;font-weight:800;color:#FF6B35;letter-spacing:.3px;">
+    📋 기본 정보를 선택해 주세요
+  </div>
+
   <!-- ② 성별 -->
   <div class="card">
     <div class="sl">👤 성별</div>
     <div class="trow" id="gRow">
       <div class="tog" data-g="M" onclick="selG(this)">👨 남성</div>
       <div class="tog" data-g="F" onclick="selG(this)">👩 여성</div>
-      
+      <div class="tog" data-g="N" onclick="selG(this)">선택안함</div>
     </div>
   </div>
 
@@ -1647,7 +1652,8 @@ async function _logClick(type, menu) {
       <div class="tog" data-a="20" onclick="selA(this)">20대</div>
       <div class="tog sel-a" data-a="30" onclick="selA(this)">30대</div>
       <div class="tog" data-a="40" onclick="selA(this)">40대</div>
-      <div class="tog" data-a="50" onclick="selA(this)">50대+</div>
+      <div class="tog" data-a="50" onclick="selA(this)">50대</div>
+      <div class="tog" data-a="60" onclick="selA(this)">60대+</div>
     </div>
   </div>
 
@@ -1666,19 +1672,61 @@ async function _logClick(type, menu) {
     </div>
   </div>
 
+  <!-- ④ 건강목표 (필수) -->
+  <div class="card">
+    <div class="sl">🎯 건강 목표 <span class="health-item-hint">(1개 선택)</span></div>
+    <div class="h-chips" id="hGoalChips" style="margin-top:8px;">
+      <div class="h-chip goal" data-v="체중감량" onclick="selHealthSingle(this,'goal')">체중감량</div>
+      <div class="h-chip goal" data-v="근육증가" onclick="selHealthSingle(this,'goal')">근육증가</div>
+      <div class="h-chip goal" data-v="건강유지" onclick="selHealthSingle(this,'goal')">건강유지</div>
+      <div class="h-chip goal" data-v="피로회복" onclick="selHealthSingle(this,'goal')">피로회복</div>
+      <div class="h-chip goal" data-v="혈당관리" onclick="selHealthSingle(this,'goal')">혈당관리</div>
+      <div class="h-chip goal" data-v="소화개선" onclick="selHealthSingle(this,'goal')">소화개선</div>
+    </div>
+  </div>
+
+  <!-- ⑤ 생활패턴 (필수) -->
+  <div class="card">
+    <div class="sl">🏃 생활 패턴 <span class="health-item-hint">(1개 선택)</span></div>
+    <div class="activity-chips" id="hActChips" style="margin-top:8px;">
+      <button type="button" class="h-chip activity-chip" data-v="sedentary" onclick="selHealthActivity(this)">
+        <span class="ac-icon">🪑</span><span class="ac-label">주로 앉아서 생활해요</span>
+      </button>
+      <button type="button" class="h-chip activity-chip" data-v="light" onclick="selHealthActivity(this)">
+        <span class="ac-icon">🚶</span><span class="ac-label">가끔 움직여요</span>
+      </button>
+      <button type="button" class="h-chip activity-chip" data-v="moderate" onclick="selHealthActivity(this)">
+        <span class="ac-icon">💪</span><span class="ac-label">활동량이 많아요</span>
+      </button>
+      <button type="button" class="h-chip activity-chip" data-v="active" onclick="selHealthActivity(this)">
+        <span class="ac-icon">🏋️</span><span class="ac-label">운동을 꾸준히 해요</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ⑥ 알러지/못 먹는 식재료 (필수, 복수선택) -->
+  <div class="card">
+    <div class="sl">🚫 알러지 / 못 먹는 식재료 <span class="health-item-hint">(중복선택 가능)</span></div>
+    <div class="h-chips multi" id="hAlgChips" style="margin-top:8px;">
+      <div class="h-chip alg" data-v="견과류" onclick="selHealthMulti(this,'alg')">🥜 견과류</div>
+      <div class="h-chip alg" data-v="갑각류" onclick="selHealthMulti(this,'alg')">🦐 갑각류</div>
+      <div class="h-chip alg" data-v="유제품" onclick="selHealthMulti(this,'alg')">🥛 유제품</div>
+      <div class="h-chip alg" data-v="밀글루텐" onclick="selHealthMulti(this,'alg')">🌾 밀/글루텐</div>
+      <div class="h-chip alg" data-v="달걀" onclick="selHealthMulti(this,'alg')">🥚 달걀</div>
+      <div class="h-chip alg" data-v="없음" onclick="selHealthMulti(this,'alg',true)">없음</div>
+    </div>
+  </div>
+
   <!-- ③½ 건강정보 (선택 · 접이식) -->
   <div class="card health-card" id="healthCard">
     <button type="button" class="health-toggle" onclick="toggleHealth()" aria-expanded="false">
       <span class="ht-state ht-closed">
-        💚 건강정보 입력 (선택) ▼
-        <span class="ht-hint">이 정보는 맞춤 메뉴추천은 물론 개인 건강데이터 추출의 중요 근거가 됩니다</span>
+        ✨ 입력하면 더 정밀해져요 ▼
+        <span class="ht-hint">키·몸무게·혈압·혈당·콜레스테롤·가족력·생활습관</span>
       </span>
-      <span class="ht-state ht-open">💚 건강정보 입력 중 ▲</span>
+      <span class="ht-state ht-open">✨ 입력 중 ▲</span>
     </button>
     <div class="health-body">
-      <div class="health-notice">
-        건강 정보를 입력하면 나에게 딱 맞는 맞춤 메뉴를 추천해드려요. <span style="color:var(--text3);font-weight:700;">(선택사항)</span>
-      </div>
 
       <!-- 섹션 1 — 기본 신체 정보 -->
       <div class="health-section">
@@ -1707,9 +1755,9 @@ async function _logClick(type, menu) {
           <div class="health-item-label">❤️ 혈압 <span class="health-item-hint">(1개 선택)</span></div>
           <div class="h-chips" id="hBpChips">
             <div class="h-chip bp" data-v="정상" onclick="selHealthSingle(this,'bp')">정상</div>
-            <div class="h-chip bp" data-v="경계" onclick="selHealthSingle(this,'bp')">경계 (130–139)</div>
-            <div class="h-chip bp" data-v="고혈압" onclick="selHealthSingle(this,'bp')">고혈압 (140+)</div>
-            <div class="h-chip bp" data-v="혈압약복용" onclick="selHealthSingle(this,'bp')">💊 혈압약 복용 중</div>
+            <div class="h-chip bp" data-v="높음" onclick="selHealthSingle(this,'bp')">높음</div>
+            <div class="h-chip bp" data-v="낮음" onclick="selHealthSingle(this,'bp')">낮음</div>
+            <div class="h-chip bp" data-v="모름" onclick="selHealthSingle(this,'bp')">모름</div>
           </div>
         </div>
 
@@ -1717,8 +1765,9 @@ async function _logClick(type, menu) {
           <div class="health-item-label">🩸 혈당 / 당뇨 <span class="health-item-hint">(1개 선택)</span></div>
           <div class="h-chips" id="hGluChips">
             <div class="h-chip glu" data-v="정상" onclick="selHealthSingle(this,'glu')">정상</div>
-            <div class="h-chip glu" data-v="전단계" onclick="selHealthSingle(this,'glu')">전단계</div>
-            <div class="h-chip glu" data-v="당뇨" onclick="selHealthSingle(this,'glu')">당뇨</div>
+            <div class="h-chip glu" data-v="경계" onclick="selHealthSingle(this,'glu')">경계</div>
+            <div class="h-chip glu" data-v="당뇨있음" onclick="selHealthSingle(this,'glu')">당뇨있음</div>
+            <div class="h-chip glu" data-v="모름" onclick="selHealthSingle(this,'glu')">모름</div>
           </div>
         </div>
 
@@ -1726,64 +1775,44 @@ async function _logClick(type, menu) {
           <div class="health-item-label">🥛 콜레스테롤 <span class="health-item-hint">(1개 선택)</span></div>
           <div class="h-chips" id="hCholChips">
             <div class="h-chip chol" data-v="정상" onclick="selHealthSingle(this,'chol')">정상</div>
-            <div class="h-chip chol" data-v="경계" onclick="selHealthSingle(this,'chol')">경계</div>
             <div class="h-chip chol" data-v="높음" onclick="selHealthSingle(this,'chol')">높음</div>
+            <div class="h-chip chol" data-v="모름" onclick="selHealthSingle(this,'chol')">모름</div>
           </div>
         </div>
       </div>
 
       <div class="health-section-divider"></div>
 
-      <!-- 섹션 3 — 가족력 & 알레르기 -->
+      <!-- 섹션 3 — 가족력 -->
       <div class="health-section">
-        <div class="health-section-title">🧬 가족력 &amp; 알레르기</div>
+        <div class="health-section-title">🧬 가족력</div>
 
         <div class="health-item">
           <div class="health-item-label">👨‍👩‍👧 가족력 <span class="health-item-hint">(중복선택 가능)</span></div>
           <div class="h-chips multi" id="hFamChips">
-            <div class="h-chip fam" data-v="심혈관질환" onclick="selHealthMulti(this,'fam')">심혈관질환</div>
+            <div class="h-chip fam" data-v="심혈관" onclick="selHealthMulti(this,'fam')">심혈관</div>
             <div class="h-chip fam" data-v="당뇨" onclick="selHealthMulti(this,'fam')">당뇨</div>
-            <div class="h-chip fam" data-v="암" onclick="selHealthMulti(this,'fam')">암</div>
             <div class="h-chip fam" data-v="고혈압" onclick="selHealthMulti(this,'fam')">고혈압</div>
-            <div class="h-chip fam" data-v="없음" onclick="selHealthMulti(this,'fam',true)">없음</div>
-          </div>
-        </div>
-
-        <div class="health-item">
-          <div class="health-item-label">🚫 알레르기 / 기피 식재료 <span class="health-item-hint">(중복선택 가능)</span></div>
-          <div class="h-chips multi" id="hAlgChips">
-            <div class="h-chip alg" data-v="견과류" onclick="selHealthMulti(this,'alg')">🥜 견과류</div>
-            <div class="h-chip alg" data-v="갑각류" onclick="selHealthMulti(this,'alg')">🦐 갑각류</div>
-            <div class="h-chip alg" data-v="유제품" onclick="selHealthMulti(this,'alg')">🥛 유제품</div>
-            <div class="h-chip alg" data-v="돼지고기" onclick="selHealthMulti(this,'alg')">🐖 돼지고기</div>
-            <div class="h-chip alg" data-v="소고기" onclick="selHealthMulti(this,'alg')">🐄 소고기</div>
-            <div class="h-chip alg" data-v="날것" onclick="selHealthMulti(this,'alg')">🍣 날것</div>
-            <div class="h-chip alg" data-v="없음" onclick="selHealthMulti(this,'alg',true)">없음</div>
+            <div class="h-chip fam" data-v="암" onclick="selHealthMulti(this,'fam')">암</div>
+            <div class="h-chip fam" data-v="없음" onclick="selHealthMulti(this,'fam',true)">없음/모름</div>
           </div>
         </div>
       </div>
 
       <div class="health-section-divider"></div>
 
-      <!-- 섹션 4 — 생활 패턴 -->
+      <!-- 섹션 4 — 생활 습관 -->
       <div class="health-section">
-        <div class="health-section-title">🏃 생활 패턴</div>
+        <div class="health-section-title">🛌 생활 습관</div>
 
         <div class="health-item">
-          <div class="health-item-label">평소 활동량 <span class="health-item-hint">(1개 선택)</span></div>
-          <div class="activity-chips" id="hActChips">
-            <button type="button" class="h-chip activity-chip" data-v="sedentary" onclick="selHealthActivity(this)">
-              <span class="ac-icon">🛋️</span><span class="ac-label">비활동</span><span class="ac-desc">주로 앉아서 생활</span>
-            </button>
-            <button type="button" class="h-chip activity-chip" data-v="light" onclick="selHealthActivity(this)">
-              <span class="ac-icon">🚶</span><span class="ac-label">가벼운 활동</span><span class="ac-desc">주 1~3회 운동</span>
-            </button>
-            <button type="button" class="h-chip activity-chip" data-v="moderate" onclick="selHealthActivity(this)">
-              <span class="ac-icon">🏃</span><span class="ac-label">보통 활동</span><span class="ac-desc">주 3~5회 운동</span>
-            </button>
-            <button type="button" class="h-chip activity-chip" data-v="active" onclick="selHealthActivity(this)">
-              <span class="ac-icon">💪</span><span class="ac-label">활발한 활동</span><span class="ac-desc">매일 운동</span>
-            </button>
+          <div class="health-item-label">생활 습관 <span class="health-item-hint">(중복선택 가능)</span></div>
+          <div class="h-chips multi" id="hLifestyleChips">
+            <div class="h-chip lifestyle" data-v="흡연" onclick="selHealthMulti(this,'lifestyle')">🚬 흡연</div>
+            <div class="h-chip lifestyle" data-v="음주" onclick="selHealthMulti(this,'lifestyle')">🍺 음주</div>
+            <div class="h-chip lifestyle" data-v="수면부족" onclick="selHealthMulti(this,'lifestyle')">😴 수면부족</div>
+            <div class="h-chip lifestyle" data-v="스트레스높음" onclick="selHealthMulti(this,'lifestyle')">😰 스트레스높음</div>
+            <div class="h-chip lifestyle" data-v="해당없음" onclick="selHealthMulti(this,'lifestyle',true)">해당없음</div>
           </div>
         </div>
 
@@ -1793,23 +1822,6 @@ async function _logClick(type, menu) {
             <button type="button" class="h-chip pregnancy-chip" data-v="" onclick="selHealthPregnancy(this)">해당없음</button>
             <button type="button" class="h-chip pregnancy-chip" data-v="pregnant" onclick="selHealthPregnancy(this)">🤰 임신 중</button>
             <button type="button" class="h-chip pregnancy-chip" data-v="nursing" onclick="selHealthPregnancy(this)">🍼 수유 중</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="health-section-divider"></div>
-
-      <!-- 섹션 5 — 건강 목표 -->
-      <div class="health-section">
-        <div class="health-section-title">🎯 건강 목표</div>
-        <div class="health-item">
-          <div class="health-item-label">목표 <span class="health-item-hint">(1개 선택)</span></div>
-          <div class="h-chips" id="hGoalChips">
-            <div class="h-chip goal" data-v="체중감량" onclick="selHealthSingle(this,'goal')">체중감량</div>
-            <div class="h-chip goal" data-v="혈압관리" onclick="selHealthSingle(this,'goal')">혈압관리</div>
-            <div class="h-chip goal" data-v="혈당관리" onclick="selHealthSingle(this,'goal')">혈당관리</div>
-            <div class="h-chip goal" data-v="근육증가" onclick="selHealthSingle(this,'goal')">근육증가</div>
-            <div class="h-chip goal" data-v="균형식단" onclick="selHealthSingle(this,'goal')">균형식단</div>
           </div>
         </div>
       </div>
@@ -1836,6 +1848,20 @@ async function _logClick(type, menu) {
       </div>
 
       <button type="button" class="h-clear" onclick="clearHealth()">건강정보 모두 지우기</button>
+    </div>
+  </div>
+
+  <!-- 🍽 최근 메뉴 자연어 입력 (건강정보 입력 직후) -->
+  <div class="card recent-meal-section" id="recentMealInput">
+    <p class="recent-meal-title" style="font-size:15px;font-weight:800;color:#FF6B35;margin:0 0 4px;">최근 먹은 메뉴, 생각나는 대로 적어주세요</p>
+    <p class="recent-meal-sub" style="font-size:12px;color:var(--text2);margin:0 0 10px;">2~3가지 자유롭게 적어도 좋아요 🍽️</p>
+    <textarea id="recentMealText"
+      placeholder="예: 어제 삼겹살이랑 냉면 먹었고 아침엔 토스트&#10;또는: 김치찌개, 라면, 샐러드"
+      rows="3" maxlength="200"
+      style="width:100%;padding:10px 12px;border:1px solid #FFE3CC;border-radius:10px;font-size:13px;background:#fff;outline:none;resize:vertical;box-sizing:border-box;font-family:inherit;"></textarea>
+    <div class="recent-meal-btns" style="display:flex;gap:8px;margin-top:10px;">
+      <button id="recentMealSkip" type="button" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;">건너뛰기</button>
+      <button id="recentMealSave" type="button" style="flex:2;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#FF6B35,#FF8758);color:#fff;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(255,107,53,.25);">기록하고 추천받기 →</button>
     </div>
   </div>
 
@@ -1895,20 +1921,23 @@ async function _logClick(type, menu) {
         <div class="ai-alts-list" id="aiAltsList"></div>
       </div>
 
-      <!-- 다시 선택하기 — 컨텍스트 유지하고 메뉴/대안만 새로 뽑음 -->
+      <!-- 건강정보 가중치 뱃지 (renderHealthBadge가 동적으로 채움) -->
+      <div id="healthBadgeSlot"></div>
+
+      <!-- 다른 메뉴 추천받기 — 카테고리로 스크롤해 사용자가 다시 추천받음 -->
       <div style="margin-bottom:8px;">
-        <button onclick="pickAgain()" style="width:100%;padding:15px;border:1.5px solid #FFE3CC;border-radius:13px;background:#fff;color:#7A6E62;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 2px 8px rgba(255,107,53,.06);"
+        <button onclick="onPickOther()" style="width:100%;padding:15px;border:1.5px solid #FFE3CC;border-radius:13px;background:#fff;color:#7A6E62;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 2px 8px rgba(255,107,53,.06);"
           onmouseover="this.style.borderColor='#FF6B35';this.style.color='#FF6B35'"
           onmouseout="this.style.borderColor='#FFE3CC';this.style.color='#7A6E62'">
-          🔁 다른 메뉴 추천 요청하기
+          🔁 다른 메뉴 추천받기
         </button>
       </div>
-      <!-- 처음부터 다시 선택하기 — 모든 입력 초기화 -->
+      <!-- 처음부터 다시 추천받기 — 건강정보 입력 섹션으로 스크롤 -->
       <div style="margin-bottom:12px;">
-        <button onclick="resetAll()" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:13px;background:#fff;color:#7A6E62;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;"
+        <button onclick="onResetFromTop()" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:13px;background:#fff;color:#7A6E62;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;"
           onmouseover="this.style.borderColor='#FF6B35';this.style.color='#FF6B35'"
           onmouseout="this.style.borderColor='#ddd';this.style.color='#7A6E62'">
-          🔄 처음부터 다시 추천 요청하기
+          🔄 처음부터 다시 추천받기
         </button>
       </div>
 
@@ -1918,13 +1947,15 @@ async function _logClick(type, menu) {
         <div class="related-grid" id="relatedGrid"></div>
       </div>
 
-      <!-- 추천→기록 원스텝 — _renderQuickLogBtn 가 채움 (showResult 끝에 호출) -->
-      <div id="quickLogWrap" style="display:none;"></div>
-
-      <!-- 영양정보 (lazy-load) — 칼로리·탄단지·good_for·avoid_for까지 -->
-      <button class="nutri-btn" id="nutriBtn" onclick="loadNutrition()">
-        🥗 영양정보 보기, 추천과 주의 보기
-      </button>
+      <!-- 영양정보 + 이 음식 이야기 (가로 2개) — "이 메뉴를 드실 건가요?" 위로 이동 -->
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <button class="nutri-btn" id="nutriBtn" onclick="loadNutrition()" style="flex:1;">
+          🥗 영양정보 보기
+        </button>
+        <button class="story-btn" id="storyBtn" onclick="loadStory()" style="flex:1;margin-top:0;">
+          📖 이 음식 이야기
+        </button>
+      </div>
       <div class="nutri-section" id="nutriSection">
         <div class="nutri-card">
           <div class="nutri-head"><span>🥗</span><span id="nutriTitle">영양 분석</span></div>
@@ -1943,15 +1974,18 @@ async function _logClick(type, menu) {
       </div>
 
       <!-- 이 음식 이야기 (6항목 카드 — 유래/지역/제철/사실/세계/트렌드) -->
-      <button class="story-btn" id="storyBtn" onclick="loadStory()" style="margin-top:8px;">
-        📖 이 음식 이야기
-      </button>
       <div class="nutri-section" id="storySection">
         <div class="nutri-card" style="background:linear-gradient(135deg,#FFFAF5,#FFF7EE);border-color:#FFE3CC;">
           <div class="nutri-head"><span>📖</span><span id="storyTitle">이 음식 이야기</span></div>
           <div class="story-grid" id="storyGrid"></div>
         </div>
       </div>
+
+      <!-- 구분선 -->
+      <div style="height:1px;background:var(--border);margin:14px 0 12px;"></div>
+
+      <!-- 추천→선택/다시추천 — _renderQuickLogBtn 가 채움 (showResult 끝에 호출) -->
+      <div id="quickLogWrap" style="display:none;"></div>
 
       <!-- 함께 먹으면 좋은 음식 — 메뉴 추천 시 자동 표시 -->
       <div class="match-section">
@@ -2878,7 +2912,9 @@ let selHealth={
   // 활동량: ''|'sedentary'|'light'|'moderate'|'active'
   activity:"",
   // 임신/수유: ''|'pregnant'|'nursing' (여성일 때만 의미)
-  pregnancy:""
+  pregnancy:"",
+  // 생활 습관 (다중): 흡연/음주/수면부족/스트레스높음/해당없음
+  lifestyle:[]
 };
 function _bmiCategory(bmi){
   if(bmi<18.5)return{label:"저체중",cls:"h-bmi-low"};
@@ -3002,7 +3038,8 @@ function _pushHealthInfo(){
     healthGoal:info.goal,
     activity:info.activity||"",
     // 비여성에서는 항상 빈값으로 보내 서버에 잘못된 임신/수유가 박히지 않게 함
-    pregnancy:(selGend==="F"?(info.pregnancy||""):"")
+    pregnancy:(selGend==="F"?(info.pregnancy||""):""),
+    lifestyle:Array.isArray(info.lifestyle)?info.lifestyle:[]
   };
   fetch("/api/user/health-info",{
     method:"POST",
@@ -3023,7 +3060,8 @@ function loadHealth(){
       fam:Array.isArray(d.fam)?d.fam:[],
       alg:Array.isArray(d.alg)?d.alg:[],
       activity:d.activity||"",
-      pregnancy:d.pregnancy||""
+      pregnancy:d.pregnancy||"",
+      lifestyle:Array.isArray(d.lifestyle)?d.lifestyle:[]
     };
     if(selHealth.height)document.getElementById("hHeight").value=selHealth.height;
     if(selHealth.weight)document.getElementById("hWeight").value=selHealth.weight;
@@ -3047,6 +3085,7 @@ function loadHealth(){
     restoreSingle("hGoalChips",selHealth.goal);
     restoreMulti("hFamChips",selHealth.fam);
     restoreMulti("hAlgChips",selHealth.alg);
+    restoreMulti("hLifestyleChips",selHealth.lifestyle);
     // 활동량 / 임신·수유 — 칩 클래스 동일하게 .on 토글
     if(selHealth.activity){
       document.querySelectorAll("#hActChips .activity-chip").forEach(c=>{
@@ -3069,11 +3108,11 @@ function loadHealth(){
   }catch(e){}
 }
 function clearHealth(){
-  selHealth={height:null,weight:null,bp:null,glu:null,chol:null,goal:null,fam:[],alg:[],activity:"",pregnancy:""};
+  selHealth={height:null,weight:null,bp:null,glu:null,chol:null,goal:null,fam:[],alg:[],activity:"",pregnancy:"",lifestyle:[]};
   document.getElementById("hHeight").value="";
   document.getElementById("hWeight").value="";
   document.getElementById("hBmiDisplay").style.display="none";
-  document.querySelectorAll("#healthCard .h-chip.on").forEach(c=>c.classList.remove("on"));
+  document.querySelectorAll("#healthCard .h-chip.on, #hGoalChips .h-chip.on, #hActChips .h-chip.on, #hAlgChips .h-chip.on").forEach(c=>c.classList.remove("on"));
   try{localStorage.removeItem(HEALTH_LS_KEY);}catch(e){}
   toast("건강정보를 모두 지웠어요");
 }
@@ -3091,7 +3130,7 @@ function getHealthInfo(){
   const bmi=_calcBmi(h.height,h.weight);
   const has=h.height||h.weight||h.bp||h.glu||h.chol||h.goal
           ||(h.fam&&h.fam.length)||(h.alg&&h.alg.length)
-          ||h.activity||h.pregnancy;
+          ||h.activity||h.pregnancy||(h.lifestyle&&h.lifestyle.length);
   if(!has)return null;
   return{
     height:h.height||null,
@@ -3105,9 +3144,55 @@ function getHealthInfo(){
     family:Array.isArray(h.fam)?h.fam:[],
     allergy:Array.isArray(h.alg)?h.alg:[],
     activity:h.activity||"",
-    pregnancy:h.pregnancy||""
+    pregnancy:h.pregnancy||"",
+    lifestyle:Array.isArray(h.lifestyle)?h.lifestyle:[]
   };
 }
+// 추천 결과 카드 상단에 표시할 건강정보 가중치 뱃지
+function _getHealthInfo(){return getHealthInfo();}
+function renderHealthBadge(){
+  const info=_getHealthInfo();
+  if(!info||!info.goal)return '';
+  return `<div class="health-badge" style="margin:0 0 10px;padding:9px 12px;border-radius:10px;background:linear-gradient(135deg,#FFF4E8,#FFE9D4);border:1px solid #FFD4A8;color:#B85C1A;font-size:12px;font-weight:800;text-align:center;">✨ ${info.goal} 목표를 고려한 추천이에요</div>`;
+}
+// 카테고리 카드로 부드럽게 스크롤 (자연어 입력/다시추천 흐름 공통 사용)
+function scrollToCategory(){
+  const el=document.getElementById('catCard');
+  if(el && typeof el.scrollIntoView==='function')el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+// 건강정보 입력 섹션으로 부드럽게 스크롤
+function scrollToHealthInfo(){
+  const el=document.querySelector('.basic-info-header')||document.getElementById('healthCard');
+  if(el && typeof el.scrollIntoView==='function')el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── 최근 먹은 메뉴 자연어 입력 — 건강정보 다음 단계 ──
+async function saveRecentMeals(){
+  const ta=document.getElementById('recentMealText');
+  const btn=document.getElementById('recentMealSave');
+  const text=(ta&&ta.value||'').trim();
+  if(!text){scrollToCategory();return;}
+  if(btn){btn.textContent='분석 중...';btn.disabled=true;}
+  try{
+    const res=await fetch('/api/parse-recent-meals',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text, uid: (typeof FP_UID!=='undefined'?FP_UID:_getOrCreateUid())})
+    });
+    await res.json().catch(()=>({}));
+    if(typeof toast==='function')toast('최근 메뉴를 기록했어요 📝');
+    if(typeof loadMealLogs==='function')loadMealLogs();
+    scrollToCategory();
+  }catch(e){
+    scrollToCategory();
+  }finally{
+    if(btn){btn.textContent='기록하고 추천받기 →';btn.disabled=false;}
+  }
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('recentMealSave')?.addEventListener('click', saveRecentMeals);
+  document.getElementById('recentMealSkip')?.addEventListener('click', ()=>scrollToCategory());
+});
 // 페이지 로드 후 자동 복원
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', loadHealth);
@@ -3201,6 +3286,8 @@ async function _restoreHealthFromServer(){
     restoreMulti('hFamChips',d.family_history,'fam');
     // 알레르기
     restoreMulti('hAlgChips',d.allergies,'alg');
+    // 생활 습관
+    restoreMulti('hLifestyleChips',d.lifestyle,'lifestyle');
 
     // 활동량 — 4개 중 1개
     if(d.activity && ['sedentary','light','moderate','active'].includes(d.activity)){
@@ -3235,7 +3322,8 @@ async function _restoreHealthFromServer(){
         fam:Array.isArray(selHealth.fam)?selHealth.fam:[],
         alg:Array.isArray(selHealth.alg)?selHealth.alg:[],
         activity:selHealth.activity||"",
-        pregnancy:selHealth.pregnancy||""
+        pregnancy:selHealth.pregnancy||"",
+        lifestyle:Array.isArray(selHealth.lifestyle)?selHealth.lifestyle:[]
       }));
     }catch(e){}
 
@@ -5573,6 +5661,16 @@ function pickAgain(){
   pickMenu();
   if(typeof _ga==="function")_ga("pick_again",{});
 }
+// "다른 메뉴 추천받기" — 카테고리 카드로 스크롤 (사용자가 카테고리 재선택 후 다시 추천)
+function onPickOther(){
+  if(typeof _ga==="function")_ga("pick_other",{});
+  scrollToCategory();
+}
+// "처음부터 다시 추천받기" — 건강정보 입력 섹션으로 스크롤 (입력값은 보존)
+function onResetFromTop(){
+  if(typeof _ga==="function")_ga("reset_from_top",{});
+  scrollToHealthInfo();
+}
 
 /* ── 처음부터 다시 선택하기 — 모든 입력/상태 초기화 ── */
 function resetAll(){
@@ -5689,23 +5787,36 @@ function _recommendForNutrient(nutrient){
   setTimeout(()=>{ if(typeof pickMenu==="function")pickMenu(); }, 500);
 }
 
-/* ── 추천→기록 원스텝 — 결과 카드 하단에 끼니 4종 빠른 기록 버튼 ── */
+/* ── 추천→선택/다시추천 — "이 메뉴를 드실 건가요?" + ✅선택/🔄다시추천 ── */
 function _renderQuickLogBtn(){
   if(!curMenu)return;
   const wrap=document.getElementById("quickLogWrap");
   if(!wrap)return;
   wrap.innerHTML=`
-    <div class="qls-section">
-      <div class="qls-title">이 메뉴를 드신다면 언제 드시나요?</div>
-      <div class="qls-meal-btns">
-        <button class="qls-btn" type="button" onclick="_quickLog('breakfast')">🌅 아침</button>
-        <button class="qls-btn" type="button" onclick="_quickLog('lunch')">☀️ 점심</button>
-        <button class="qls-btn" type="button" onclick="_quickLog('dinner')">🌙 저녁</button>
-        <button class="qls-btn" type="button" onclick="_quickLog('snack')">🍪 간식(야식)</button>
-        <button class="qls-btn qls-btn-unknown" type="button" onclick="_quickLog('unknown')">❓ 미확정</button>
+    <div class="qls-section" style="text-align:center;">
+      <div class="qls-title" style="font-size:15px;font-weight:800;color:#FF6B35;margin-bottom:10px;">이 메뉴를 드실 건가요?</div>
+      <div class="qls-meal-btns" style="display:flex;gap:8px;">
+        <button id="selectThisMenu" class="btn-select-menu qls-btn" type="button" onclick="_selectThisMenu()" style="flex:2;padding:14px;border:none;border-radius:11px;background:linear-gradient(135deg,#4CAF7D,#2E9E6B);color:#fff;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(76,175,125,.28);">✅ 이 메뉴로 선택</button>
+        <button id="retryRecommend" class="btn-retry qls-btn" type="button" onclick="_retryRecommend()" style="flex:1;padding:14px;border:1.5px solid #FFE3CC;border-radius:11px;background:#fff;color:#FF6B35;font-size:14px;font-weight:800;cursor:pointer;">🔄 다시 추천</button>
       </div>
     </div>`;
   wrap.style.display="block";
+}
+// 현재 시각 기반 끼니 자동 판단 — 06~10=아침, 11~14=점심, 17~21=저녁, 그 외=간식
+function _autoMealType(){
+  const h=new Date().getHours();
+  if(h>=6 && h<=10)return 'breakfast';
+  if(h>=11 && h<=14)return 'lunch';
+  if(h>=17 && h<=21)return 'dinner';
+  return 'snack';
+}
+async function _selectThisMenu(){
+  if(!curMenu){toast("먼저 메뉴를 추천받아 주세요!");return;}
+  await _quickLog(_autoMealType());
+}
+function _retryRecommend(){
+  if(typeof _ga==="function")_ga("retry_recommend",{});
+  scrollToCategory();
 }
 async function _quickLog(mealType){
   if(!curMenu){toast("먼저 메뉴를 추천받아 주세요!");return;}
@@ -5793,6 +5904,10 @@ function showResult(menu,nextMenus){
       <span class="rel-sub">${r.sub}</span>
     </a>`;
   }).join("");
+
+  // 건강정보 가중치 뱃지 — 목표가 있을 때만 표시
+  const hbSlot=document.getElementById("healthBadgeSlot");
+  if(hbSlot)hbSlot.innerHTML=(typeof renderHealthBadge==="function"?renderHealthBadge():"");
 
   const rc=document.getElementById("resultCard");
   rc.classList.remove("show");void rc.offsetWidth;rc.classList.add("show");
