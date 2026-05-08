@@ -2046,34 +2046,37 @@ async function _logClick(type, menu) {
         box-shadow:0 6px 20px rgba(76,175,125,.35);transition:transform .18s ease, box-shadow .18s ease, filter .18s;"
       onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 9px 24px rgba(76,175,125,.45)';this.style.filter='brightness(1.04)';"
       onmouseout="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(76,175,125,.35)';this.style.filter='';">
-      <span class="dmt-state dmt-closed" style="color:#fff;">📝 내가 먹은 음식을 기록하여 내 식습관 알아가기 ▼</span>
-      <span class="dmt-state dmt-open" style="color:#fff;">📝 내가 먹은 음식을 기록하여 내 식습관 알아가기 접기 ▲</span>
+      <span class="dmt-state dmt-closed" style="color:#fff;">📝 내가 먹은 음식기록 확인하기 ▼</span>
+      <span class="dmt-state dmt-open" style="color:#fff;">📝 내가 먹은 음식기록 확인하기 접기 ▲</span>
     </button>
     <div id="dailyMealBody" style="display:none;margin-top:10px;border:1px solid var(--border);border-radius:var(--rsm);background:#fff;padding:14px 16px 16px;">
-      <!-- 안내 -->
-      <div class="meal-log-intro">
-        <div class="meal-log-intro-title">🍽️ 최근 드신 음식이 기억나시나요?</div>
-        <div class="meal-log-intro-desc">
-          생각나는 것부터 하나씩 적어보세요.<br>
-          기록이 쌓일수록 나만의 정확한<br>
-          건강 식습관 리포트가 만들어집니다 📊
-        </div>
-      </div>
+      <!-- 안내 (21끼 + 픽헬스 솔루션 안내로 통합) -->
+      <p class="meal-record-desc" style="font-size:13px;color:#5C6E66;line-height:1.6;text-align:center;margin:6px 4px 12px;">
+        최근 드신 음식 기록입니다.<br>
+        영양학적으로 <strong style="color:#2E7D32;">21끼</strong>를 기록하면 유의미한 건강 식습관 리포트가 만들어집니다.<br>
+        21끼를 기록하여 <strong style="color:#FF6B35;">픽헬스</strong>에서 내 식습관 기반 맞춤 건강 솔루션을 받으세요.
+      </p>
 
       <!-- 연속 기록 스트릭 — loadMealLogs 가 logs 기준으로 갱신 (2일 미만이면 숨김) -->
       <div id="mealStreakBar" class="meal-streak-bar" style="display:none;"></div>
 
-      <!-- 픽헬스 동기부여 힌트 — 21끼 달성하면 맞춤 솔루션 연동 -->
-      <div class="meal-log-pickhealth-hint">
-        <span class="mlph-icon">💡</span>
-        <div class="mlph-text">
-          <strong>21끼를 기록하면</strong> 픽헬스에서 내 식습관 기반 맞춤 건강 솔루션을 받을 수 있어요.
-          <span class="mlph-sub">(영양제 전에 음식으로 먼저 채워드려요)</span>
-        </div>
+      <!-- 리스트 가이드 안내 -->
+      <p class="meal-list-guide" style="font-size:12.5px;color:#7A6E62;line-height:1.5;background:#FFF7EE;border:1px solid #FFE3CC;border-radius:10px;padding:10px 12px;margin:0 0 10px;">
+        📋 아래 목록에서 기록을 확인하고 삭제하거나, 하단에서 새로운 음식을 추가할 수 있어요.
+      </p>
+
+      <!-- 기록 목록 -->
+      <div class="meal-log-list" id="mealLogList" style="margin-top:0;"></div>
+
+      <!-- 진행 바 -->
+      <div class="meal-log-progress" style="margin-top:12px;">
+        <div class="mlp-count">📊 현재 <span id="mealLogCount">0</span>끼 기록 중</div>
+        <div class="progress-wrap"><div class="progress-bar" id="mealLogProgressBar" style="width:0%"></div></div>
+        <div class="mlp-next" id="mealLogNextMsg">기록을 불러오는 중...</div>
       </div>
 
-      <!-- 입력창 + 추가 버튼 -->
-      <div class="meal-log-input-wrap">
+      <!-- 입력창 + 추가 버튼 (리스트 하단으로 이동) -->
+      <div class="meal-log-input-wrap" style="margin-top:12px;">
         <div class="meal-log-search-wrap">
           <input type="search" id="mealLogInput"
             placeholder="음식명을 검색하거나 직접 입력하세요"
@@ -2084,16 +2087,6 @@ async function _logClick(type, menu) {
         </div>
         <button onclick="openMealLogAddPopup()" class="meal-log-add-btn" type="button">추가 +</button>
       </div>
-
-      <!-- 진행 바 -->
-      <div class="meal-log-progress">
-        <div class="mlp-count">📊 현재 <span id="mealLogCount">0</span>끼 기록 중</div>
-        <div class="progress-wrap"><div class="progress-bar" id="mealLogProgressBar" style="width:0%"></div></div>
-        <div class="mlp-next" id="mealLogNextMsg">기록을 불러오는 중...</div>
-      </div>
-
-      <!-- 기록 목록 -->
-      <div class="meal-log-list" id="mealLogList" style="margin-top:12px;"></div>
 
       <!-- 픽헬스 활성화 슬롯 (기록 섹션 하단) — verifyPickHealth가 채움 -->
       <div id="pickhealthCardRecord"></div>
@@ -5848,34 +5841,57 @@ async function _quickLog(mealType){
   // 즉시 더블클릭 방지 — 클릭한 버튼만 disable
   const btns=document.querySelectorAll("#quickLogWrap .qls-btn");
   btns.forEach(b=>b.disabled=true);
-  try{
+
+  // 단일 호출 — 서버 응답을 그대로 반환 (재시도 시 mealType 만 바꿔 재호출)
+  async function _post(mt){
     const r=await fetch("/api/meal-log",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
         uid:FP_UID,
         menuName:curMenu.n,
-        mealType,
+        mealType:mt,
         mealDate:today,
         kcal:parseInt(curMenu.kcal,10)||0,
         category:curMenu.cat||"",
-        // 서버 화이트리스트(`db|manual`)에 맞춰 manual 로 기록 — recommend 출처는 GA 이벤트로 별도 추적
-        source:"manual"
+        // "이 메뉴로 선택" 경로 — 서버 화이트리스트 'recommendation' 사용
+        source:"recommendation"
       })
     });
     const j=await r.json().catch(()=>({}));
-    if(j && j.duplicate){
-      if(typeof toast==="function")toast("이미 기록된 메뉴예요 📋");
-    }else if(j && j.success){
-      if(typeof toast==="function")toast(`${curMenu.n} 기록됐어요! 📊`);
-      if(typeof loadMealLogs==="function")loadMealLogs();
+    return {status:r.status, j};
+  }
+
+  let dup=false;
+  let success=false;
+  let lastErr='';
+  try{
+    let {status, j}=await _post(mealType);
+    // 같은 끼니 슬롯이 이미 차 있으면 ('snack' 으로 폴백 후 재시도) — 누적 기록을 막지 않게.
+    if(status===409 && j && j.code==='DUPLICATE' && mealType!=='snack'){
+      if(typeof _ga==="function")_ga("quick_log_slot_full",{menu:curMenu.n, meal_type:mealType});
+      ({status, j}=await _post('snack'));
+      mealType='snack';
+    }
+    if(status>=200 && status<300 && j && j.success){
+      if(j.duplicate){
+        dup=true;
+        if(typeof toast==="function")toast("이미 기록된 메뉴예요 📋");
+      }else{
+        success=true;
+        if(typeof toast==="function")toast(`✅ ${curMenu.n} 기록됐어요!`);
+      }
     }else{
+      lastErr=(j&&j.error)||`HTTP ${status}`;
       if(typeof toast==="function")toast(j?.error||"기록에 실패했어요. 다시 시도해주세요.");
     }
-    if(typeof _ga==="function")_ga("quick_log_from_recommend",{menu:curMenu.n, meal_type:mealType, dup:!!j?.duplicate});
+    if(typeof _ga==="function")_ga("quick_log_from_recommend",{menu:curMenu.n, meal_type:mealType, dup});
   }catch(e){
+    lastErr=e?.message||'fetch fail';
     if(typeof toast==="function")toast("기록에 실패했어요. 다시 시도해주세요.");
   }finally{
+    // 끼니 카운트 / 리스트 / 스트릭은 시도 결과와 무관하게 항상 갱신 (서버 상태 반영)
+    if(typeof loadMealLogs==="function")loadMealLogs();
     const wrap=document.getElementById("quickLogWrap");
     if(wrap){wrap.style.display="none";wrap.innerHTML="";}
   }
