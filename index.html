@@ -2549,8 +2549,8 @@ const _dbLoadPromise = fetch(DB_URL, { cache: 'force-cache' })
 const CAT_KR={korean:"한식",japanese:"일식",chinese:"중식",western:"양식",chicken:"치킨",pizza:"피자/버거",cafe:"카페/브런치",snack:"분식",seafood:"해산물",health:"건강식",meat:"고기/구이",noodle:"면류",rice:"밥/덮밥",season:"계절메뉴",random:"랜덤",custom:"직접입력"};
 // 5개 그룹 카테고리 → DB의 베이스 카테고리 집합 매핑
 const CAT_GROUP_MAP={
-  kfood: ["korean","snack","meat","seafood","rice","season"],
-  asian: ["japanese","chinese"],
+  kfood: ["korean","snack","meat","seafood","rice","season","chicken"],
+  asian: ["japanese","chinese","noodle"],
   wfood: ["western","pizza"],
   health:["health"],
   cafe:  ["cafe"]
