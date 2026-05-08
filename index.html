@@ -529,6 +529,8 @@ body{
 .mli-kcal{font-size:13px;font-weight:700;color:#FF6B35;flex-shrink:0;}
 .mli-del{background:#fff;border:1px solid #FFCDD2;border-radius:6px;color:#D6645B;font-size:11.5px;font-weight:800;cursor:pointer;padding:5px 9px;line-height:1;flex-shrink:0;letter-spacing:.3px;}
 .mli-del:hover{background:#FFF5F5;border-color:#E57373;color:#E57373;}
+/* DUPLICATE 시 해당 항목 강조 — _highlightMealLogItem 이 2초간 부착 */
+.mli-highlight{background:#FFF3CD !important;border:1px solid #FF6B35 !important;transition:background .3s, border-color .3s;}
 .meal-log-more-btn{width:100%;padding:12px;background:none;border:1px dashed #ccc;border-radius:10px;color:#888;font-size:13px;cursor:pointer;margin-top:6px;font-family:inherit;}
 .meal-log-more-btn:hover{border-color:#4CAF7D;color:#4CAF7D;}
 /* 식사 기록 CSV 내보내기 */
@@ -5872,22 +5874,33 @@ function _retryRecommend(){
   if(typeof _ga==="function")_ga("retry_recommend",{});
   scrollToCategory();
 }
+// 클라 시간을 KST(YYYY-MM-DD)로 환산. UTC 자정 ~ 한국 09:00 사이 어제로 들어가는 문제 차단.
+function _getKSTDateStr(){
+  const now=new Date();
+  const kst=new Date(now.getTime()+9*60*60*1000);
+  return kst.toISOString().slice(0,10);
+}
 async function _quickLog(mealType){
   if(!curMenu){toast("먼저 메뉴를 추천받아 주세요!");return;}
+  // 재진입 가드 — 모바일 더블탭/이벤트 중복 디스패치 차단. 첫 호출 종료까지 무시.
+  if(window._quickLogBusy)return;
+  window._quickLogBusy=true;
   if(mealType==='unknown')mealType='dinner';
-  const today=new Date().toISOString().slice(0,10);
+  // KST 기준 오늘 (서버 검증과 일치)
+  const today=_getKSTDateStr();
+  const menuNameSnapshot=curMenu.n; // finally 시점에 curMenu 변경 가능 — 여기서 고정
   // 즉시 더블클릭 방지 — 클릭한 버튼만 disable
   const btns=document.querySelectorAll("#quickLogWrap .qls-btn");
   btns.forEach(b=>b.disabled=true);
 
-  // 단일 호출 — 서버 응답을 그대로 반환 (재시도 시 mealType 만 바꿔 재호출)
+  // 단일 호출 — 서버 응답을 그대로 반환
   async function _post(mt){
     const r=await fetch("/api/meal-log",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
         uid:FP_UID,
-        menuName:curMenu.n,
+        menuName:menuNameSnapshot,
         mealType:mt,
         mealDate:today,
         kcal:parseInt(curMenu.kcal,10)||0,
@@ -5907,24 +5920,49 @@ async function _quickLog(mealType){
     const {status, j}=await _post(mealType);
     if(status===409 && j && j.code==='DUPLICATE'){
       dup=true;
-      if(typeof toast==="function")toast("오늘 이미 기록된 메뉴예요 📋");
+      if(typeof toast==="function")toast("이미 기록된 메뉴예요 — 목록에서 확인하세요 📋");
     }else if(status>=200 && status<300 && j && j.success){
       success=true;
-      if(typeof toast==="function")toast(`✅ ${curMenu.n} 기록됐어요!`);
+      if(typeof toast==="function")toast(`✅ ${menuNameSnapshot} 기록됐어요!`);
     }else{
       lastErr=(j&&j.error)||`HTTP ${status}`;
       if(typeof toast==="function")toast(j?.error||"기록에 실패했어요. 다시 시도해주세요.");
     }
-    if(typeof _ga==="function")_ga("quick_log_from_recommend",{menu:curMenu.n, meal_type:mealType, dup});
+    if(typeof _ga==="function")_ga("quick_log_from_recommend",{menu:menuNameSnapshot, meal_type:mealType, dup});
   }catch(e){
     lastErr=e?.message||'fetch fail';
     if(typeof toast==="function")toast("기록에 실패했어요. 다시 시도해주세요.");
   }finally{
     // 끼니 카운트 / 리스트 / 스트릭은 시도 결과와 무관하게 항상 갱신 (서버 상태 반영)
-    if(typeof loadMealLogs==="function")loadMealLogs();
+    if(typeof loadMealLogs==="function"){
+      const p=loadMealLogs();
+      // DUPLICATE 였으면 목록 갱신 직후 해당 메뉴 항목을 잠깐 하이라이트
+      if(dup){
+        const apply=()=>_highlightMealLogItem(menuNameSnapshot);
+        if(p && typeof p.then==='function')p.then(apply).catch(apply);
+        else setTimeout(apply,250);
+      }
+    }
     const wrap=document.getElementById("quickLogWrap");
     if(wrap){wrap.style.display="none";wrap.innerHTML="";}
+    window._quickLogBusy=false;
   }
+}
+// DUPLICATE 시 메뉴명 일치 항목을 2초간 강조. 스크롤도 부드럽게 이동.
+function _highlightMealLogItem(name){
+  if(!name)return;
+  const list=document.getElementById('mealLogList');
+  if(!list)return;
+  const items=list.querySelectorAll('.meal-log-item');
+  let target=null;
+  items.forEach(el=>{
+    const nm=el.querySelector('.mli-name');
+    if(!target && nm && nm.textContent.trim()===String(name).trim())target=el;
+  });
+  if(!target)return;
+  target.classList.add('mli-highlight');
+  try{target.scrollIntoView({behavior:'smooth',block:'center'});}catch(_){}
+  setTimeout(()=>target.classList.remove('mli-highlight'),2000);
 }
 
 function showResult(menu,nextMenus){
