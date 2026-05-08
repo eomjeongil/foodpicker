@@ -547,9 +547,15 @@ body{
 .meal-export-hint{font-size:11px;color:#aaa;text-align:center;line-height:1.5;}
 .meal-log-progress{background:#F9FFF9;border:1px solid #E0F0E8;border-radius:10px;padding:14px;margin-top:10px;}
 .mlp-count{font-size:14px;font-weight:700;color:#2E7D32;margin-bottom:8px;}
-.mlp-next{font-size:11.5px;color:#666;margin-top:8px;line-height:1.5;}
-.progress-wrap{background:#E8F5E9;border-radius:20px;height:8px;overflow:hidden;}
-.progress-bar{height:100%;border-radius:20px;background:linear-gradient(90deg,#4CAF7D,#2E9E6B);transition:width .5s ease;}
+.mlp-next{font-size:14px;color:#444;margin-top:8px;line-height:1.55;white-space:normal;font-weight:600;}
+.mlp-next span{font-size:12px !important;}
+.progress-wrap{background:#E8F5E9;border-radius:20px;height:8px;overflow:hidden;display:block;width:100%;min-width:0;box-sizing:border-box;}
+.progress-bar{height:100%;border-radius:20px;background:linear-gradient(90deg,#4CAF7D,#2E9E6B);transition:width .5s ease;display:block;min-width:2px;}
+@media (max-width:480px){
+  .meal-log-progress{padding:12px;}
+  .meal-log-progress .progress-wrap,.ph-progress-wrap{width:100%;display:block;height:10px;}
+  .meal-log-progress .progress-bar,.ph-progress-bar{height:100%;display:block;min-width:2px;}
+}
 /* 리포트 단계별 카드 */
 .report-stage-card{background:#fff;border:1px solid #E0F0E8;border-radius:12px;padding:16px;margin-bottom:10px;}
 .report-stage-card h4{font-size:16px;font-weight:800;color:#2E7D32;margin:0 0 10px;}
@@ -694,15 +700,23 @@ body{
 .ab-actual .ab-row{display:flex;justify-content:space-between;gap:8px;}
 .ab-actual .ab-row + .ab-row{margin-top:2px;}
 .ab-actual .ab-warn{color:#E65100;font-weight:700;}
-/* 리포트→추천 부족 영양소 카드 하단 버튼 */
+/* 리포트→추천 부족 영양소 카드 하단 버튼 (legacy — 인라인 칩으로 대체됨) */
 .rd-recommend-btn{width:100%;margin-top:10px;padding:12px;background:linear-gradient(135deg,#FF6B35,#E65100);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
 .rd-recommend-btn:hover{filter:brightness(1.05);}
+/* 부족 영양소 카드 — 인라인 추천 메뉴 칩 */
+.nutri-recommend-cards{margin-top:8px;padding:10px;background:#f9f9f9;border-radius:10px;}
+.nutri-recommend-title{font-size:13px;color:#666;margin:0 0 8px;}
+.nutri-menu-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.nutri-menu-chip{background:#fff;border:1px solid #FF6B35;color:#FF6B35;border-radius:20px;padding:4px 12px;font-size:13px;cursor:default;}
 /* 건강점수 주간 변화 라벨 */
 .hsc-diff{font-size:13px;font-weight:700;margin-top:6px;}
 .hsc-diff.up{color:#4CAF7D;}
 .hsc-diff.down{color:#FF6B35;}
 .hsc-diff-sub{font-size:12px;color:#aaa;font-weight:400;margin-left:4px;}
 .report-top-hint{display:flex;align-items:flex-start;gap:8px;background:#FFFDE7;border:1px solid #FFF176;border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:13px;}
+.report-top-hint--achieved{background:#F3E5F5;border-color:#CE93D8;}
+.rth-msg{flex:1;min-width:0;color:#555;line-height:1.55;font-weight:600;}
+.report-top-hint--achieved .rth-msg{color:#6A1B9A;}
 .rth-icon{font-size:20px;flex-shrink:0;}
 .rth-text{flex:1;min-width:0;}
 .rth-title{font-weight:800;color:#F57F17;margin-bottom:2px;font-size:14px;}
@@ -2049,8 +2063,8 @@ async function _logClick(type, menu) {
   </div>
 
   <!-- ⑦ 오늘 식사 직접 입력 (접이식) — 민트(기록)이 보라(리포트)보다 위 -->
-  <div class="daily-meal-card" id="dailyMealCard" style="margin:14px 0 0;">
-    <button id="dailyMealToggle" type="button" onclick="toggleDailyMeal()" aria-expanded="false"
+  <div class="daily-meal-card open" id="dailyMealCard" style="margin:14px 0 0;">
+    <button id="dailyMealToggle" type="button" onclick="toggleDailyMeal()" aria-expanded="true"
       style="width:100%;padding:16px 20px;border:none;border-radius:14px;cursor:pointer;
         background:linear-gradient(135deg,#4CAF7D,#2E9E6B);color:#fff;font-weight:800;font-size:14px;letter-spacing:.3px;line-height:1.5;
         display:flex;align-items:center;justify-content:center;gap:6px;text-align:center;
@@ -2060,7 +2074,7 @@ async function _logClick(type, menu) {
       <span class="dmt-state dmt-closed" style="color:#fff;">📝 내가 먹은 음식기록 확인하기 ▼</span>
       <span class="dmt-state dmt-open" style="color:#fff;">📝 내가 먹은 음식기록 확인하기 접기 ▲</span>
     </button>
-    <div id="dailyMealBody" style="display:none;margin-top:10px;border:1px solid var(--border);border-radius:var(--rsm);background:#fff;padding:14px 16px 16px;">
+    <div id="dailyMealBody" style="display:block;margin-top:10px;border:1px solid var(--border);border-radius:var(--rsm);background:#fff;padding:14px 16px 16px;">
       <!-- 안내 (21끼 + 픽헬스 솔루션 안내로 통합) -->
       <p class="meal-record-desc" style="font-size:13px;color:#5C6E66;line-height:1.6;text-align:center;margin:6px 4px 12px;">
         최근 드신 음식 기록입니다.<br>
@@ -2605,8 +2619,10 @@ function snd(t){
 /* ============================================================
    선택
    ============================================================ */
-function selG(el){document.querySelectorAll("#gRow .tog").forEach(t=>t.classList.remove("sel-m","sel-f","sel-a"));const g=el.dataset.g;el.classList.add(g==="M"?"sel-m":g==="F"?"sel-f":"sel-a");selGend=g;snd("click");if(typeof _togglePregnancySection==="function")_togglePregnancySection();}
-function selA(el){document.querySelectorAll("#aRow .tog").forEach(t=>t.classList.remove("sel-m","sel-f","sel-a"));el.classList.add("sel-a");selAgeV=el.dataset.a;snd("click");}
+const FP_PROFILE_LS_KEY="fp6_profile";
+function _saveProfileLS(){try{localStorage.setItem(FP_PROFILE_LS_KEY,JSON.stringify({gender:selGend||"",age:selAgeV||""}));}catch(e){}}
+function selG(el){document.querySelectorAll("#gRow .tog").forEach(t=>t.classList.remove("sel-m","sel-f","sel-a"));const g=el.dataset.g;el.classList.add(g==="M"?"sel-m":g==="F"?"sel-f":"sel-a");selGend=g;_saveProfileLS();snd("click");if(typeof _togglePregnancySection==="function")_togglePregnancySection();}
+function selA(el){document.querySelectorAll("#aRow .tog").forEach(t=>t.classList.remove("sel-m","sel-f","sel-a"));el.classList.add("sel-a");selAgeV=el.dataset.a;_saveProfileLS();snd("click");}
 function selCatF(el){document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));el.classList.add("active");selCatV=el.dataset.cat;snd("click");}
 
 /* ── 직전 식사 (lastMeal) — 추천 영양 균형 보조 컨텍스트 ── */
@@ -3058,6 +3074,30 @@ function _pushHealthInfo(){
   }).catch(()=>{});
 }
 function loadHealth(){
+  // 프로필(gender/age) 복원 — selGend/selAgeV는 별도 LS 키에 저장됨
+  try{
+    const pRaw=localStorage.getItem(FP_PROFILE_LS_KEY);
+    if(pRaw){
+      const p=JSON.parse(pRaw)||{};
+      if(p.gender && ['M','F','N'].includes(p.gender)){
+        selGend=p.gender;
+        document.querySelectorAll('#gRow .tog').forEach(t=>{
+          t.classList.remove('sel-m','sel-f','sel-a');
+          if(t.dataset.g===p.gender){
+            t.classList.add(p.gender==='M'?'sel-m':p.gender==='F'?'sel-f':'sel-a');
+          }
+        });
+        if(typeof _togglePregnancySection==='function')_togglePregnancySection();
+      }
+      if(p.age){
+        selAgeV=String(p.age);
+        document.querySelectorAll('#aRow .tog').forEach(t=>{
+          t.classList.remove('sel-m','sel-f','sel-a');
+          if(t.dataset.a===String(p.age))t.classList.add('sel-a');
+        });
+      }
+    }
+  }catch(e){}
   try{
     const raw=localStorage.getItem(HEALTH_LS_KEY);
     if(!raw)return;
@@ -3261,6 +3301,8 @@ async function _restoreHealthFromServer(){
         if(t.dataset.a===String(d.age))t.classList.add('sel-a');
       });
     }
+    // 서버에서 받은 프로필 값을 로컬 캐시에도 반영 (다음 로드 빠른 표시)
+    if(typeof _saveProfileLS==='function')_saveProfileLS();
 
     // 키/몸무게 복원
     if(d.height!=null){
@@ -4087,10 +4129,19 @@ function _renderStreakCard(streak){
   return `<div class="streak-card">
     <div class="streak-emoji">📊</div>
     <div class="streak-text">
-      <div class="streak-title">이번 주 ${w}끼 기록 중</div>
+      <div class="streak-title">현재까지 ${w}끼 기록 중</div>
       <div class="streak-sub">매일 한 끼라도 기록하면 연속 기록이 시작돼요</div>
     </div>
   </div>`;
+}
+/* ── 끼니 수 기준 안내 메시지 분기 (21끼 미달 / 21끼 이상) ── */
+function _getMealCountMessage(count){
+  const n=parseInt(count,10)||0;
+  if(n<21){
+    const remaining=21-n;
+    return `🍽️ ${remaining}끼 더 기록하면 유의미한 건강 식습관 리포트가 만들어져요`;
+  }
+  return `✨ 꾸준한 기록으로 픽헬스에서 맞춤 건강 솔루션을 받으시고 매일 건강 업그레이드하세요`;
 }
 // loadMealLogs 가 받은 logs(meal_date 내림차순)에서 연속일 즉시 계산. 서버 호출 없이.
 function _calcStreakClient(logs){
@@ -4141,16 +4192,10 @@ async function openReport(){
   // 연속 기록 스트릭 카드 — 2일 이상일 때만 노출. 모든 단계 공통.
   const _streakCard = _renderStreakCard(data.streak);
 
-  // 21끼 미달 시 리포트 최상단에 픽헬스 동기 부여 힌트 (모든 단계 공통)
-  const _topHint = (total < 21) ? `<div class="report-top-hint">
-    <span class="rth-icon">💡</span>
-    <div class="rth-text">
-      <div class="rth-title">21끼를 기록하면</div>
-      <div class="rth-desc">픽헬스에서 내 식습관 기반 맞춤 건강 솔루션을 받을 수 있어요.
-        <span class="rth-sub">(영양제 전에 음식으로 먼저 채워드려요)</span>
-      </div>
-    </div>
-  </div>` : '';
+  // 끼니 수 기준 분기 메시지 (21끼 미달: 진행 안내 / 21끼 이상: 픽헬스 솔루션 안내)
+  const _topHint = `<div class="report-top-hint report-top-hint--${total<21?'progress':'achieved'}">
+    <div class="rth-msg">${_getMealCountMessage(total)}</div>
+  </div>`;
 
   // stage 0 — 진행 바 + CTA + (오늘 기록이 있으면 today 블록도 함께)
   if(stage===0){
@@ -4596,6 +4641,33 @@ async function loadNutritionAnalysis(){
   if(typeof _ga==="function")_ga("nutrition_analysis_render",{n:data.deficiencies.length, source, match_rate:matchRate});
 }
 
+/* 영양소 → 대표 추천 메뉴 칩 매핑. 부족 영양소 카드 하단에 인라인 노출. */
+const _NUTRIENT_MENU_MAP = {
+  '단백질':   ['닭가슴살 샐러드🍗', '계란말이🥚', '고등어구이🐟'],
+  '칼슘':     ['우유🥛', '멸치볶음🐟', '두부조림🫙'],
+  '철분':     ['시금치나물🥬', '소고기볶음🥩', '굴국밥🦪'],
+  '비타민C':  ['귤🍊', '브로콜리볶음🥦', '파프리카샐러드🫑'],
+  '비타민':   ['귤🍊', '브로콜리볶음🥦', '파프리카샐러드🫑'],
+  '식이섬유': ['잡곡밥🌾', '고구마🍠', '샐러드🥗'],
+  '식이섬유·비타민': ['잡곡밥🌾', '브로콜리볶음🥦', '샐러드🥗'],
+  '비타민D':  ['연어구이🐟', '달걀프라이🍳', '버섯볶음🍄'],
+  '오메가3':  ['고등어조림🐟', '참치김밥🍱', '견과류🥜'],
+  '오메가-3': ['고등어조림🐟', '참치김밥🍱', '견과류🥜'],
+  '아연':     ['굴국밥🦪', '소고기미역국🥩', '호박씨🌰']
+};
+function _renderNutrientChips(nutrient){
+  const key=String(nutrient||"").trim();
+  if(!key) return '';
+  const menus=_NUTRIENT_MENU_MAP[key]
+    || _NUTRIENT_MENU_MAP[key.replace(/\s+/g,'')]
+    || null;
+  if(!menus || !menus.length) return '';
+  const chips=menus.map(m=>`<span class="nutri-menu-chip">${_escAt(m)}</span>`).join("");
+  return `<div class="nutri-recommend-cards">
+    <p class="nutri-recommend-title">이런 메뉴 드셔보세요 👇</p>
+    <div class="nutri-menu-chips">${chips}</div>
+  </div>`;
+}
 function _renderDeficiency(d, idx){
   const sev=String(d.severity||"medium").toLowerCase();
   const sevIcon={high:"🔴",medium:"🟠",low:"🟢"}[sev]||"🟠";
@@ -4614,10 +4686,7 @@ function _renderDeficiency(d, idx){
          class="rdf-buy-btn" onclick="_logCpa('food_ingredient')">🛒 구매</a>
     </div>`;
   }).join("");
-  const nutrient=String(d.nutrient||"").trim();
-  const recBtn=nutrient
-    ? `<button class="rd-recommend-btn" type="button" onclick="_recommendForNutrient('${_escAt(nutrient).replace(/'/g,"&#39;")}')">🍽️ ${_escAt(nutrient)} 풍부한 메뉴 추천받기</button>`
-    : '';
+  const nutrientChips=_renderNutrientChips(d.nutrient);
   return `<div class="report-deficiency rd-severity-${_escAt(sev)}">
     <div class="rd-header">
       <span class="rd-severity-${_escAt(sev)}">${sevIcon}</span>
@@ -4629,7 +4698,7 @@ function _renderDeficiency(d, idx){
     ${foodCards||""}
     ${d.recommended_menu?`<div class="rd-menu-suggest">💡 추천 메뉴: ${_escAt(d.recommended_menu)}</div>`:""}
     ${d.supplement_note?`<div class="rd-supplement-note">💊 ${_escAt(d.supplement_note)}</div>`:""}
-    ${recBtn}
+    ${nutrientChips}
   </div>`;
 }
 function closeReport(){
@@ -5444,10 +5513,10 @@ function _renderPickHealthCard(d, profile){
       <div class="ph-feature">🔬 <strong>근거 있는 추천</strong> — 식약처 인정 기능성 + 임상 연구 근거</div>
     </div>
     <div class="ph-lock-progress-wrap">
-      <div class="ph-lock-progress-title">🔒 맞춤 추천 잠금 해제까지 (${total}/21끼 · ${days}/5일)</div>
+      <div class="ph-lock-progress-title">🔒 맞춤 추천 잠금 해제까지 (${total}/21끼)</div>
       <div class="progress-wrap"><div class="progress-bar" id="phLockBar" style="width:${pct}%"></div></div>
       <div class="ph-lock-msg" id="phLockMsg">${_escAt(lockMsg)}</div>
-      <div class="ph-lock-sub">* 5일 이상 기록 시 활성화 (영양학적 신뢰 기준)</div>
+      <div class="ph-lock-sub">* 21끼 이상 기록 시 픽헬스 버튼 활성화 (영양학적 신뢰 기준)</div>
     </div>
     <button class="ph-lock-btn" type="button" disabled>💊 픽헬스 맞춤 솔루션 보기 🔒</button>
   </div>`;
@@ -5552,6 +5621,15 @@ function toggleDailyMeal(){
     if(typeof _ga==="function")_ga("daily_meal_open",{});
   }
 }
+// 음식기록 섹션 기본 펼침 정책 — 페이지 로드 시 자동으로 기록 한 번 로드
+(function _autoLoadMealLogsOnInit(){
+  const run=()=>{
+    const card=document.getElementById("dailyMealCard");
+    if(card && card.classList.contains("open") && typeof loadMealLogs==="function")loadMealLogs();
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);
+  else setTimeout(run,0);
+})();
 function quickPickAlt(name){
   if(!name)return;
   if(typeof _ga==="function")_ga("ai_alt_pick",{name});
