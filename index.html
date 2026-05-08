@@ -682,6 +682,15 @@ body{
   padding:12px 4px;
 }
 .qls-btn-unknown:hover{background:#E8F5E9;border-color:#4CAF7D;transform:translateY(-1px);}
+/* A+B 혼합 영양분석 정확도 배지 */
+.ab-badge{display:inline-flex;align-items:center;gap:4px;background:#E8F5E9;border:1px solid #A5D6A7;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;color:#2E7D32;margin-bottom:8px;}
+.ab-badge.partial{background:#FFF8E1;border-color:#FFE082;color:#F57F17;}
+.ab-badge.fallback{background:#F5F5F5;border-color:#ddd;color:#888;}
+.ab-actual{background:#F1F8E9;border:1px solid #C5E1A5;border-radius:10px;padding:10px 12px;margin:8px 0 10px;font-size:12px;color:#33691E;line-height:1.6;}
+.ab-actual b{color:#1B5E20;}
+.ab-actual .ab-row{display:flex;justify-content:space-between;gap:8px;}
+.ab-actual .ab-row + .ab-row{margin-top:2px;}
+.ab-actual .ab-warn{color:#E65100;font-weight:700;}
 /* 리포트→추천 부족 영양소 카드 하단 버튼 */
 .rd-recommend-btn{width:100%;margin-top:10px;padding:12px;background:linear-gradient(135deg,#FF6B35,#E65100);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
 .rd-recommend-btn:hover{filter:brightness(1.05);}
@@ -4386,11 +4395,11 @@ function _renderHabitEvaluation(he){
   </div>`;
 }
 
-/* ── 부족 영양소 분석 lazy-load ── */
+/* ── 부족 영양소 분석 lazy-load (A+B 혼합 엔진) ── */
 async function loadNutritionAnalysis(){
   const mount=document.getElementById("deficiencyMount");
   if(!mount)return;
-  let data=null, source="ai";
+  let data=null, source="ai", actual=null, matchRate=0, recommended=null;
   try{
     const health=(typeof getHealthInfo==="function")?getHealthInfo():null;
     const r=await fetch("/api/nutrition-analysis",{
@@ -4400,6 +4409,7 @@ async function loadNutritionAnalysis(){
     const j=await r.json().catch(()=>({}));
     if(j && j.data && Array.isArray(j.data.deficiencies)){
       data=j.data; source=j.source||"ai";
+      actual=j.actual||null; matchRate=j.match_rate||0; recommended=j.recommended||null;
     }
   }catch(e){ console.warn("[nutrition-analysis] failed:",e?.message); }
 
@@ -4408,9 +4418,39 @@ async function loadNutritionAnalysis(){
     return;
   }
 
+  // A+B 정확도 배지
+  let badgeHtml="";
+  if(source==="AB"){
+    badgeHtml=`<div class="ab-badge">📊 DB+AI 혼합분석 (${matchRate}% 매칭)</div>`;
+  } else if(source==="A"){
+    badgeHtml=`<div class="ab-badge partial">📊 DB 실측 분석 (${matchRate}% 매칭, AI 일시 중단)</div>`;
+  } else if(source==="cache"){
+    badgeHtml=`<div class="ab-badge">📊 DB+AI 혼합분석 (${matchRate}% 매칭, 캐시)</div>`;
+  } else {
+    badgeHtml=`<div class="ab-badge fallback">📊 추정 분석</div>`;
+  }
+
+  // 실측 통계 카드
+  let actualHtml="";
+  if(actual && actual.avg && recommended){
+    const a=actual.avg, r=recommended;
+    const pctK=Math.round(a.kcal*3/r.kcal*100);
+    const pctP=Math.round(a.protein*3/r.protein*100);
+    const naWarn=a.sodium>1500?'<span class="ab-warn">⚠️</span>':'';
+    actualHtml=`<div class="ab-actual">
+      <div class="ab-row"><span><b>1끼 평균</b></span><span>${actual.mealCount}끼 분석</span></div>
+      <div class="ab-row"><span>🔥 칼로리</span><span>${a.kcal}kcal <span style="color:#888;">(1일 환산 ${pctK}%)</span></span></div>
+      <div class="ab-row"><span>💪 단백질</span><span>${a.protein}g <span style="color:#888;">(1일 환산 ${pctP}%)</span></span></div>
+      <div class="ab-row"><span>🧂 나트륨</span><span>${naWarn}${a.sodium}mg</span></div>
+      ${a.fiber>0?`<div class="ab-row"><span>🌿 식이섬유</span><span>${a.fiber}g</span></div>`:''}
+    </div>`;
+  }
+
   const overall=data.overall_comment?`<div class="rsc-note" style="text-align:center;color:#1565C0;font-style:normal;margin:6px 0 10px;font-size:12.5px;">${_escAt(data.overall_comment)}</div>`:"";
   let html=`<div class="report-section">
     <div class="report-section-title">🧪 부족한 영양소 + 식품 추천</div>
+    ${badgeHtml}
+    ${actualHtml}
     ${overall}
     ${data.deficiencies.map((d,idx)=>_renderDeficiency(d,idx)).join("")}
     <div id="reportPickhealthHint"></div>
@@ -4418,7 +4458,7 @@ async function loadNutritionAnalysis(){
   mount.outerHTML=html;
   // verifyPickHealth 가 이미 끝나 있으면 즉시 채우고, 진행 중이면 다음 verifyPickHealth 호출 때 갱신됨
   _refreshReportPickhealthHint();
-  if(typeof _ga==="function")_ga("nutrition_analysis_render",{n:data.deficiencies.length, source});
+  if(typeof _ga==="function")_ga("nutrition_analysis_render",{n:data.deficiencies.length, source, match_rate:matchRate});
 }
 
 function _renderDeficiency(d, idx){
@@ -6249,7 +6289,38 @@ function _denyPush(){
   if (typeof _ga === 'function') _ga('push_denied', { source: 'toast' });
 }
 
-// loadMealLogs 가 끝날 때 5/21 마일스톤에서 알림 권한 요청 트리거
+// 카카오 채널 단계별 유도 — 5/10/21끼 마일스톤에서 1회씩
+// 단계별 메시지·강도 차등화. 이미 연동(FP_LS_KAKAO=1)이면 즉시 종료.
+function _nudgeKakaoChannel(totalMeals){
+  try{
+    if(localStorage.getItem(FP_LS_KAKAO)==="1") return;
+  }catch(_){ return; }
+  const stage = parseInt(localStorage.getItem('fp_kakao_nudged')||'0',10)||0;
+  const showToast = (msg, ms)=>{
+    if(typeof toast==='function') toast(msg, ms);
+  };
+  if(totalMeals>=5 && stage<1){
+    setTimeout(()=>{
+      showToast('🔐 기기를 바꿔도 기록이 유지돼요! 카카오 채널을 추가해보세요', 4000);
+      localStorage.setItem('fp_kakao_nudged','1');
+      if(typeof _ga==='function')_ga('kakao_nudge',{stage:1, meals:totalMeals});
+    }, 2000);
+  } else if(totalMeals>=10 && stage<2){
+    setTimeout(()=>{
+      showToast('📊 10끼 달성! 카카오 채널을 추가하면 기록이 영구 보관돼요', 4000);
+      localStorage.setItem('fp_kakao_nudged','2');
+      if(typeof _ga==='function')_ga('kakao_nudge',{stage:2, meals:totalMeals});
+    }, 2000);
+  } else if(totalMeals>=21 && stage<3){
+    setTimeout(()=>{
+      showToast('🎉 21끼 달성! 카카오 채널 추가하고 픽헬스 영양진단을 받아보세요', 5000);
+      localStorage.setItem('fp_kakao_nudged','3');
+      if(typeof _ga==='function')_ga('kakao_nudge',{stage:3, meals:totalMeals});
+    }, 1500);
+  }
+}
+
+// loadMealLogs 가 끝날 때 5/21 마일스톤에서 알림 권한 요청 트리거 + 카카오 채널 단계별 유도
 // (기존 loadMealLogs 본체에 직접 끼워넣지 않고 wrap 으로 hook — 다른 호출부 영향 최소화)
 (function(){
   if (typeof loadMealLogs !== 'function') return;
@@ -6260,6 +6331,7 @@ function _denyPush(){
       const cnt = parseInt(document.getElementById('mealLogCount')?.textContent || '0', 10) || 0;
       if (cnt === 5)  _askPushPermission('5끼 달성');
       if (cnt === 21) _askPushPermission('21끼 달성');
+      _nudgeKakaoChannel(cnt);
     } catch(_){}
     return out;
   };
