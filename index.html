@@ -2670,7 +2670,7 @@ function clearLastMeal(){
   if(typeof setLast==="function")setLast("");
   if(typeof toast==="function")toast("직전 식사 정보를 지웠어요");
 }
-// 자동완성용 보조 — 직전 식사 입력창 전용 (맵 카테고리는 일관성 위해 _MLOG_CAT_KCAL 와 동일 키 사용)
+// 자동완성용 보조 — 직전 식사 입력창 전용 (맵 카테고리는 일관성 위해 _LM_CAT_KCAL 와 동일 키 사용)
 // 이전엔 _dmSearchDB / _dmKcalFor / _dmEsc 가 정의되지 않아 _dmEsc(q) 호출에서 ReferenceError 가 나며
 // 드롭다운이 표시되지 않았다 — 셋 다 여기서 구체화한다.
 const _LM_CAT_KCAL={
@@ -3266,6 +3266,92 @@ async function loadNutrition(){
   if(sec.classList.contains("show")){
     sec.classList.remove("show");
     btn.textContent="🥗 영양정보 보기, 추천과 주의 보기";
+    return;
+  }
+  // DB 우선 — curMenu에 kcal 있으면 AI 호출 없이 즉시 카드 렌더
+  if(curMenu && (parseInt(curMenu.kcal,10)||0) > 0){
+    const d={
+      kcal:    parseInt(curMenu.kcal,10)||0,
+      protein: parseFloat(curMenu.protein)||0,
+      carb:    parseFloat(curMenu.carb)||0,
+      fat:     parseFloat(curMenu.fat)||0,
+      sodium:  parseFloat(curMenu.sodium)||0,
+      fiber:   parseFloat(curMenu.fiber)||0,
+      sugar:   parseFloat(curMenu.sugar)||0
+    };
+    _nutriCache=d;
+    document.getElementById("nutriTitle").textContent=`${curMenu.n} 영양 분석`;
+    document.getElementById("nutriGrid").innerHTML=`
+      <div class="nutri-cell"><div class="nk">칼로리</div><div class="nv">${d.kcal} kcal</div></div>
+      <div class="nutri-cell"><div class="nk">단백질</div><div class="nv">${d.protein} g</div></div>
+      <div class="nutri-cell"><div class="nk">탄수화물</div><div class="nv">${d.carb} g</div></div>
+      <div class="nutri-cell"><div class="nk">지방</div><div class="nv">${d.fat} g</div></div>`;
+    // 추가 정보를 태그로 표시 (나트륨/식이섬유/당류)
+    const _tagsHtml=[];
+    if(d.sodium>0){
+      const sodWarn=d.sodium>=1500;
+      _tagsHtml.push(`<span class="nutri-tag${sodWarn?' warn':''}">🧂 나트륨 ${d.sodium}mg${sodWarn?' (높음)':''}</span>`);
+    }
+    if(d.fiber>0)_tagsHtml.push(`<span class="nutri-tag">🌾 식이섬유 ${d.fiber}g</span>`);
+    if(d.sugar>0){
+      const sugWarn=d.sugar>=20;
+      _tagsHtml.push(`<span class="nutri-tag${sugWarn?' warn':''}">🍬 당류 ${d.sugar}g${sugWarn?' (높음)':''}</span>`);
+    }
+    document.getElementById("nutriTags").innerHTML=_tagsHtml.join("");
+    document.getElementById("nutriNote").textContent="※ 픽푸드 DB 기준 (1인분 평균 추정치)";
+    // 탄단지 비율 바
+    const macroBar=document.getElementById("nutriMacroBar");
+    const macroLeg=document.getElementById("nutriMacroLegend");
+    const cKcal=d.carb*4, pKcal=d.protein*4, fKcal=d.fat*9;
+    const tot=cKcal+pKcal+fKcal;
+    if(tot>0){
+      let cP=Math.round(cKcal/tot*100), pP=Math.round(pKcal/tot*100), fP=100-cP-pP;
+      if(fP<0){fP=0;cP=Math.round(cKcal/tot*100);pP=100-cP-fP;}
+      macroBar.innerHTML=`
+        <div class="nm-segment nm-carb" style="width:${cP}%;">${cP>=10?`탄 ${cP}%`:''}</div>
+        <div class="nm-segment nm-protein" style="width:${pP}%;">${pP>=10?`단 ${pP}%`:''}</div>
+        <div class="nm-segment nm-fat" style="width:${fP}%;">${fP>=10?`지 ${fP}%`:''}</div>`;
+      macroLeg.innerHTML=`
+        <span class="lg-c">탄수 ${d.carb}g</span>
+        <span class="lg-p">단백 ${d.protein}g</span>
+        <span class="lg-f">지방 ${d.fat}g</span>`;
+      macroBar.style.display="flex";macroLeg.style.display="flex";
+    }else{macroBar.style.display="none";macroLeg.style.display="none";}
+    // 좋은 사람/피해야 할 사람: DB에는 없으므로 숨김
+    const peopleEl=document.getElementById("nutriPeople");
+    if(peopleEl)peopleEl.style.display="none";
+    // 운동 소모 (로컬 추정 — METs 기준)
+    const exEl=document.getElementById("nutriExercise");
+    const exList=document.getElementById("nutriExList");
+    const exFoot=document.getElementById("nutriExFoot");
+    if(exEl&&exList&&d.kcal>0){
+      const health=(typeof getHealthInfo==="function")?getHealthInfo():null;
+      const w=parseFloat(health?.weight)||65;
+      const usedMine=!!(health&&health.weight);
+      const _exEst=(mets)=>Math.max(1,Math.round(d.kcal*60/(mets*w)));
+      const exArr=[
+        {emoji:"🚶",name:"걷기 (4km/h)",  minutes:_exEst(3.5)},
+        {emoji:"🏃",name:"달리기 (8km/h)",minutes:_exEst(8.0)},
+        {emoji:"🚴",name:"자전거 (16km/h)",minutes:_exEst(6.5)}
+      ];
+      exList.innerHTML=exArr.map(e=>`
+        <div class="nutri-ex-item">
+          <span class="nutri-ex-emoji">${_escAt(e.emoji)}</span>
+          <div class="nutri-ex-text">
+            <div class="nutri-ex-name">${_escAt(e.name)}</div>
+            <div class="nutri-ex-min">→ 약 ${e.minutes}분</div>
+          </div>
+        </div>`).join("");
+      exFoot.textContent = usedMine
+        ? `※ 입력하신 몸무게 ${w}kg 기준 추정치`
+        : `※ 성인 평균 ${w}kg 기준 추정치 (건강정보에 몸무게 입력 시 정확도 ↑)`;
+      exEl.style.display="block";
+    }else if(exEl){
+      exEl.style.display="none";
+    }
+    sec.classList.add("show");
+    btn.textContent="🔼 영양정보 닫기";
+    if(typeof _ga==="function")_ga("nutrition_view",{menu:curMenu.n,kcal:d.kcal,source:"db"});
     return;
   }
   btn.classList.add("loading");
@@ -4477,21 +4563,15 @@ function _resetAiReason(){
 }
 
 /* ── 식습관 기록 (meal_logs 단일 입력) ── */
-// 카테고리별 1인분 평균 칼로리 — DB에 kcal 없을 때 추정값
-const _MLOG_CAT_KCAL={
-  korean:580, japanese:480, chinese:650, western:700,
-  chicken:750, pizza:800, cafe:250, snack:450,
-  seafood:500, health:380, meat:700, noodle:580,
-  rice:550, season:500, random:500, etc:500, custom:500
-};
+// 카테고리별 1인분 평균 칼로리 추정 — _LM_CAT_KCAL 재사용 (중복 정의 제거)
 function _mlogEsc(s){return String(s||"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function _mlogKcalFor(m){
   if(m&&typeof m==="object"){
     const k=parseInt(m.kcal,10);
     if(isFinite(k)&&k>=0)return k;
-    return _MLOG_CAT_KCAL[m.cat]||500;
+    return _LM_CAT_KCAL[m.cat]||500;
   }
-  return _MLOG_CAT_KCAL[m]||500;
+  return _LM_CAT_KCAL[m]||500;
 }
 function _mlogSearchDB(q,limit){
   if(!Array.isArray(window.DB)||!q)return [];
@@ -4901,7 +4981,7 @@ function renderMealLogList(logs, byDate){
   const renderGroup=(d)=>{
     const items=groups[d]||[];
     // 합산: 서버 by_date가 있으면 사용, 없으면 클라에서 합
-    const sum=byDate[d]||{count:items.length, total_kcal:items.reduce((s,l)=>s+(l.kcal||_MLOG_CAT_KCAL[l.menu_category]||500),0)};
+    const sum=byDate[d]||{count:items.length, total_kcal:items.reduce((s,l)=>s+(l.kcal||_LM_CAT_KCAL[l.menu_category]||500),0)};
     const isToday=(d===today);
     return `
       <div class="meal-date-group" id="mdg-${d}">
@@ -4918,7 +4998,7 @@ function renderMealLogList(logs, byDate){
             const t=l.meal_type||"";
             const emoji=_MLOG_TYPE_EMOJI[t]||"🍽️";
             const kor=_MLOG_TYPE_KOR[t]||t;
-            const kcal=l.kcal||_MLOG_CAT_KCAL[l.menu_category]||500;
+            const kcal=l.kcal||_LM_CAT_KCAL[l.menu_category]||500;
             const src=l.source==="db"?"DB ✓":"직접입력";
             // 반찬 태그 (있을 때만): 🥬채소 🥚계란 …
             const sides=(l.side_dishes||"").split(",").map(s=>s.trim()).filter(s=>_SIDE_EMOJI[s]);
