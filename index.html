@@ -426,12 +426,13 @@ body{
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--border-strong);color:var(--text);padding:14px 22px;border-radius:50px;font-size:14px;font-weight:700;z-index:9999;white-space:nowrap;box-shadow:var(--shadow-lg);animation:toastIn .3s cubic-bezier(.34,1.56,.64,1);}
 .toast.toast-warn{border-color:#FF6B35;color:#B33E0F;background:#FFF4EE;}
 .toast.toast-multi{white-space:normal;max-width:300px;text-align:center;line-height:1.55;border-radius:14px;}
-/* 웹 푸시 권한 요청 토스트 (5/21끼 달성 시 노출, 10초 자동 닫힘) */
+/* 웹 푸시 권한 요청 토스트 (비활성화 — 카카오 브랜드 메시지 전환 예정) */
 .push-ask-toast{
+  display:none !important;
   position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
   width:calc(100% - 32px);max-width:380px;background:#fff;
   border:1.5px solid #FF6B35;border-radius:14px;padding:16px;
-  display:flex;align-items:center;gap:10px;
+  align-items:center;gap:10px;
   box-shadow:0 8px 30px rgba(0,0,0,.15);z-index:9998;
   animation:slideUp .3s ease;
 }
@@ -2196,7 +2197,7 @@ async function _logClick(type, menu) {
       <button class="ccc-btn" id="channelBtn" type="button" onclick="linkKakaoChannel('channel_card')">🔐<br>영구<br>보호</button>
     </div>
   </div>
-  <div class="ccc-note">📅 매일 저녁 8:30 알림 · 알림을 받으면 오늘 드신 음식을 기록해보세요</div>
+  <div class="ccc-note" style="display:none !important;" data-push-disabled="1">📅 매일 저녁 8:30 알림 · 알림을 받으면 오늘 드신 음식을 기록해보세요</div>
 
 </div>
 
@@ -6473,15 +6474,20 @@ function addKakaoChannel(ev){
 updateProg();renderHist();
 
 /* ============================================================
-   🔔 웹 푸시 — 서비스워커 등록 + VAPID 구독 + 권한 요청 토스트
+   🔔 웹 푸시 — 비활성화 (카카오 브랜드 메시지 전환 예정)
+   - 모든 함수 보존, 단 _PUSH_ENABLED=false 일 때 시작부에서 즉시 반환
+   - VAPID fetch / SW 자동 등록 / 권한 토스트 모두 차단
    ============================================================ */
+const _PUSH_ENABLED = false;
 let _pushPublicKey = '';
 let _pushAsked = false;
 try { _pushAsked = localStorage.getItem('fp_push_asked') === '1'; } catch(_){}
-fetch('/api/push/vapid-public-key')
-  .then(r => r.json())
-  .then(d => { _pushPublicKey = d.publicKey || ''; })
-  .catch(() => {});
+if (_PUSH_ENABLED) {
+  fetch('/api/push/vapid-public-key')
+    .then(r => r.json())
+    .then(d => { _pushPublicKey = d.publicKey || ''; })
+    .catch(() => {});
+}
 
 function _urlBase64ToUint8Array(base64String){
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -6501,6 +6507,7 @@ function _detectBrowser(){
 }
 
 async function _registerPush(){
+  if (!_PUSH_ENABLED) { console.log('[push] 비활성화 상태 — 구독 스킵'); return false; }
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
     console.log('[push] 미지원 브라우저');
     return false;
@@ -6543,6 +6550,7 @@ async function _registerPush(){
 }
 
 async function _askPushPermission(trigger){
+  if (!_PUSH_ENABLED) return;
   if (_pushAsked) return;
   if (!('Notification' in window)) return;
   if (Notification.permission === 'granted') { await _registerPush(); return; }
@@ -6570,6 +6578,10 @@ async function _askPushPermission(trigger){
   if (typeof _ga === 'function') _ga('push_ask_shown', { trigger });
 }
 async function _allowPush(){
+  if (!_PUSH_ENABLED) {
+    const t = document.getElementById('pushAskToast'); if (t) t.remove();
+    return;
+  }
   const t = document.getElementById('pushAskToast'); if (t) t.remove();
   _pushAsked = true;
   try { localStorage.setItem('fp_push_asked','1'); }catch(_){}

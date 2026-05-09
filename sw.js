@@ -1,7 +1,12 @@
-/* PickFood Service Worker — 웹 푸시 수신/클릭/구독 변경 처리.
-   범위는 sw.js 가 위치한 도메인 루트(/) 전체. cache-control 은 Express 정적 서빙에 위임. */
+/* PickFood Service Worker — 웹 푸시 비활성화 (카카오 브랜드 메시지 전환 예정).
+   범위는 sw.js 가 위치한 도메인 루트(/) 전체. cache-control 은 Express 정적 서빙에 위임.
+   복구: SW_PUSH_ENABLED 를 true 로 바꾸면 모든 핸들러가 즉시 작동.
+   기존 코드는 의도적으로 보존 — early return 으로 차단만 한다. */
+
+const SW_PUSH_ENABLED = false;
 
 self.addEventListener('push', e => {
+  if (!SW_PUSH_ENABLED) return;
   if (!e.data) return;
   let data = {};
   try { data = e.data.json(); } catch (_) {
@@ -23,6 +28,7 @@ self.addEventListener('push', e => {
 });
 
 self.addEventListener('notificationclick', e => {
+  if (!SW_PUSH_ENABLED) return;
   e.notification.close();
   const url = (e.notification.data && e.notification.data.url) || 'https://pickfood.kr';
   e.waitUntil(
@@ -38,6 +44,7 @@ self.addEventListener('notificationclick', e => {
 
 // 브라우저가 구독을 자동 갱신할 때 — 새 구독을 서버에 즉시 동기화 (uid 없이도 endpoint 키로 매칭).
 self.addEventListener('pushsubscriptionchange', e => {
+  if (!SW_PUSH_ENABLED) return;
   if (!e.newSubscription) return;
   e.waitUntil(
     fetch('/api/push/subscribe', {
