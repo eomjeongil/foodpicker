@@ -1550,12 +1550,34 @@ body{
   white-space: nowrap;
 }
 .kakao-login-btn:hover { filter: brightness(0.95); }
-.picki-login-btn.picki-logged-in,
-#kakaoLoginBtn.picki-logged-in {
+.picki-login-btn.picki-logged-in {
   background: #4CAF7D !important;
   color: #fff !important;
 }
-.ccc-right .kakao-login-btn { margin-top: 8px; padding: 10px 14px; font-size: 13px; line-height: 1.3; }
+.channel-card-compact.ccc-card-locked {
+  opacity: 0.5;
+  filter: grayscale(0.3);
+  transition: opacity .2s, filter .2s;
+}
+.channel-card-compact.ccc-card-locked .ccc-btn { pointer-events: none; }
+.channel-card-compact.ccc-card-unlocked {
+  border: 2px solid #FEE500 !important;
+  box-shadow: 0 4px 16px rgba(254,229,0,0.3) !important;
+  animation: ccc-pulse 2s ease-in-out 1;
+}
+.channel-card-compact.ccc-card-loggedin {
+  border: 2px solid #4CAF7D !important;
+  box-shadow: 0 2px 10px rgba(76,175,125,0.2) !important;
+}
+@keyframes ccc-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+#picciLoginBtn.picki-logged-in {
+  background: #4CAF7D !important;
+  color: #fff !important;
+}
 </style>
 <script>
 /* UUID 기기 ID — 로컬 영구 저장. 모든 서버 API 호출에 함께 전송. */
@@ -2213,8 +2235,7 @@ async function _logClick(type, menu) {
       <div class="ccc-desc">소중한 식습관 기록을 안전하게 보존하기 위해<br>카카오 로그인을 권장합니다.<br>별도 회원가입이 아닌, 기록 보호를 위한 간편 인증이에요 🔐</div>
     </div>
     <div class="ccc-right">
-      <button class="ccc-btn" id="channelBtn" type="button" onclick="linkKakaoChannel('channel_card')">🔐<br>영구<br>보호</button>
-      <button class="kakao-login-btn picki-login-btn" id="kakaoLoginBtn" type="button" onclick="_startPickiLogin()">카카오로<br>로그인</button>
+      <button class="ccc-btn picki-login-btn" id="picciLoginBtn" type="button" onclick="_startPickiOAuthFlow()">🔐<br>기록<br>보호</button>
     </div>
   </div>
   <div class="ccc-note" style="display:none !important;" data-push-disabled="1">📅 매일 저녁 8:30 알림 · 알림을 받으면 오늘 드신 음식을 기록해보세요</div>
@@ -5171,6 +5192,10 @@ async function loadMealLogs(){
         }else{
           streakEl.style.display="none";
         }
+        // ccc 카드 강조 + 마일스톤 넛지 (5끼/21끼 1회)
+        if(typeof window._checkMealMilestone==="function"){
+          window._checkMealMilestone(totalMeals);
+        }
       }
     }catch(_){}
   }catch(e){
@@ -6912,7 +6937,7 @@ document.addEventListener('keydown',e=>{
 <script>window.PWA_OPTIONS={name:"픽푸드",color:"#FF6B35"};</script>
 <script src="/pwa-install.js" defer></script>
 <script>
-// picki 로그인 상태 처리 (카카오 OAuth via picki.kr)
+// picki 로그인 상태 처리 (카카오 OAuth via picki.kr) + ccc 카드 통합 UX
 (function() {
   function _getCookie(name) {
     return document.cookie.split(";").map(c=>c.trim())
@@ -6923,6 +6948,7 @@ document.addEventListener('keydown',e=>{
     catch (_) { return null; }
   }
 
+  // ── 로그인 상태 복원
   const token = _getCookie("picki_jwt") || localStorage.getItem("picki_jwt");
   if (token) {
     const payload = _parseJWT(token);
@@ -6933,20 +6959,131 @@ document.addEventListener('keydown',e=>{
       if (payload.uid) {
         try { localStorage.setItem("fp_uid", payload.uid); } catch(_) {}
       }
-      document.querySelectorAll(".picki-login-btn, #kakaoLoginBtn").forEach(btn => {
-        btn.textContent = (payload.nickname || "회원") + "님 ✓";
-        btn.classList.add("picki-logged-in");
-      });
+      _applyLoggedInUI(payload);
       console.log("[picki] 로그인 상태:", payload.nickname || payload.uid);
     } else if (payload) {
       localStorage.removeItem("picki_jwt");
     }
   }
 
-  window._startPickiLogin = function() {
+  function _applyLoggedInUI(payload) {
+    document.querySelectorAll(".picki-login-btn").forEach(btn => {
+      btn.textContent = "✓ 보호중";
+      btn.classList.add("picki-logged-in");
+    });
+    const card = document.querySelector(".channel-card-compact");
+    if (card) {
+      card.classList.remove("ccc-card-locked", "ccc-card-unlocked");
+      card.classList.add("ccc-card-loggedin");
+      const desc = card.querySelector(".ccc-desc");
+      if (desc) {
+        desc.textContent = (payload?.nickname || "회원")
+          + "님의 기록이 안전하게 보호되고 있어요 ✅";
+      }
+    }
+  }
+
+  // ── OAuth 시작
+  window._startPickiOAuthFlow = function() {
+    const returnTo = "https://pickfood.kr/auth/cross";
     location.href = "https://picki.kr/api/auth/kakao?return_to="
-      + encodeURIComponent("https://pickfood.kr/auth/cross");
+      + encodeURIComponent(returnTo);
   };
+  // 하위 호환
+  window._startPickiLogin = window._startPickiOAuthFlow;
+
+  // ── ccc 카드 끼니 수 기반 강조
+  window._updateCccCardByMealCount = function(count) {
+    if (window._pickiUser) return;
+    const card = document.querySelector(".channel-card-compact");
+    if (!card) return;
+    if (count >= 5) {
+      card.classList.remove("ccc-card-locked");
+      card.classList.add("ccc-card-unlocked");
+    } else {
+      card.classList.add("ccc-card-locked");
+      card.classList.remove("ccc-card-unlocked");
+    }
+  };
+
+  // ── 5끼/21끼 마일스톤 + 넛지
+  window._checkMealMilestone = function(count) {
+    if (typeof count !== "number") count = 0;
+    _updateCccCardByMealCount(count);
+    if (window._pickiUser) return;
+    const key = "picki_milestone_shown";
+    const shown = localStorage.getItem(key) || "";
+    if (count >= 5 && !shown.includes("5,")) {
+      setTimeout(() => _showPickiLoginNudge(count), 1500);
+      localStorage.setItem(key, shown + "5,");
+      return;
+    }
+    if (count >= 21 && !shown.includes("21,")) {
+      setTimeout(() => _showPickiLoginNudge(count), 1500);
+      localStorage.setItem(key, shown + "21,");
+    }
+  };
+
+  function _showPickiLoginNudge(count) {
+    if (window._pickiUser) return;
+    if (document.getElementById("picciNudgeBanner")) return;
+    const msg = count >= 21
+      ? `🎉 ${count}끼 달성! 픽헬스에서 맞춤 건강 솔루션을 받아보세요\n카카오 로그인으로 기록을 보호하세요 🔐`
+      : `🎉 벌써 ${count}끼 기록했어요!\n카카오 로그인하면 기기가 바뀌어도 기록이 영구 보존돼요 🔐`;
+    const banner = document.createElement("div");
+    banner.id = "picciNudgeBanner";
+    banner.style.cssText = "position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;border:2px solid #FEE500;border-radius:16px;padding:16px 20px;max-width:320px;width:90%;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:9000;text-align:center;font-family:inherit;animation:picciSlideUp 0.3s ease;";
+    banner.innerHTML = `
+      <style>@keyframes picciSlideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}</style>
+      <div style="font-size:14px;color:#333;line-height:1.6;white-space:pre-line;margin-bottom:12px">${msg}</div>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button type="button" onclick="_startPickiOAuthFlow();document.getElementById('picciNudgeBanner')?.remove();"
+          style="background:#FEE500;color:#191919;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
+          🔐 카카오 로그인
+        </button>
+        <button type="button" onclick="document.getElementById('picciNudgeBanner')?.remove();"
+          style="background:#f5f5f5;color:#888;border:none;border-radius:10px;padding:10px 14px;font-size:13px;cursor:pointer;font-family:inherit">
+          나중에
+        </button>
+      </div>`;
+    document.body.appendChild(banner);
+    setTimeout(() => banner?.remove(), 8000);
+  }
+  window._showPickiLoginNudge = _showPickiLoginNudge;
+
+  // ── OAuth 성공 후 채널 추가 권유 팝업
+  function _showChannelAddPrompt() {
+    if (document.getElementById("channelAddPrompt")) return;
+    const popup = document.createElement("div");
+    popup.id = "channelAddPrompt";
+    popup.style.cssText = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:20px;padding:24px 20px;max-width:300px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.2);z-index:9999;text-align:center;font-family:inherit;";
+    popup.innerHTML = `
+      <div style="font-size:24px;margin-bottom:8px">🎉</div>
+      <div style="font-size:16px;font-weight:800;color:#1F1C18;margin-bottom:8px">로그인 완료!</div>
+      <div style="font-size:13px;color:#666;line-height:1.6;margin-bottom:16px">
+        카카오 채널을 추가하면<br>맞춤 식습관 알림을 받을 수 있어요 📱<br>
+        <span style="color:#aaa;font-size:11px">(선택사항)</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button type="button" onclick="if(typeof linkKakaoChannel==='function')linkKakaoChannel('login_success');document.getElementById('channelAddPrompt')?.remove();"
+          style="background:#FEE500;color:#191919;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
+          📣 카카오 채널 추가하기
+        </button>
+        <button type="button" onclick="document.getElementById('channelAddPrompt')?.remove();"
+          style="background:none;border:none;color:#aaa;font-size:13px;cursor:pointer;padding:8px">
+          나중에 할게요
+        </button>
+      </div>`;
+    document.body.appendChild(popup);
+  }
+  window._showChannelAddPrompt = _showChannelAddPrompt;
+
+  // ── picki_auth=success 감지 (페이지 로드 직후)
+  const _authParams = new URLSearchParams(location.search);
+  if (_authParams.get("picki_auth") === "success") {
+    history.replaceState({}, "", location.pathname);
+    setTimeout(_showChannelAddPrompt, 1000);
+  }
 })();
 </script>
 </body>
