@@ -6948,29 +6948,49 @@ document.addEventListener('keydown',e=>{
     catch (_) { return null; }
   }
 
-  // ── 로그인 상태 복원
-  const token = _getCookie("picki_jwt") || localStorage.getItem("picki_jwt");
-  if (token) {
+  // ── 로그인 상태 적용 (DOMContentLoaded 타이밍 보장)
+  function _applyPickiLoginState() {
+    const token = _getCookie("picki_jwt") || localStorage.getItem("picki_jwt");
+    if (!token) return;
+
     const payload = _parseJWT(token);
-    if (payload && payload.exp * 1000 > Date.now()) {
-      localStorage.setItem("picki_jwt", token);
-      window._pickiJWT = token;
-      window._pickiUser = payload;
-      if (payload.uid) {
-        try { localStorage.setItem("fp_uid", payload.uid); } catch(_) {}
-      }
-      _applyLoggedInUI(payload);
-      console.log("[picki] 로그인 상태:", payload.nickname || payload.uid);
-    } else if (payload) {
+    if (!payload || payload.exp * 1000 < Date.now()) {
+      document.cookie = "picki_jwt=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
       localStorage.removeItem("picki_jwt");
+      return;
     }
+
+    localStorage.setItem("picki_jwt", token);
+    window._pickiJWT = token;
+    window._pickiUser = payload;
+    if (payload.uid) {
+      try { localStorage.setItem("fp_uid", payload.uid); } catch(_) {}
+    }
+
+    const btns = document.querySelectorAll(
+      "#kakaoLoginBtn, #kakaoLoginBtnHealth, #picciLoginBtn, .picki-login-btn, .kakao-login-btn-header"
+    );
+    btns.forEach(btn => {
+      btn.textContent = (payload.nickname || "회원") + "님 ✓";
+      btn.style.background = "#4CAF7D";
+      btn.style.color = "#fff";
+      btn.style.borderRadius = "20px";
+      btn.classList.add("picki-logged-in");
+      btn.onclick = () => {
+        if (confirm("로그아웃 하시겠어요?")) {
+          document.cookie = "picki_jwt=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+          localStorage.removeItem("picki_jwt");
+          localStorage.removeItem("fp_uid");
+          location.reload();
+        }
+      };
+    });
+
+    _applyLoggedInUI(payload);
+    console.log("[picki] 로그인 상태 적용:", payload.nickname || payload.uid);
   }
 
   function _applyLoggedInUI(payload) {
-    document.querySelectorAll(".picki-login-btn").forEach(btn => {
-      btn.textContent = "✓ 보호중";
-      btn.classList.add("picki-logged-in");
-    });
     const card = document.querySelector(".channel-card-compact");
     if (card) {
       card.classList.remove("ccc-card-locked", "ccc-card-unlocked");
@@ -6981,6 +7001,12 @@ document.addEventListener('keydown',e=>{
           + "님의 기록이 안전하게 보호되고 있어요 ✅";
       }
     }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", _applyPickiLoginState);
+  } else {
+    _applyPickiLoginState();
   }
 
   // ── OAuth 시작
