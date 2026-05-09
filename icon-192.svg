@@ -12,7 +12,7 @@
           <rect x="88" y="72" width="4" height="26" rx="2" fill="#FF6B35"/>
           <path d="M96 72 Q110 72 110 85 Q110 95 96 98 L96 72Z" fill="#FF6B35"/>
           <rect x="80" y="102" width="34" height="4" rx="2" fill="white" opacity="0.8"/>
-          <text x="96" y="135" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="22" fill="white">푸드피커</text>
+          <text x="96" y="135" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="22" fill="white">픽푸드</text>
         
   </g>
 </svg>
