@@ -7182,10 +7182,48 @@ document.addEventListener('keydown',e=>{
   }
   window._showChannelAddPrompt = _showChannelAddPrompt;
 
+  // ── 픽헬스 자동 연동 (백그라운드 iframe)
+  function _syncTokenToPickhealth() {
+    try {
+      const token = _getCookie("picki_jwt") || localStorage.getItem("picki_jwt");
+      if (!token) return;
+      const url = "https://pickhealth.kr/auth/cross?token=" + encodeURIComponent(token);
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      setTimeout(() => iframe.remove(), 5000);
+      console.log("[pickfood] 픽헬스 자동 연동 트리거");
+    } catch (e) {
+      console.warn("[pickfood] 픽헬스 자동 연동 실패:", e);
+    }
+  }
+  window._syncTokenToPickhealth = _syncTokenToPickhealth;
+
+  // ── _startPickiOAuthFlow 강화: 이미 로그인 시 알림
+  const _origStartPickiOAuthFlow = window._startPickiOAuthFlow;
+  window._startPickiOAuthFlow = function() {
+    if (window._pickiUser) {
+      const nick = window._pickiUser.nickname || "회원";
+      const msg = "✅ " + nick + "님으로 이미 로그인되어 있어요!";
+      if (typeof _showToast === "function") {
+        _showToast(msg, 3000);
+      } else {
+        alert(msg);
+      }
+      return;
+    }
+    return _origStartPickiOAuthFlow();
+  };
+  window._startPickiLogin = window._startPickiOAuthFlow;
+
   // ── picki_auth=success 감지 (페이지 로드 직후)
   const _authParams = new URLSearchParams(location.search);
   if (_authParams.get("picki_auth") === "success") {
     history.replaceState({}, "", location.pathname);
+    // 픽헬스 자동 연동 (먼저 토큰을 픽헬스로 전달)
+    setTimeout(_syncTokenToPickhealth, 200);
+    // 채널 추가 프롬프트
     setTimeout(_showChannelAddPrompt, 1000);
   }
 })();
