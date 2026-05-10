@@ -1623,6 +1623,30 @@ async function _logClick(type, menu) {
   try { await fetch('https://pickfood.kr/api/log-click', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,menu,uid:FP_UID})}); } catch(e) {}
 }
 </script>
+<script>
+// picki 로그인 상태 즉시 체크 (버튼 깜빡임 방지)
+(function() {
+  function _parseJWT(t) {
+    try { return JSON.parse(atob(t.split('.')[1])); } catch(e) { return null; }
+  }
+  function _getCk(n) {
+    var m = document.cookie.split(';').map(function(c){return c.trim();})
+      .find(function(c){return c.indexOf(n+'=')===0;});
+    return m ? m.split('=')[1] : null;
+  }
+  var token = _getCk('picki_jwt') || localStorage.getItem('picki_jwt');
+  if (token) {
+    var p = _parseJWT(token);
+    if (p && p.exp * 1000 > Date.now()) {
+      window._pickiPreLoggedIn = true;
+      window._pickiPrePayload = p;
+      var s = document.createElement('style');
+      s.textContent = '#kakaoLoginBtn,#kakaoLoginBtnHealth,.kakao-login-btn-header,.picki-login-btn:not(#picciLoginBtn){display:none!important}';
+      document.head.appendChild(s);
+    }
+  }
+})();
+</script>
 </head>
 <body>
 <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
@@ -7157,6 +7181,13 @@ document.addEventListener('keydown',e=>{
 
   // ── OAuth 성공 후 채널 추가 권유 팝업
   function _showChannelAddPrompt() {
+    // picki SSO로 진입한 경우 채널 팝업 차단
+    try {
+      if (sessionStorage.getItem("from_picki") === "1") {
+        sessionStorage.removeItem("from_picki");
+        return;
+      }
+    } catch(_) {}
     if (document.getElementById("channelAddPrompt")) return;
     const popup = document.createElement("div");
     popup.id = "channelAddPrompt";
@@ -7200,17 +7231,41 @@ document.addEventListener('keydown',e=>{
   }
   window._syncTokenToPickhealth = _syncTokenToPickhealth;
 
-  // ── _startPickiOAuthFlow 강화: 이미 로그인 시 알림
+  // ── _startPickiOAuthFlow 강화: 이미 로그인 시 알림 (쿠키/localStorage까지 확인)
   const _origStartPickiOAuthFlow = window._startPickiOAuthFlow;
   window._startPickiOAuthFlow = function() {
-    if (window._pickiUser) {
-      const nick = window._pickiUser.nickname || "회원";
-      const msg = "✅ " + nick + "님으로 이미 로그인되어 있어요!";
+    // 1순위: _applyPickiLoginState 후 설정된 _pickiUser
+    let payload = window._pickiUser;
+    // 2순위: 쿠키/localStorage의 JWT 직접 확인 (DOMContentLoaded 이전 클릭 대비)
+    if (!payload) {
+      const tk = _getCookie("picki_jwt") || localStorage.getItem("picki_jwt");
+      if (tk) {
+        const p = _parseJWT(tk);
+        if (p && p.exp * 1000 > Date.now()) {
+          payload = p;
+          window._pickiUser = p;
+          window._pickiJWT = tk;
+        }
+      }
+    }
+    if (payload) {
+      const nick = payload.nickname || "회원";
+      const msg = "✅ " + nick + "님, 이미 카카오 로그인으로 기록이 보호되고 있어요!";
       if (typeof _showToast === "function") {
-        _showToast(msg, 3000);
+        _showToast(msg, 4000);
       } else {
         alert(msg);
       }
+      // ccc 카드 상태 즉시 업데이트
+      try {
+        const card = document.querySelector(".channel-card-compact");
+        if (card) {
+          card.classList.remove("ccc-card-locked", "ccc-card-unlocked");
+          card.classList.add("ccc-card-loggedin");
+          const desc = card.querySelector(".ccc-desc");
+          if (desc) desc.textContent = nick + "님의 기록이 안전하게 보호되고 있어요 ✅";
+        }
+      } catch(_) {}
       return;
     }
     return _origStartPickiOAuthFlow();
@@ -7221,10 +7276,10 @@ document.addEventListener('keydown',e=>{
   const _authParams = new URLSearchParams(location.search);
   if (_authParams.get("picki_auth") === "success") {
     history.replaceState({}, "", location.pathname);
+    try { sessionStorage.setItem("from_picki", "1"); } catch(_) {}
     // 픽헬스 자동 연동 (먼저 토큰을 픽헬스로 전달)
     setTimeout(_syncTokenToPickhealth, 200);
-    // 채널 추가 프롬프트
-    setTimeout(_showChannelAddPrompt, 1000);
+    // 채널 팝업은 picki SSO 진입 시 띄우지 않음 (사용자 혼선 방지)
   }
 })();
 </script>
