@@ -1641,7 +1641,9 @@ async function _logClick(type, menu) {
       window._pickiPreLoggedIn = true;
       window._pickiPrePayload = p;
       var s = document.createElement('style');
-      s.textContent = '#kakaoLoginBtn,#kakaoLoginBtnHealth,.kakao-login-btn-header,.picki-login-btn:not(#picciLoginBtn){display:none!important}';
+      s.textContent = '#kakaoLoginBtn,#kakaoLoginBtnHealth,.kakao-login-btn-header,.picki-login-btn:not(#picciLoginBtn){display:none!important}'
+        + '.channel-card-compact.ccc-card-locked{opacity:1!important;filter:none!important}'
+        + '.channel-card-compact.ccc-card-locked .ccc-btn{pointer-events:auto!important}';
       document.head.appendChild(s);
     }
   }
@@ -7122,7 +7124,7 @@ document.addEventListener('keydown',e=>{
 
   // ── ccc 카드 끼니 수 기반 강조
   window._updateCccCardByMealCount = function(count) {
-    if (window._pickiUser) return;
+    if (window._pickiUser || window._pickiPreLoggedIn) return;
     const card = document.querySelector(".channel-card-compact");
     if (!card) return;
     if (count >= 5) {
@@ -7138,7 +7140,7 @@ document.addEventListener('keydown',e=>{
   window._checkMealMilestone = function(count) {
     if (typeof count !== "number") count = 0;
     _updateCccCardByMealCount(count);
-    if (window._pickiUser) return;
+    if (window._pickiUser || window._pickiPreLoggedIn) return;
     const key = "picki_milestone_shown";
     const shown = localStorage.getItem(key) || "";
     if (count >= 5 && !shown.includes("5,")) {
