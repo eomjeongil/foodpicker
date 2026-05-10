@@ -1627,7 +1627,12 @@ async function _logClick(type, menu) {
 // picki 로그인 상태 즉시 체크 (버튼 깜빡임 방지)
 (function() {
   function _parseJWT(t) {
-    try { return JSON.parse(atob(t.split('.')[1])); } catch(e) { return null; }
+    try {
+      var b64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      var pad = b64 + '='.repeat((4 - b64.length % 4) % 4);
+      var bytes = Uint8Array.from(atob(pad), function(c){ return c.charCodeAt(0); });
+      return JSON.parse(new TextDecoder('utf-8').decode(bytes));
+    } catch(e) { return null; }
   }
   function _getCk(n) {
     var m = document.cookie.split(';').map(function(c){return c.trim();})
@@ -7048,8 +7053,12 @@ document.addEventListener('keydown',e=>{
       .find(c=>c.startsWith(name+"="))?.split("=")[1] || null;
   }
   function _parseJWT(t) {
-    try { return JSON.parse(atob(t.split(".")[1])); }
-    catch (_) { return null; }
+    try {
+      const b64 = t.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+      const pad = b64 + "=".repeat((4 - b64.length % 4) % 4);
+      const bytes = Uint8Array.from(atob(pad), c => c.charCodeAt(0));
+      return JSON.parse(new TextDecoder("utf-8").decode(bytes));
+    } catch (_) { return null; }
   }
 
   // ── 로그인 상태 적용 (DOMContentLoaded 타이밍 보장)
