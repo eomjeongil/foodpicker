@@ -1,0 +1,9 @@
+# 백업 파일 (.bak / .bak.YYYYMMDD / .bak-YYYYMMDD-... 패턴 모두)
+*.bak
+*.bak.*
+*.bak-*
+
+# 환경/DB/의존성 (상위 디렉토리지만 혹시 모를 방어)
+.env
+*.db
+node_modules/
