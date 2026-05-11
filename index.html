@@ -2400,7 +2400,7 @@ const _cfg = (()=>{
   const _b = "food_picker_v6";
   const _c = "YOUR_KAKAO_JS_KEY";               // ← 카카오 JS 키
   const _d = "https://pickfood.kr";       // ← 배포 URL
-  const _e = "9efcbf6d4b73d6427db514cdfa6fc821";                    // ← OpenWeatherMap 키
+  const _e = "";                                                    // ← OpenWeatherMap 키는 서버(.env: OPENWEATHERMAP_API_KEY)로 이동 — 클라이언트에서 직접 호출하지 않음
   return {p:_a, s:_b, k:_c, u:_d, w:_e};
 })();
 
@@ -2620,16 +2620,60 @@ setInterval(tickClock,30000);tickClock();detectMeal();
 const WX_LABELS={clear:"☀️ 맑음",cloud:"⛅ 흐림",rain:"🌧️ 비",snow:"❄️ 눈",hot:"🥵 더움",cold:"🥶 추움"};
 const WX_BONUS={rain:["korean","snack","noodle"],snow:["korean","noodle"],hot:["health","cafe"],cold:["meat","korean"],clear:[],cloud:[]};
 let wxCode="clear";
+function _wxTimeFallback(){
+  const h=new Date().getHours();wxCode=h<6||h>21?"cold":"clear";
+  document.getElementById("wxTag").textContent=WX_LABELS[wxCode];
+  _updateWeatherBanner();
+}
+async function _askLocationConsent(){
+  const saved = localStorage.getItem('pf_loc_consent');
+  if(saved==='allow') return true;
+  if(saved==='deny')  return false;
+  return new Promise(resolve=>{
+    const w=document.createElement('div');
+    w.id='_loc_consent';
+    w.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9990;display:flex;align-items:center;justify-content:center;padding:20px;';
+    const box=document.createElement('div');
+    box.style.cssText='background:#fff;border-radius:18px;padding:22px 22px 18px;max-width:340px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.18);font-family:inherit;';
+    box.innerHTML=`
+      <div style="font-size:30px;text-align:center;margin-bottom:8px">📍</div>
+      <div style="font-size:15px;font-weight:800;text-align:center;color:#1F1C18;margin-bottom:6px">날씨 맞춤 메뉴 추천</div>
+      <div style="font-size:13px;line-height:1.6;color:#555;text-align:center;margin-bottom:14px">
+        현재 위치(위도/경도)를 1회 사용해<br>날씨에 어울리는 메뉴를 추천드려요.<br>
+        <span style="color:#888;font-size:12px">서버에 저장되지 않고 즉시 파기됩니다.</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button id="_loc_skip" style="flex:1;background:#f5f3ef;color:#666;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">건너뛰기</button>
+        <button id="_loc_ok" style="flex:1;background:#FF6B35;color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">위치 허용</button>
+      </div>
+      <div style="font-size:11px;color:#aaa;text-align:center;margin-top:10px;line-height:1.5">
+        ⓘ 좌표는 OpenWeatherMap(미국)에 전송됩니다 ·
+        <a href="#" id="_loc_pp" style="color:#FF6B35;text-decoration:underline">처리방침</a>
+      </div>`;
+    w.appendChild(box);
+    document.body.appendChild(w);
+    box.querySelector('#_loc_ok').addEventListener('click',()=>{
+      try{localStorage.setItem('pf_loc_consent','allow');}catch(_){}
+      w.remove();resolve(true);
+    });
+    box.querySelector('#_loc_skip').addEventListener('click',()=>{
+      try{localStorage.setItem('pf_loc_consent','deny');}catch(_){}
+      w.remove();resolve(false);
+    });
+    box.querySelector('#_loc_pp').addEventListener('click',e=>{
+      e.preventDefault();
+      try{ openModal('privacy'); }catch(_){}
+    });
+  });
+}
 async function fetchWeather(){
   try{
-    if(_cfg.w==="YOUR_OWM_KEY"){
-      const h=new Date().getHours();wxCode=h<6||h>21?"cold":"clear";
-      document.getElementById("wxTag").textContent=WX_LABELS[wxCode];
-      _updateWeatherBanner();return;
-    }
-    const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:5000}));
-    const r=await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&appid=${_cfg.w}&units=metric`);
+    const consent = await _askLocationConsent();
+    if(!consent){ _wxTimeFallback(); return; }
+    const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:5000,maximumAge:300000}));
+    const r=await fetch(`/api/weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
     const d=await r.json();
+    if(!d || !d.weather || (d.cod && d.cod!==200)) throw new Error('weather api');
     const id=d.weather[0].id,t=d.main.temp;
     wxCode=id>=200&&id<600?"rain":id>=600&&id<700?"snow":id>=800&&id<=801?"clear":"cloud";
     if(t>=28)wxCode="hot";if(t<=5)wxCode="cold";
@@ -6869,9 +6913,9 @@ const _LEGAL_CONTENT={
     title:'개인정보처리방침',
     body:`
       <div class="legal-section">
-        <div class="legal-date">시행일: 2026년 1월 1일 · 최종 수정: 2026년 5월</div>
+        <div class="legal-date">시행일: 2026년 1월 1일 · 최종 수정: 2026년 5월 11일</div>
 
-        <div class="legal-notice">PickFood는 개인정보보호법을 준수하며 이용자의 개인정보를 소중히 보호합니다.</div>
+        <div class="legal-notice">PickFood는 개인정보보호법 및 위치정보의 보호 및 이용 등에 관한 법률을 준수하며 이용자의 개인정보를 소중히 보호합니다.</div>
 
         <div class="legal-article">
           <div class="legal-article-title">1. 수집하는 개인정보 항목</div>
@@ -6880,7 +6924,9 @@ const _LEGAL_CONTENT={
             · 기기 고유 ID (UUID, 자동 생성)<br>
             · 방문 기록, 메뉴 선택 기록<br>
             · 접속 시간, 앱 사용 기록<br><br>
-            <strong>이용자 입력 항목 (선택):</strong><br>
+            <strong>선택 수집 항목 (이용자 동의 시):</strong><br>
+            · <strong>위치 정보 (위도/경도)</strong>: 날씨 기반 메뉴 추천을 위한 1회성 좌표. 서버에 저장하지 않으며 OpenWeatherMap 조회 후 즉시 파기됩니다.<br><br>
+            <strong>건강 입력 항목 (선택):</strong><br>
             · 건강정보: 키, 몸무게, BMI<br>
             · 건강 상태: 혈압, 혈당, 콜레스테롤<br>
             · 생활 정보: 활동량, 임신·수유 여부<br>
@@ -6896,6 +6942,7 @@ const _LEGAL_CONTENT={
           <div class="legal-article-title">2. 개인정보 수집 및 이용 목적</div>
           <div class="legal-article-body">
             · AI 기반 맞춤 메뉴 추천<br>
+            · 현재 날씨를 반영한 시간·계절 맞춤 메뉴 추천 (위치 정보 이용 시)<br>
             · 식습관 분석 및 건강 리포트 제공<br>
             · 서비스 품질 개선<br>
             · 카카오 채널 연동 시 건강리포트 알림 발송
@@ -6921,7 +6968,8 @@ const _LEGAL_CONTENT={
             · 법령의 규정에 의하거나 수사 목적으로 법령에 정해진 절차에 따른 경우<br><br>
             <strong>제휴 서비스:</strong><br>
             · 쿠팡파트너스: 링크 클릭 시 쿠팡의 개인정보처리방침 적용<br>
-            · 카카오: 채널 추가 시 카카오의 개인정보처리방침 적용
+            · 카카오: 채널 추가 시 카카오의 개인정보처리방침 적용<br>
+            · <strong>OpenWeatherMap Inc.(미국)</strong>: 날씨 조회 목적으로 위치 좌표(위도/경도)만 1회 전송됩니다. 개인 식별 정보는 포함되지 않으며 응답 수신 후 좌표는 즉시 폐기됩니다. <a href="https://openweathermap.org/privacy-policy" target="_blank" rel="noopener" style="color:#FF6B35;text-decoration:underline">OpenWeatherMap 개인정보처리방침</a>
           </div>
         </div>
 
@@ -6953,7 +7001,21 @@ const _LEGAL_CONTENT={
           <div class="legal-article-body">
             서비스명: PickFood (pickfood.kr)<br>
             운영: picki.kr<br>
-            문의: 카카오 채널 메시지로 문의해주세요
+            문의: 카카오 채널 메시지<br>
+            이메일: <a href="mailto:tithelord@gmail.com" style="color:#FF6B35;text-decoration:underline">tithelord@gmail.com</a>
+          </div>
+        </div>
+
+        <div class="legal-article">
+          <div class="legal-article-title">8. 위치정보의 처리</div>
+          <div class="legal-article-body">
+            <strong>수집 목적:</strong> 현재 날씨를 반영한 맞춤 메뉴 추천<br>
+            <strong>수집 항목:</strong> 현재 위치 좌표(위도/경도)<br>
+            <strong>수집 방법:</strong> 브라우저 위치 권한 허용 시 1회 수집 (거부 시 시간대 기반 추정값 제공)<br>
+            <strong>보유 기간:</strong> 날씨 조회 완료 즉시 파기 — 서버 저장 없음<br>
+            <strong>제3자 제공:</strong> OpenWeatherMap Inc.(미국) — 날씨 조회 목적에 한해 좌표 전송<br>
+            <strong>거부 권리:</strong> 브라우저 설정 또는 사이트 권한에서 위치 권한을 거부할 수 있으며, 거부 시에도 서비스 이용에 제한이 없습니다<br>
+            <strong>관련 법령:</strong> 위치정보의 보호 및 이용 등에 관한 법률 준수
           </div>
         </div>
       </div>
