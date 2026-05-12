@@ -1606,6 +1606,14 @@ function _getOrCreateUid() {
   }
 }
 let FP_UID = _getOrCreateUid();
+// 카카오 로그인 처리 완료 플래그 + 대기 콜백 큐 — _quickLog 등이 FP_UID 갱신 전에 발사되는 race 방지
+window._fpLoginReady = false;
+window._fpLoginQueue = [];
+(function(){
+  // 토큰이 없으면(비로그인 또는 게이트 우회 케이스) 즉시 ready로 표시해 불필요한 대기 제거
+  const _tk = localStorage.getItem('picki_jwt') || (document.cookie.match(/(?:^|;\s*)picki_jwt=([^;]+)/)?.[1] || null);
+  if (!_tk) window._fpLoginReady = true;
+})();
 
 async function _sendStat(endpoint, data) {
   try { await fetch("https://pickfood.kr/" + endpoint, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...data, uid: FP_UID})}); } catch(e) {}
@@ -6417,6 +6425,13 @@ function _getKSTDateStr(){
 }
 async function _quickLog(mealType){
   if(!curMenu){toast("먼저 메뉴를 추천받아 주세요!");return;}
+  // 로그인 처리 race 방지 — 토큰 보유 상태에서 _applyPickiLoginState 미완료면 FP_UID가 익명 uid일 수 있음
+  if(!window._fpLoginReady){
+    await new Promise(resolve=>{
+      (window._fpLoginQueue = window._fpLoginQueue || []).push(resolve);
+      setTimeout(resolve, 3000); // 안전 타임아웃 — 토큰 검증 실패 등 ready가 안 켜지는 케이스
+    });
+  }
   // 재진입 가드 — 모바일 더블탭/이벤트 중복 디스패치 차단. 첫 호출 종료까지 무시.
   if(window._quickLogBusy)return;
   window._quickLogBusy=true;
@@ -7482,6 +7497,12 @@ document.addEventListener('keydown',e=>{
       try { localStorage.setItem("fp_uid", payload.uid); } catch(_) {}
       // 모듈 평가 시점 캡처된 FP_UID let을 최신 카카오 uid로 갱신 (이후 모든 API 호출이 새 uid 사용)
       FP_UID = payload.uid;
+      // 로그인 처리 완료 — 대기 중인 콜백(예: _quickLog) 즉시 실행
+      window._fpLoginReady = true;
+      if (Array.isArray(window._fpLoginQueue) && window._fpLoginQueue.length) {
+        const _q = window._fpLoginQueue; window._fpLoginQueue = [];
+        _q.forEach(fn => { try { fn(); } catch(_) {} });
+      }
       // 익명 → 카카오 uid 머지: sessionStorage의 fp_pre_login_uid가 다르면 서버에 데이터 이전 요청
       try {
         const _preUid = sessionStorage.getItem('fp_pre_login_uid');
