@@ -1671,10 +1671,16 @@ async function _logClick(type, menu) {
       <li>✅ 어디서든 내 리포트 확인</li>
       <li>✅ 픽헬스 맞춤 솔루션 연동</li>
     </ul>
-    <button type="button" class="lgm-kakao-btn" onclick="_startPickiOAuthFlow()">
+    <button type="button" class="lgm-kakao-btn" onclick="_gateKakaoLogin()">
       <span aria-hidden="true" style="font-size:18px;line-height:1;">💬</span>
       <span>카카오로 시작하기</span>
     </button>
+    <p class="lgm-kakao-notice">카카오 인증 후 자동으로 돌아옵니다</p>
+    <div id="lgmRetryMsg" class="lgm-retry-msg" style="display:none;">
+      ⚠️ 로그인에 문제가 생겼어요<br>
+      <small>잠시 후 다시 시도해주세요</small><br>
+      <button type="button" class="lgm-retry-btn" onclick="_retryPickiLogin()">다시 시도하기</button>
+    </div>
     <p class="lgm-footer">픽푸드는 카카오 계정으로만 안전하게 이용하실 수 있어요</p>
   </div>
 </div>
@@ -1974,6 +1980,10 @@ async function _logClick(type, menu) {
     .lgm-benefits li{font-size:13.5px;color:#333;padding:3px 0;line-height:1.5;}
     .lgm-kakao-btn{width:100%;padding:14px;background:#FEE500;border:none;border-radius:12px;font-size:15.5px;font-weight:800;color:#1a1a1a;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;transition:transform .15s,box-shadow .15s;}
     .lgm-kakao-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(254,229,0,0.5);}
+    .lgm-kakao-notice{font-size:11.5px;color:#999;margin:-6px 0 14px;text-align:center;}
+    .lgm-retry-msg{background:#FFF3F3;border:1px solid #FFCDD2;border-radius:10px;padding:12px;margin:0 0 12px;font-size:13px;color:#C62828;line-height:1.6;text-align:center;}
+    .lgm-retry-btn{margin-top:8px;padding:8px 20px;background:#FF6B35;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+    .lgm-retry-btn:hover{background:#E55A2B;}
     .lgm-footer{font-size:11.5px;color:#999;line-height:1.5;margin:0;}
   </style>
   <div class="card recent-meal-section" id="recentMealInput">
@@ -7373,6 +7383,10 @@ document.addEventListener('keydown',e=>{
 
   // ── 카카오 로그인 필수 게이트: 토큰 유효 시 close, 없으면 open
   function _checkLoginGate() {
+    // ?guest=1 점검 우회
+    if(_checkGuestMode()) return;
+    // OAuth 실패 복귀(?auth=expired|invalid|fail) 시 retry 메시지 노출
+    _checkAuthResult();
     const overlay = document.getElementById('loginGateOverlay');
     if (!overlay) return;
     try {
@@ -7388,6 +7402,58 @@ document.addEventListener('keydown',e=>{
     } catch(_) {}
     overlay.style.display = 'flex';
   }
+  // ── 로그인 게이트 안전장치 ─────────────────────────────
+  // 주의: navigation 후 JS context가 소멸하므로 in-page 타이머는 같은 페이지를 떠나지 않은
+  // 시나리오(예: SDK 임베드, 새 창 인증)에서만 fire함. 실제 안전망은 ?auth=*** URL 파라미터.
+  let _loginGateTimer = null;
+  function _startLoginTimer(){
+    if(_loginGateTimer)clearTimeout(_loginGateTimer);
+    _loginGateTimer = setTimeout(()=>{
+      const m = document.getElementById('lgmRetryMsg');
+      if(m) m.style.display = 'block';
+    }, 30000);
+  }
+  function _clearLoginTimer(){
+    if(_loginGateTimer){ clearTimeout(_loginGateTimer); _loginGateTimer = null; }
+  }
+  // 재시도 버튼 — 메시지 숨기고 OAuth 재시작
+  window._retryPickiLogin = function(){
+    const m = document.getElementById('lgmRetryMsg');
+    if(m) m.style.display = 'none';
+    _clearLoginTimer();
+    _startLoginTimer();
+    if(typeof _startPickiOAuthFlow==='function') _startPickiOAuthFlow();
+  };
+  // 게이트 카카오 버튼 클릭 핸들러 — 타이머 시작 후 OAuth 진입
+  window._gateKakaoLogin = function(){
+    _startLoginTimer();
+    if(typeof _startPickiOAuthFlow==='function') _startPickiOAuthFlow();
+  };
+  // ?guest=1 관리자 우회 (점검/긴급용)
+  function _checkGuestMode(){
+    try{
+      const p = new URLSearchParams(location.search);
+      if(p.get('guest') === '1'){
+        console.warn('[gate] guest 모드 — 로그인 게이트 우회');
+        const o = document.getElementById('loginGateOverlay');
+        if(o) o.style.display = 'none';
+        return true;
+      }
+    }catch(_){}
+    return false;
+  }
+  // OAuth 실패 복귀 처리 — 서버는 auth=expired|invalid|fail 중 하나로 redirect
+  function _checkAuthResult(){
+    try{
+      const p = new URLSearchParams(location.search);
+      const v = p.get('auth') || p.get('picki_auth');
+      if(v && ['expired','invalid','fail'].includes(v)){
+        const m = document.getElementById('lgmRetryMsg');
+        if(m) m.style.display = 'block';
+      }
+    }catch(_){}
+  }
+
   function _closeLoginGate() {
     const overlay = document.getElementById('loginGateOverlay');
     if (overlay) overlay.style.display = 'none';
