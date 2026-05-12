@@ -1658,6 +1658,26 @@ async function _logClick(type, menu) {
 </script>
 </head>
 <body>
+
+<!-- 카카오 로그인 필수 게이트 — 비로그인 시 전면 차단 -->
+<div id="loginGateOverlay" class="login-gate-overlay" style="display:none;">
+  <div class="login-gate-modal" role="dialog" aria-modal="true" aria-labelledby="lgmTitle">
+    <div class="lgm-icon" aria-hidden="true">🔐</div>
+    <h2 id="lgmTitle" class="lgm-title">내 식습관 기록을<br>안전하게 보호하세요</h2>
+    <p class="lgm-desc">카카오 로그인을 하면 기기를 바꾸거나<br>캐시를 삭제해도 소중한 기록이 사라지지 않아요</p>
+    <ul class="lgm-benefits">
+      <li>✅ 기기 변경해도 기록 유지</li>
+      <li>✅ 캐시 삭제해도 복원 가능</li>
+      <li>✅ 어디서든 내 리포트 확인</li>
+      <li>✅ 픽헬스 맞춤 솔루션 연동</li>
+    </ul>
+    <button type="button" class="lgm-kakao-btn" onclick="_startPickiOAuthFlow()">
+      <span aria-hidden="true" style="font-size:18px;line-height:1;">💬</span>
+      <span>카카오로 시작하기</span>
+    </button>
+    <p class="lgm-footer">픽푸드는 카카오 계정으로만 안전하게 이용하실 수 있어요</p>
+  </div>
+</div>
 <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
 
 <!-- TIME BAR -->
@@ -1943,6 +1963,18 @@ async function _logClick(type, menu) {
     .slot-edit-hint{font-size:11.5px;color:#9E9E9E;margin-top:6px;line-height:1.4;}
     @keyframes rmGuidePulse{0%{background:#FFF8E1;}40%{background:#FFE082;}100%{background:#FFF8E1;}}
     .rm-edit-guide.is-flash{animation:rmGuidePulse 1.2s ease;}
+    /* ── 카카오 로그인 필수 게이트 ─────────────────── */
+    .login-gate-overlay{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;}
+    .login-gate-modal{background:#fff;border-radius:20px;padding:32px 24px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:lgmSlideUp .35s cubic-bezier(.34,1.56,.64,1);}
+    @keyframes lgmSlideUp{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+    .lgm-icon{font-size:46px;margin-bottom:14px;line-height:1;}
+    .lgm-title{font-size:19px;font-weight:800;color:#1a1a1a;line-height:1.4;margin:0 0 10px;}
+    .lgm-desc{font-size:13.5px;color:#666;line-height:1.6;margin:0 0 18px;}
+    .lgm-benefits{list-style:none;padding:14px 16px;margin:0 0 18px;background:#F8F9FA;border-radius:12px;text-align:left;}
+    .lgm-benefits li{font-size:13.5px;color:#333;padding:3px 0;line-height:1.5;}
+    .lgm-kakao-btn{width:100%;padding:14px;background:#FEE500;border:none;border-radius:12px;font-size:15.5px;font-weight:800;color:#1a1a1a;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;transition:transform .15s,box-shadow .15s;}
+    .lgm-kakao-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(254,229,0,0.5);}
+    .lgm-footer{font-size:11.5px;color:#999;line-height:1.5;margin:0;}
   </style>
   <div class="card recent-meal-section" id="recentMealInput">
     <p class="recent-meal-title" style="font-size:15px;font-weight:800;color:#FF6B35;margin:0 0 4px;">최근 먹은 메뉴를 날짜별로 적어주세요</p>
@@ -7339,6 +7371,28 @@ document.addEventListener('keydown',e=>{
     } catch (_) { return null; }
   }
 
+  // ── 카카오 로그인 필수 게이트: 토큰 유효 시 close, 없으면 open
+  function _checkLoginGate() {
+    const overlay = document.getElementById('loginGateOverlay');
+    if (!overlay) return;
+    try {
+      const token = localStorage.getItem('picki_jwt')
+                    || (document.cookie.match(/(?:^|;\s*)picki_jwt=([^;]+)/)?.[1] || null);
+      if (token) {
+        const payload = _parseJWT(token);
+        if (payload && payload.uid && payload.exp * 1000 > Date.now()) {
+          overlay.style.display = 'none';
+          return;
+        }
+      }
+    } catch(_) {}
+    overlay.style.display = 'flex';
+  }
+  function _closeLoginGate() {
+    const overlay = document.getElementById('loginGateOverlay');
+    if (overlay) overlay.style.display = 'none';
+  }
+
   // ── 로그인 상태 적용 (DOMContentLoaded 타이밍 보장)
   function _applyPickiLoginState() {
     const token = _getCookie("picki_jwt") || localStorage.getItem("picki_jwt");
@@ -7378,6 +7432,7 @@ document.addEventListener('keydown',e=>{
     });
 
     _applyLoggedInUI(payload);
+    _closeLoginGate();
     console.log("[picki] 로그인 상태 적용:", payload.nickname || payload.uid);
   }
 
@@ -7394,10 +7449,11 @@ document.addEventListener('keydown',e=>{
     }
   }
 
+  function _loginBootstrap(){ _applyPickiLoginState(); _checkLoginGate(); }
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", _applyPickiLoginState);
+    document.addEventListener("DOMContentLoaded", _loginBootstrap);
   } else {
-    _applyPickiLoginState();
+    _loginBootstrap();
   }
 
   // ── OAuth 시작
