@@ -6057,6 +6057,23 @@ function updateMealProgress(count){
 }
 
 // 토스트 — 카테고리 가드 헬퍼 패턴 재사용 (자체 DOM)
+// ── 전역 toast 함수 — 기존 코드 34곳의 `if (typeof toast==='function') toast(...)` 호출이 실제로 작동하도록.
+// _catGuardLikeToast(#mealLogToast)를 1순위로 위임. 정의 안 됐을 때를 위한 즉석 fallback 포함.
+function toast(msg, duration) {
+  if (typeof _catGuardLikeToast === 'function') {
+    _catGuardLikeToast(msg);
+    return;
+  }
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);'
+    + 'background:rgba(0,0,0,0.85);color:#fff;padding:12px 20px;border-radius:12px;'
+    + 'font-size:14px;z-index:9999;text-align:center;max-width:320px;line-height:1.5;'
+    + 'font-family:inherit;box-shadow:0 6px 24px rgba(0,0,0,0.35);';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => { if (el.parentNode) el.remove(); }, duration || 2400);
+}
+
 function _catGuardLikeToast(msg){
   const old=document.getElementById("mealLogToast");
   if(old)old.remove();
@@ -7535,8 +7552,7 @@ document.addEventListener('keydown',e=>{
             if (d && d.ok) {
               console.log(`[uid머지] ${_preUid.slice(0,8)} → ${payload.uid.slice(0,12)} (meal_logs ${d.moved||0}건 이전)`);
               if (typeof loadMealLogs === 'function') loadMealLogs();
-              // 머지 후 새 uid의 건강정보 재조회 (anonymous uid에 health info 있으면 머지로 이전됨, 없으면 빈 응답)
-              if (typeof loadHealth === 'function') loadHealth();
+              // 머지 후 새 uid의 건강정보 재조회. loadHealth는 localStorage만 읽어 stale 덮어쓰기 위험 → 서버 fetch만 호출.
               if (typeof _restoreHealthFromServer === 'function') _restoreHealthFromServer();
             } else {
               console.warn('[uid머지] 실패:', d && d.error);
