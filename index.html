@@ -5350,7 +5350,17 @@ async function saveMealLog(){
       // 서버가 반환한 검증 코드별 안내
       const code=j.code||"";
       const msg=j.error||"저장 실패";
-      _catGuardLikeToast(msg);
+      // 하루 4끼 초과(LIMIT) — 토스트 대신 강조 팝업으로 안내
+      if (code === 'LIMIT' || (msg && msg.includes('4끼'))) {
+        _showAlertPopup(
+          'limitMealPopup',
+          '📋',
+          '오늘 기록이 모두 찼어요',
+          `하루 최대 <strong>4끼</strong>까지 기록 가능해요<br>수정하려면 하단에서 기존 메뉴를 <strong>삭제</strong>한 후<br>다시 입력해주세요`
+        );
+      } else {
+        _catGuardLikeToast(msg);
+      }
       if(typeof _ga==="function")_ga("meal_log_save_blocked",{code,type:_mealLogMeal,date:_mealLogDate});
       return;
     }
@@ -6074,6 +6084,31 @@ function toast(msg, duration) {
   setTimeout(() => { if (el.parentNode) el.remove(); }, duration || 2400);
 }
 
+// ── 공용 알림 팝업 — toast로 부족한 강조가 필요한 안내(중복, 한도 초과 등)에 사용
+// id: DOM 중복 방지 키 / icon: 큰 이모지 / title: 굵은 제목 / body: HTML 허용 본문
+function _showAlertPopup(id, icon, title, body) {
+  const existing = document.getElementById(id);
+  if (existing) existing.remove();
+  const pop = document.createElement('div');
+  pop.id = id;
+  pop.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);'
+    + 'display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;'
+    + 'animation:fadeIn .2s ease;';
+  pop.innerHTML = `
+    <div style="background:#fff;border-radius:20px;padding:28px 24px;max-width:340px;width:100%;
+                text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.25);font-family:inherit;">
+      <div style="font-size:42px;margin-bottom:12px;line-height:1;">${icon}</div>
+      <h3 style="font-size:17px;font-weight:800;margin:0 0 10px;color:#1a1a1a;line-height:1.4;">${title}</h3>
+      <p style="font-size:14px;color:#666;line-height:1.7;margin:0 0 22px;">${body}</p>
+      <button type="button" onclick="document.getElementById('${id}')?.remove()"
+        style="width:100%;padding:14px;background:#FF6B35;color:#fff;border:none;border-radius:12px;
+               font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">확인</button>
+    </div>`;
+  document.body.appendChild(pop);
+  // overlay 외부 클릭으로도 닫기 (모달 내부 클릭은 stopPropagation 없이 위임)
+  pop.addEventListener('click', e => { if (e.target === pop) pop.remove(); });
+}
+
 function _catGuardLikeToast(msg){
   const old=document.getElementById("mealLogToast");
   if(old)old.remove();
@@ -6469,9 +6504,12 @@ async function _quickLog(mealType){
       && l.source==='recommendation' && !l.is_deleted);
     if (_alreadyRec) {
       const _ML={breakfast:'아침',lunch:'점심',dinner:'저녁',snack:'간식'};
-      if (typeof toast==='function') {
-        toast(`이미 ${_ML[mealType]||mealType} 추천메뉴가 기록됐어요. 변경하려면 하단 기록에서 삭제 후 다시 추천받으세요 🗑️`);
-      }
+      _showAlertPopup(
+        'dupMealPopup',
+        '🍽️',
+        `이미 ${_ML[mealType]||mealType} 메뉴가 기록됐어요`,
+        `메뉴를 변경하려면<br>하단 기록에서 해당 메뉴를 <strong>삭제</strong>한 후<br>다시 추천받거나 직접 입력해주세요`
+      );
       btns.forEach(b=>b.disabled=false);
       window._quickLogBusy=false;
       return;
