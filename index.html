@@ -1605,7 +1605,7 @@ function _getOrCreateUid() {
     });
   }
 }
-const FP_UID = _getOrCreateUid();
+let FP_UID = _getOrCreateUid();
 
 async function _sendStat(endpoint, data) {
   try { await fetch("https://pickfood.kr/" + endpoint, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...data, uid: FP_UID})}); } catch(e) {}
@@ -7426,6 +7426,10 @@ document.addEventListener('keydown',e=>{
   };
   // 게이트 카카오 버튼 클릭 핸들러 — 타이머 시작 후 OAuth 진입
   window._gateKakaoLogin = function(){
+    // OAuth 진입 직전 현재 익명 uid 저장 → 복귀 후 머지에 사용 (sessionStorage는 같은 origin/탭 navigation에서 유지)
+    try {
+      if (FP_UID) sessionStorage.setItem('fp_pre_login_uid', FP_UID);
+    } catch(_) {}
     _startLoginTimer();
     if(typeof _startPickiOAuthFlow==='function') _startPickiOAuthFlow();
   };
@@ -7476,6 +7480,29 @@ document.addEventListener('keydown',e=>{
     window._pickiUser = payload;
     if (payload.uid) {
       try { localStorage.setItem("fp_uid", payload.uid); } catch(_) {}
+      // 모듈 평가 시점 캡처된 FP_UID let을 최신 카카오 uid로 갱신 (이후 모든 API 호출이 새 uid 사용)
+      FP_UID = payload.uid;
+      // 익명 → 카카오 uid 머지: sessionStorage의 fp_pre_login_uid가 다르면 서버에 데이터 이전 요청
+      try {
+        const _preUid = sessionStorage.getItem('fp_pre_login_uid');
+        if (_preUid && _preUid !== payload.uid) {
+          sessionStorage.removeItem('fp_pre_login_uid');
+          fetch('/api/users/merge-uid', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ oldUid: _preUid, newUid: payload.uid })
+          })
+          .then(r => r.json()).then(d => {
+            if (d && d.ok) {
+              console.log(`[uid머지] ${_preUid.slice(0,8)} → ${payload.uid.slice(0,12)} (meal_logs ${d.moved||0}건 이전)`);
+              if (typeof loadMealLogs === 'function') loadMealLogs();
+            } else {
+              console.warn('[uid머지] 실패:', d && d.error);
+            }
+          })
+          .catch(e => console.warn('[uid머지] 네트워크 오류:', e?.message));
+        }
+      } catch(_) {}
     }
 
     const btns = document.querySelectorAll(
