@@ -3374,8 +3374,23 @@ async function saveRecentMeals(){
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({text, uid: (typeof FP_UID!=='undefined'?FP_UID:_getOrCreateUid())})
     });
-    await res.json().catch(()=>({}));
-    if(typeof toast==='function')toast('최근 메뉴를 기록했어요 📝');
+    const data=await res.json().catch(()=>({}));
+    if(typeof toast==='function'){
+      const _MEAL_LBL={breakfast:'아침',lunch:'점심',dinner:'저녁',snack:'간식'};
+      const _DATE_LBL={today:'오늘',yesterday:'어제','2daysago':'그제'};
+      const _meals=Array.isArray(data&&data.meals)?data.meals:[];
+      if(_meals.length>0){
+        const _summary=_meals.slice(0,3).map(m=>{
+          const dl=_DATE_LBL[m&&m.date]||'오늘';
+          const ml=_MEAL_LBL[m&&m.meal_type]||'간식';
+          return `${(m&&m.name)||''}(${dl} ${ml})`;
+        }).join(' · ');
+        const _more=_meals.length>3?` 외 ${_meals.length-3}건`:'';
+        toast(`${_summary}${_more} 기록됨 🍽️`);
+      }else{
+        toast('최근 메뉴를 기록했어요 📝');
+      }
+    }
     if(typeof loadMealLogs==='function')loadMealLogs();
     scrollToCategory();
   }catch(e){
