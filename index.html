@@ -6443,6 +6443,24 @@ async function _quickLog(mealType){
   const btns=document.querySelectorAll("#quickLogWrap .qls-btn");
   btns.forEach(b=>b.disabled=true);
 
+  // 같은 끼니에 이미 추천메뉴 기록이 있으면 사전 차단 (서버 UNIQUE 409 대신 친절한 안내)
+  try {
+    const _lr = await fetch(`/api/meal-logs?uid=${encodeURIComponent(FP_UID)}&days=1`, {cache:'no-store'});
+    const _lj = await _lr.json().catch(()=>({}));
+    const _logs = Array.isArray(_lj.logs) ? _lj.logs : [];
+    const _alreadyRec = _logs.find(l => l && l.meal_date===today && l.meal_type===mealType
+      && l.source==='recommendation' && !l.is_deleted);
+    if (_alreadyRec) {
+      const _ML={breakfast:'아침',lunch:'점심',dinner:'저녁',snack:'간식'};
+      if (typeof toast==='function') {
+        toast(`이미 ${_ML[mealType]||mealType} 추천메뉴가 기록됐어요. 변경하려면 하단 기록에서 삭제 후 다시 추천받으세요 🗑️`);
+      }
+      btns.forEach(b=>b.disabled=false);
+      window._quickLogBusy=false;
+      return;
+    }
+  } catch(e) { console.warn('[추천중복체크] 오류:', e?.message); }
+
   // 단일 호출 — 서버 응답을 그대로 반환
   async function _post(mt){
     const r=await fetch("/api/meal-log",{
@@ -7517,6 +7535,9 @@ document.addEventListener('keydown',e=>{
             if (d && d.ok) {
               console.log(`[uid머지] ${_preUid.slice(0,8)} → ${payload.uid.slice(0,12)} (meal_logs ${d.moved||0}건 이전)`);
               if (typeof loadMealLogs === 'function') loadMealLogs();
+              // 머지 후 새 uid의 건강정보 재조회 (anonymous uid에 health info 있으면 머지로 이전됨, 없으면 빈 응답)
+              if (typeof loadHealth === 'function') loadHealth();
+              if (typeof _restoreHealthFromServer === 'function') _restoreHealthFromServer();
             } else {
               console.warn('[uid머지] 실패:', d && d.error);
             }
@@ -7547,6 +7568,15 @@ document.addEventListener('keydown',e=>{
 
     _applyLoggedInUI(payload);
     _closeLoginGate();
+    // 로그인 성공 시 건강정보 카드 자동 펼침 (저장된 값 즉시 확인 가능하도록)
+    setTimeout(() => {
+      const _hc = document.getElementById('healthCard');
+      if (_hc && !_hc.classList.contains('open')) {
+        _hc.classList.add('open');
+        const _bt = _hc.querySelector('.health-toggle');
+        if (_bt) _bt.setAttribute('aria-expanded', 'true');
+      }
+    }, 500);
     console.log("[picki] 로그인 상태 적용:", payload.nickname || payload.uid);
   }
 
