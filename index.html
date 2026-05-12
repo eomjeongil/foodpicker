@@ -2244,9 +2244,9 @@ async function _logClick(type, menu) {
       <div class="mlp-popup-menu" id="mlpPopupMenu" style="font-size:13px;font-weight:800;color:#2E7D32;margin-bottom:14px;text-align:center;"></div>
       <div class="mlp-title">언제 드셨나요?</div>
       <div class="mlp-date-row">
-        <button class="mlp-btn active" data-date="today" onclick="selectLogDate(this)" type="button">오늘</button>
-        <button class="mlp-btn" data-date="yesterday" onclick="selectLogDate(this)" type="button">어제</button>
-        <button class="mlp-btn" data-date="2daysago" onclick="selectLogDate(this)" type="button">그제</button>
+        <button id="mlpBtnToday"     class="mlp-btn active" data-date="today"     onclick="selectLogDate(this)" type="button">오늘</button>
+        <button id="mlpBtnYesterday" class="mlp-btn"        data-date="yesterday" onclick="selectLogDate(this)" type="button">어제</button>
+        <button id="mlpBtn2daysago"  class="mlp-btn"        data-date="2daysago"  onclick="selectLogDate(this)" type="button">그제</button>
       </div>
       <div class="mlp-title">어느 끼니였나요?</div>
       <div class="mlp-meal-row">
@@ -5195,6 +5195,22 @@ document.addEventListener("click",e=>{
   if(ac){ac.style.display="none";ac.classList.remove("show");}
 });
 
+// 팝업 날짜 버튼 라벨을 KST 기준 실제 날짜로 갱신 — 자정 넘어 다시 열면 자동 반영되도록 매 open 시 호출.
+function _updatePopupDateLabels(){
+  const _DAY_KR=['일','월','화','수','목','금','토'];
+  const _kstNow=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Seoul'}));
+  const _fmt=d=>`${d.getMonth()+1}/${d.getDate()}(${_DAY_KR[d.getDay()]})`;
+  const _today=_kstNow;
+  const _yest=new Date(_kstNow.getTime()-86400000);
+  const _two=new Date(_kstNow.getTime()-172800000);
+  const _b1=document.getElementById('mlpBtnToday');
+  const _b2=document.getElementById('mlpBtnYesterday');
+  const _b3=document.getElementById('mlpBtn2daysago');
+  if(_b1)_b1.textContent=`오늘 ${_fmt(_today)}`;
+  if(_b2)_b2.textContent=`어제 ${_fmt(_yest)}`;
+  if(_b3)_b3.textContent=`그제 ${_fmt(_two)}`;
+}
+
 function openMealLogAddPopup(){
   const inp=document.getElementById("mealLogInput");
   const text=(inp?.value||"").trim();
@@ -5210,6 +5226,7 @@ function openMealLogAddPopup(){
   // 팝업 표시 — 기본 오늘/점심
   const popup=document.getElementById("mealLogPopup");
   if(!popup)return;
+  _updatePopupDateLabels();
   document.querySelectorAll("#mealLogPopup .mlp-date-row .mlp-btn").forEach(b=>b.classList.toggle("active",b.dataset.date===_mealLogDate));
   document.querySelectorAll("#mealLogPopup .mlp-meal-row .mlp-btn").forEach(b=>b.classList.toggle("active",b.dataset.meal===_mealLogMeal));
   const menuLabel=document.getElementById("mlpPopupMenu");
