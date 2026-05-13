@@ -7866,6 +7866,13 @@ document.addEventListener('keydown',e=>{
   // ── _startPickiOAuthFlow 강화: 이미 로그인 시 알림 (쿠키/localStorage까지 확인)
   const _origStartPickiOAuthFlow = window._startPickiOAuthFlow;
   window._startPickiOAuthFlow = function() {
+    // 캐시 삭제로 sessionStorage 가 날아가도 서버가 자동 머지할 수 있게 쿠키(30일)로도 익명 uid 보존
+    try {
+      if (FP_UID) {
+        const _exp = new Date(Date.now() + 30*24*60*60*1000).toUTCString();
+        document.cookie = `fp_anon_uid=${encodeURIComponent(FP_UID)};expires=${_exp};path=/;SameSite=Lax`;
+      }
+    } catch(_) {}
     // 1순위: _applyPickiLoginState 후 설정된 _pickiUser
     let payload = window._pickiUser;
     // 2순위: 쿠키/localStorage의 JWT 직접 확인 (DOMContentLoaded 이전 클릭 대비)
