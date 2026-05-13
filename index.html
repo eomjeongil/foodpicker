@@ -3447,7 +3447,7 @@ function _initRmSlots(logs){
     {key:'yesterday',date:_ds(new Date(_kstNow.getTime()-86400000))},
     {key:'2daysago', date:_ds(new Date(_kstNow.getTime()-172800000))}
   ];
-  const recorded=new Set((logs||[]).filter(l=>l&&!l.is_deleted).map(l=>l.meal_date));
+  const recorded=new Set((logs||[]).filter(l=>l&&!l.is_deleted&&l.source==='recent_input').map(l=>l.meal_date));
   const hasAny=dates.some(d=>recorded.has(d.date));
   if(editGuide)editGuide.style.display=hasAny?'block':'none';
   container.innerHTML=dates.map(({key,date})=>{
