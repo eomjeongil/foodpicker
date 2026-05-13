@@ -580,6 +580,14 @@ body{
 .ph-status-msg{font-size:13px;color:#666;margin:6px 0 10px;line-height:1.5;}
 .pickhealth-unlock .ph-status-msg{color:#2E7D32;font-weight:700;}
 .ph-lock-btn{width:100%;padding:14px;border:none;border-radius:10px;background:#CFD8DC;color:#7A8590;font-size:13.5px;font-weight:800;cursor:not-allowed;letter-spacing:.2px;}
+.ph-stage-guide{background:#f8f9fa;border-radius:12px;padding:12px 14px;margin-bottom:14px;text-align:left;}
+.ph-stage-item{font-size:13px;color:#666;padding:5px 0;line-height:1.5;border-bottom:1px solid #eee;}
+.ph-stage-item:last-child{border-bottom:none;}
+.ph-stage-item.done{color:#2e7d32;}
+.ph-stage-item strong{color:#333;}
+.ph-stage-item.done strong{color:#2e7d32;}
+.ph-done{color:#2e7d32;font-size:12px;margin-left:4px;font-weight:700;}
+.ph-need{color:#ff6b35;font-size:12px;margin-left:4px;font-weight:700;}
 .ph-unlock-btn{width:100%;padding:14px;border:none;border-radius:10px;background:linear-gradient(135deg,#4CAF7D,#2E9E6B);color:#fff;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.2px;box-shadow:0 4px 12px rgba(76,175,125,.35);transition:transform .15s ease;}
 .ph-unlock-btn:hover{transform:translateY(-1px);}
 /* 픽헬스 카카오 가입 유도 팝업 */
@@ -5984,7 +5992,7 @@ function _refreshReportPickhealthHint(){
     const need=v.meals_needed||0;
     el.innerHTML=`<div class="report-pickhealth-hint">
       💊 <strong>픽헬스</strong>에서는 이 부족한 영양소를 식재료와 영양제로 동시에 해결할 수 있어요.<br>
-      <span style="color:#888;font-size:11px;">${need}끼 더 기록하면 연동 가능합니다</span>
+      <span style="color:#888;font-size:11px;">${need}끼만 더 기록하면 픽헬스 맞춤 솔루션을 이용할 수 있어요</span>
     </div>`;
   }
 }
@@ -6014,13 +6022,23 @@ function _renderPickHealthCard(d, profile){
         <div class="ph-preview-item">🔬 식약처+임상 근거 있는 추천</div>
         <div class="ph-preview-item">📦 신선 식재료 + 영양제 바로 구매</div>
       </div>
+      <div class="ph-stage-guide">
+        <div class="ph-stage-item ${total>=10?'done':''}">
+          📊 <strong>10끼 달성</strong> — 식습관 패턴 분석 시작
+          ${total>=10?'<span class="ph-done">✅</span>':'<span class="ph-need">('+Math.max(0,10-total)+'끼 남음)</span>'}
+        </div>
+        <div class="ph-stage-item ${total>=21?'done':''}">
+          💊 <strong>21끼 달성</strong> — 더 정확한 맞춤 영양제 추천
+          ${total>=21?'<span class="ph-done">✅</span>':'<span class="ph-need">('+Math.max(0,21-total)+'끼 남음)</span>'}
+        </div>
+      </div>
       <button class="ph-unlock-btn" type="button" onclick="openPickhealth()">💊 픽헬스 맞춤 솔루션 보기 →</button>
       <div class="ph-unlock-note">* 설문 없이 내 실제 식습관으로 추천해요</div>
     </div>`;
   }
 
   // 잠금 상태 — 동기부여 인트로 + 4가지 특징 + 진행바 + 잠금 버튼
-  const pct=Math.max(0,Math.min(100,(total/21)*100));
+  const pct=Math.max(0,Math.min(100,(total/5)*100));
   const reasonBits=[];
   if(!reasons.pattern_ok) reasonBits.push("하루 5끼 이상 기록일 발견 — 패턴 정리 필요");
   if(!reasons.variety_ok) reasonBits.push("메뉴 다양성 부족 — 다른 메뉴도 기록해보세요");
@@ -6053,7 +6071,7 @@ function _renderPickHealthCard(d, profile){
       <div class="ph-lock-progress-title">🔒 맞춤 추천 잠금 해제까지 (${total}/21끼)</div>
       <div class="progress-wrap"><div class="progress-bar" id="phLockBar" style="width:${pct}%"></div></div>
       <div class="ph-lock-msg" id="phLockMsg">${_escAt(lockMsg)}</div>
-      <div class="ph-lock-sub">* 21끼 이상 기록 시 픽헬스 버튼 활성화 (영양학적 신뢰 기준)</div>
+      <div class="ph-lock-sub">* 5끼 이상 기록 시 픽헬스 맞춤 솔루션 이용 가능</div>
     </div>
     <button class="ph-lock-btn" type="button" disabled>💊 픽헬스 맞춤 솔루션 보기 🔒</button>
   </div>`;
