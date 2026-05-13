@@ -3447,7 +3447,13 @@ function _initRmSlots(logs){
     {key:'yesterday',date:_ds(new Date(_kstNow.getTime()-86400000))},
     {key:'2daysago', date:_ds(new Date(_kstNow.getTime()-172800000))}
   ];
-  const recorded=new Set((logs||[]).filter(l=>l&&!l.is_deleted&&l.source==='recent_input').map(l=>l.meal_date));
+  // 날짜별 끼니 수 집계 (모든 source)
+  const dateCounts={};
+  (logs||[]).filter(l=>l&&!l.is_deleted).forEach(l=>{
+    dateCounts[l.meal_date]=(dateCounts[l.meal_date]||0)+1;
+  });
+  // 3끼 이상 기록된 날짜만 비활성화
+  const recorded=new Set(Object.keys(dateCounts).filter(d=>dateCounts[d]>=3));
   const hasAny=dates.some(d=>recorded.has(d.date));
   if(editGuide)editGuide.style.display=hasAny?'block':'none';
   container.innerHTML=dates.map(({key,date})=>{
@@ -3461,11 +3467,11 @@ function _initRmSlots(logs){
     return `<div class="rm-date-slot ${isRec?'disabled':''}" data-date="${date}" data-key="${key}">
         <div class="slot-header">
           <span class="slot-date">📅 ${_label}</span>
-          <span class="slot-badge ${isRec?'recorded':'empty'}">${isRec?'✅ 기록됨':'미기록'}</span>
+          <span class="slot-badge ${isRec?'recorded':'empty'}">${isRec?`✅ ${dateCounts[date]||0}끼 기록됨`:'미기록'}</span>
         </div>
         ${isRec
           ?`<div class="slot-recorded">${_menus}</div>
-            <div class="slot-edit-hint">✏️ 수정하려면 아래 목록에서 해당 메뉴를 삭제해주세요</div>`
+            <div class="slot-edit-hint">✏️ 이미 3끼가 기록됐어요. 수정하려면 아래 목록에서 삭제 후 다시 입력해주세요</div>`
           :`<textarea rows="2" maxlength="200" placeholder="예) 김치찌개, 된장국, 삼겹살" data-slot="${key}" style="font-family:inherit;"></textarea>`}
       </div>`;
   }).join('');
@@ -7703,6 +7709,11 @@ document.addEventListener('keydown',e=>{
       if (Array.isArray(window._fpLoginQueue) && window._fpLoginQueue.length) {
         const _q = window._fpLoginQueue; window._fpLoginQueue = [];
         _q.forEach(fn => { try { fn(); } catch(_) {} });
+      }
+      // 로그인 후 기록 새로고침 — DOMContentLoaded loadMealLogs 는 익명 uid 로 실행됐을 수 있음. FP_UID 갱신된 새 uid 로 재조회.
+      // 머지가 일어나도 머지 .then 에서 또 호출되지만, idempotent + 사용자가 캐시삭제 등으로 머지가 일어나지 않는 경로도 커버.
+      if (typeof loadMealLogs === 'function') {
+        setTimeout(() => { try { loadMealLogs(); } catch(_) {} }, 100);
       }
       // 익명 → 카카오 uid 머지: sessionStorage의 fp_pre_login_uid가 다르면 서버에 데이터 이전 요청
       try {
