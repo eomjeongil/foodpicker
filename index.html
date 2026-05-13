@@ -6081,27 +6081,75 @@ function openPickhealth(){ openPickHealthInvite(); }
 function openPickHealthInvite(){
   // 이미 떠 있으면 중복 생성 방지
   if(document.getElementById("phInviteModal"))return;
+
+  // 로그인 상태 즉시 평가 — picki_jwt 있고 유효하면 닉네임 추출 (innerHTML 주입 <script> 는 실행 안 되므로 popup 생성 전에 결정)
+  let _nick = null;
+  try {
+    const _t = localStorage.getItem('picki_jwt')
+      || (document.cookie.match(/(?:^|;\s*)picki_jwt=([^;]+)/)?.[1] || null);
+    if (_t) {
+      // base64url payload → UTF-8 디코드 (한글 닉네임 안전)
+      const _p = JSON.parse(new TextDecoder().decode(
+        Uint8Array.from(
+          atob(_t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')),
+          c => c.charCodeAt(0)
+        )
+      ));
+      if (_p && _p.exp * 1000 > Date.now()) {
+        _nick = _p.nickname || '회원';
+      }
+    }
+  } catch(_) {}
+
+  const _safeNick = _nick ? _escAt(_nick) : null;
+  const _desc = _safeNick
+    ? `${_safeNick}님 환영합니다 ✨<br>식습관 기반 맞춤 솔루션을 확인하세요`
+    : `픽헬스 맞춤 추천을 위해<br>카카오로 간편 가입하세요`;
+  const _btns = _safeNick
+    ? `<button class="ph-kakao-btn" type="button" onclick="_phGoTo('sso')">${_safeNick}님으로 픽헬스 진입하기 →</button>
+        <button class="ph-skip-btn"  type="button" onclick="_phGoTo('cancel')">취소</button>`
+    : `<button class="ph-kakao-btn" type="button" onclick="_phGoTo('kakao')">카카오로 1초 가입</button>
+        <button class="ph-skip-btn"  type="button" onclick="_phGoTo('skip')">그냥 방문</button>`;
+
   const m=document.createElement("div");
   m.id="phInviteModal";
   m.className="ph-modal";
   m.innerHTML=`
     <div class="ph-modal-inner" onclick="event.stopPropagation()">
       <div class="ph-modal-title">💊 픽헬스 맞춤 추천</div>
-      <div class="ph-modal-desc">픽헬스 맞춤 추천을 위해<br>카카오로 간편 가입하세요</div>
+      <div class="ph-modal-desc">${_desc}</div>
       <div class="ph-modal-actions">
-        <button class="ph-kakao-btn" type="button" onclick="_phGoTo('kakao')">카카오로 1초 가입</button>
-        <button class="ph-skip-btn"  type="button" onclick="_phGoTo('skip')">그냥 방문</button>
+        ${_btns}
       </div>
     </div>`;
   m.addEventListener("click",e=>{ if(e.target===m) _phCloseInvite(); });
   document.body.appendChild(m);
-  if(typeof _ga==="function")_ga("pickhealth_invite_open",{});
+  if(typeof _ga==="function")_ga("pickhealth_invite_open",{loggedIn:!!_nick});
 }
 function _phCloseInvite(){
   const m=document.getElementById("phInviteModal"); if(m)m.remove();
 }
 function _phGoTo(mode){
-  const url=`https://pickhealth.kr?uid=${encodeURIComponent(FP_UID)}&ref=foodpicker${mode==="kakao"?"&login=kakao":""}`;
+  // cancel — 팝업만 닫고 종료 (이동/추적 없음, GA만 송신)
+  if(mode==="cancel"){
+    if(typeof _ga==="function")_ga("pickhealth_go",{mode:"cancel"});
+    _phCloseInvite();
+    return;
+  }
+  // 모드별 URL 결정 — sso 는 JWT SSO, 그 외는 uid 쿼리 패턴 유지
+  let url;
+  if(mode==="sso"){
+    const _tok=localStorage.getItem("picki_jwt")
+      ||(document.cookie.match(/(?:^|;\s*)picki_jwt=([^;]+)/)?.[1]||null);
+    if(_tok){
+      url=`https://pickhealth.kr/auth/cross?token=${encodeURIComponent(_tok)}&ref=foodpicker`;
+    }else{
+      // 토큰 사라진 엣지 케이스 — kakao 쿼리 경로로 폴백
+      url=`https://pickhealth.kr?uid=${encodeURIComponent(FP_UID)}&ref=foodpicker&login=kakao`;
+    }
+  }else{
+    url=`https://pickhealth.kr?uid=${encodeURIComponent(FP_UID)}&ref=foodpicker${mode==="kakao"?"&login=kakao":""}`;
+  }
   if(typeof _ga==="function")_ga("pickhealth_go",{mode});
   // 픽헬스 방문 기록 — 그룹 분류 시 D그룹(이미 방문)으로 분기시키는 시그널
   if(FP_UID){
