@@ -6494,7 +6494,9 @@ function pickMenu(){
     btn.classList.remove("spin","slot");icon.textContent="🎯";
     if(btnTxt)btnTxt.textContent=originalTxt;
     let pool=getPool().filter(m=>!used.includes(m.n));
-    if(!pool.length||used.length>=40){used=[];localStorage.setItem("fp6_used","[]");pool=getPool();toast("🎉 40끼 달성! 메뉴 풀 리셋이에요");}
+    // 풀 크기 비례 임계 (풀의 70% 소진 또는 최대 60끼, 최소 15끼)
+    const _resetThreshold = Math.min(60, Math.max(15, Math.floor(getPool().length * 0.7)));
+    if(!pool.length||used.length>=_resetThreshold){used=[];localStorage.setItem("fp6_used","[]");pool=getPool();toast("🎉 메뉴 풀 리셋! 새로운 메뉴를 추천해드릴게요 🍽️");}
     const sorted=scoredPool(pool);
     const top=sorted[0],next=sorted.slice(1,4);
     used.push(top.n);localStorage.setItem("fp6_used",JSON.stringify(used));
