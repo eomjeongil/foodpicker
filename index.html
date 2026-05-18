@@ -1980,7 +1980,7 @@ async function _logClick(type, menu) {
     .rm-date-slot .slot-badge.empty{background:#FFF3E0;color:#E65100;}
     .rm-date-slot textarea{width:100%;border:1px solid #DDD;border-radius:8px;padding:8px 10px;font-size:13px;background:#fff;outline:none;resize:vertical;box-sizing:border-box;font-family:inherit;}
     .rm-date-slot textarea:focus{border-color:#FF6B35;}
-    .rm-date-slot .slot-recorded{font-size:12.5px;color:#666;line-height:1.6;word-break:keep-all;}
+    .rm-date-slot .slot-recorded{display:block;font-size:12.5px;color:#666;line-height:1.6;word-break:keep-all;margin:4px 0 6px;padding:4px 8px;background:#f9f9f9;border-radius:6px;}.slot-meal-item{font-size:12.5px;color:#555;line-height:1.8;padding:0 2px;}
     .rm-edit-guide{background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:9px 11px;font-size:12px;color:#A66800;margin:6px 0 0;line-height:1.5;}
     .slot-edit-hint{font-size:11.5px;color:#9E9E9E;margin-top:6px;line-height:1.4;}
     @keyframes rmGuidePulse{0%{background:#FFF8E1;}40%{background:#FFE082;}100%{background:#FFF8E1;}}
@@ -2249,27 +2249,9 @@ async function _logClick(type, menu) {
       </div>
 
       <!-- 입력창 + 📷 사진 + 추가 버튼 -->
-      <div class="meal-log-input-wrap" style="margin-top:12px;">
-        <div class="meal-log-search-wrap">
-          <input type="search" id="mealLogInput"
-            placeholder="음식명을 검색하거나 직접 입력하세요"
-            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-            oninput="mealLogSearch(this.value)" onfocus="mealLogSearch(this.value)"
-            onkeydown="if(event.key==='Enter')openMealLogAddPopup()">
-          <div class="meal-log-dropdown" id="mealLogDropdown" style="display:none;"></div>
-        </div>
-        <!-- 📷 음식사진 분석: 숨김 input + 버튼 (Vision AI → 자동 meal_logs 기록) -->
-        <input type="file" id="foodImageInput" accept="image/*" capture="environment"
-          style="display:none" onchange="analyzeFoodImage(this)">
-        <button type="button" id="foodCameraBtn"
-          onclick="document.getElementById('foodImageInput').click()"
-          style="background:#FF6B35;color:#fff;border:none;border-radius:10px;padding:10px 14px;font-size:18px;cursor:pointer;flex-shrink:0;margin-left:6px;"
-          title="음식 사진으로 기록">📷</button>
-        <button onclick="openMealLogAddPopup()" class="meal-log-add-btn" type="button">추가 +</button>
-      </div>
 
       <!-- 픽헬스 활성화 슬롯 (기록 섹션 하단) — verifyPickHealth가 채움 -->
-      <div id="pickhealthCardRecord"></div>
+      
 
       <!-- 삭제 복구 토글 + 목록 -->
       <button class="ml-deleted-toggle" type="button" id="mealLogDeletedToggle"
@@ -2330,9 +2312,10 @@ async function _logClick(type, menu) {
   </div>
 
   <!-- ⑦+ 식습관 리포트 트리거 (기록 토글 아래) -->
-  <button class="report-trigger" onclick="openReport()">
-    📊 내 식습관으로 내 건강 리포트 보기
+  <button class="report-trigger" id="pickHealthReportBtn" onclick="openPickhealth()" disabled>
+    📊 내 식습관 건강 리포트 보기 (픽헬스)
   </button>
+  <div id="reportBtnHint" style="font-size:11px;color:#999;text-align:center;margin-top:4px;">5끼 기록 후 활성화됩니다</div>
 
   <!-- ⑦++ 카카오 채널 구독 — 가로 컴팩트 -->
   <div class="channel-card-compact">
@@ -2424,7 +2407,7 @@ async function _logClick(type, menu) {
 
 <!-- 식습관 리포트 모달 -->
 <div class="report-overlay" id="reportOverlay" onclick="if(event.target===this)closeReport()">
-  <div class="report-box">
+  <div class="report-box"><button onclick="closeReport()" style="position:sticky;top:8px;float:right;margin-right:4px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;line-height:1;z-index:10;" aria-label="닫기">✕</button>
     <div class="report-title">📊 내 식습관 리포트</div>
     <div id="reportContent"></div>
     <button class="report-close" onclick="closeReport()">닫기</button>
@@ -3441,11 +3424,11 @@ function _initRmSlots(logs){
   const editGuide=document.getElementById('rmEditGuide');
   if(!container)return;
   const _DAY_KR=['일','월','화','수','목','금','토'];
-  const _kstNow=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Seoul'}));
-  const _ds=d=>d.toISOString().slice(0,10);
+  const _ds=ms=>new Date(Date.now()+9*60*60*1000-ms).toISOString().slice(0,10);
   const dates=[
-    {key:'yesterday',date:_ds(new Date(_kstNow.getTime()-86400000))},
-    {key:'2daysago', date:_ds(new Date(_kstNow.getTime()-172800000))}
+    {key:'2daysago', date:_ds(172800000)},
+    {key:'yesterday',date:_ds(86400000)},
+    {key:'today',    date:_ds(0)}
   ];
   // 날짜별 끼니 수 집계 (모든 source)
   const dateCounts={};
@@ -3453,26 +3436,24 @@ function _initRmSlots(logs){
     dateCounts[l.meal_date]=(dateCounts[l.meal_date]||0)+1;
   });
   // 3끼 이상 기록된 날짜만 비활성화
-  const recorded=new Set(Object.keys(dateCounts).filter(d=>dateCounts[d]>=3));
+  const recorded=new Set(Object.keys(dateCounts).filter(d=>dateCounts[d]>=4));
   const hasAny=dates.some(d=>recorded.has(d.date));
   if(editGuide)editGuide.style.display=hasAny?'block':'none';
   container.innerHTML=dates.map(({key,date})=>{
-    const isRec=recorded.has(date);
     const _d=new Date(date+'T00:00:00+09:00');
     const _label=`${_d.getMonth()+1}/${_d.getDate()} (${_DAY_KR[_d.getDay()]})`;
-    const _menus=isRec
-      ?(logs||[]).filter(l=>l&&l.meal_date===date&&!l.is_deleted)
-                 .map(l=>(l.menu_name||'').replace(/</g,'&lt;')).join(', ')
-      :'';
+    const _meals=(logs||[]).filter(l=>l&&l.meal_date===date&&!l.is_deleted);
+    const _menus=_meals.map(l=>(l.menu_name||'').replace(/</g,'&lt;')).join(', ');
+    const isRec=_meals.length>=4;
     return `<div class="rm-date-slot ${isRec?'disabled':''}" data-date="${date}" data-key="${key}">
         <div class="slot-header">
           <span class="slot-date">📅 ${_label}</span>
-          <span class="slot-badge ${isRec?'recorded':'empty'}">${isRec?`✅ ${dateCounts[date]||0}끼 기록됨`:'미기록'}</span>
+          <span class="slot-badge ${_meals.length>0?'recorded':'empty'}">${_meals.length>0?`✅ ${_meals.length}끼 기록됨`:'미기록'}</span>
         </div>
+        ${_meals.map(l=>`<div class="slot-meal-item">• ${(l.menu_name||'').replace(/</g,'&lt;')}</div>`).join('')}
         ${isRec
-          ?`<div class="slot-recorded">${_menus}</div>
-            <div class="slot-edit-hint">✏️ 이미 3끼가 기록됐어요. 수정하려면 아래 목록에서 삭제 후 다시 입력해주세요</div>`
-          :`<textarea rows="2" maxlength="200" placeholder="예) 김치찌개, 된장국, 삼겹살" data-slot="${key}" style="font-family:inherit;"></textarea>`}
+          ?`<div class="slot-edit-hint">✏️ 이미 4끼가 기록됐어요. 수정하려면 아래 목록에서 삭제 후 다시 입력해주세요</div>`
+          :`<textarea rows="2" maxlength="200" placeholder="추가할 메뉴 입력" data-slot="${key}" style="font-family:inherit;"></textarea>`}
       </div>`;
   }).join('');
   // 삭제 직후 → 해당 날짜 슬롯이 다시 미기록(textarea)으로 전환됐다면 자동 스크롤 + 포커스 + 안내 강조
@@ -5976,6 +5957,13 @@ async function verifyPickHealth(){
     if(pr&&pr.ok)profile=await pr.json();
   }catch(_){ /* 네트워크 실패는 카드 생략 */ }
   _phLastVerify=verify;
+  const _rb=document.getElementById('pickHealthReportBtn');
+  const _rh=document.getElementById('reportBtnHint');
+  if(_rb){
+    const _mealsOk=verify?.reasons?.meals_ok||verify?.is_eligible;
+    if(_mealsOk){ _rb.disabled=false; if(_rh)_rh.style.display='none'; }
+    else { _rb.disabled=true; if(_rh)_rh.style.display=''; }
+  }
   const html=_renderPickHealthCard(verify, profile);
   // 양쪽 슬롯에 같은 내용 (리포트/기록)
   const a=document.getElementById("pickhealthCardRecord");
@@ -6333,6 +6321,92 @@ function _metaBonus(menu){
   return bonus;
 }
 
+// ── 건강정보 기반 메뉴 점수 보정 ──────────────────────────
+function _healthBonus(menu){
+  const h = (typeof getHealthInfo === 'function') ? getHealthInfo() : null;
+  if(!h) return 0;
+  let b = 0;
+  const sodium = +menu.sodium || 0;
+  const sugar  = +menu.sugar  || 0;
+  const fat    = +menu.fat    || 0;
+  const fiber  = +menu.fiber  || 0;
+  const kcal   = +menu.kcal   || 0;
+  const protein= +menu.protein|| 0;
+  const htRaw  = Array.isArray(menu.health_tag) ? menu.health_tag.join('|')
+               : (typeof menu.health_tag==='string' ? menu.health_tag : '');
+  const ht     = htRaw.toLowerCase();
+
+  // 혈압 높음 → 나트륨 감점/가점
+  if(h.bp === '높음'){
+    if(sodium >= 2000) b -= 4;
+    else if(sodium >= 1500) b -= 2;
+    if(sodium && sodium <= 800) b += 1.5;
+  }
+  // 혈당 높음 → 당류 감점, 식이섬유 가점
+  if(h.glu === '높음'){
+    if(sugar >= 15) b -= 3;
+    else if(sugar >= 10) b -= 1.5;
+    if(fiber >= 5) b += 1.5;
+  }
+  // 콜레스테롤 높음 → 지방 감점
+  if(h.chol === '높음'){
+    if(fat >= 35) b -= 3;
+    else if(fat >= 25) b -= 1.5;
+  }
+  // 목표별 가점
+  const goals = Array.isArray(h.goal) ? h.goal : [];
+  if(goals.includes('체중감량')){
+    if(kcal && kcal <= 400) b += 2.5;
+    else if(kcal && kcal <= 550) b += 1;
+    else if(kcal >= 750) b -= 2;
+  }
+  if(goals.includes('근육증가')){
+    if(protein >= 30) b += 2.5;
+    else if(protein >= 20) b += 1;
+  }
+  if(goals.includes('혈당관리')){
+    if(sugar >= 15) b -= 2;
+    if(fiber >= 5) b += 1.5;
+  }
+  if(goals.includes('소화개선')){
+    if(fiber >= 5) b += 1.5;
+    if(fat >= 30) b -= 1;
+  }
+  if(goals.includes('피로회복')){
+    if(ht.includes('비타민') || ht.includes('철분') || ht.includes('에너지') || ht.includes('타우린')) b += 1.5;
+  }
+  if(goals.includes('건강유지')){
+    if(ht.includes('항산화') || ht.includes('면역') || ht.includes('균형')) b += 1;
+  }
+  // 활동량 반영
+  if(h.activity === 'sedentary' && kcal >= 700) b -= 1.5;
+  if(h.activity === 'active'    && kcal >= 600) b += 1;
+  // 임신 중 → 회/날음식 감점, 영양 밀도 가점
+  if(h.pregnancy === 'yes' || h.pregnancy === '임신중'){
+    const name = menu.n || '';
+    if(name.includes('회') || name.includes('육회') || name.includes('생선회')) b -= 3;
+    if(protein >= 20 && kcal <= 600) b += 1;
+  }
+  return b;
+}
+
+// ── 알레르기 필터 ─────────────────────────────────────────
+function _allergyFilter(pool){
+  const h = (typeof getHealthInfo === 'function') ? getHealthInfo() : null;
+  const alg = (h && Array.isArray(h.alg)) ? h.alg.filter(x => x && x !== '없음') : [];
+  if(!alg.length) return pool;
+  const ALG_KW = {
+    '갑각류': ['새우','게','랍스터','꽃게','대게','킹크랩','크랩'],
+    '유제품': ['치즈','우유','크림','요거트','버터','라떼','모짜렐라'],
+    '밀글루텐': ['파스타','피자','빵','우동','라멘','짜장','짬뽕','국수','면'],
+    '달걀': ['계란','달걀','에그','오므라이스','오믈렛'],
+    '견과류': ['땅콩','아몬드','호두','캐슈','잣','피칸','마카다미아']
+  };
+  const banWords = alg.flatMap(k => ALG_KW[k] || []);
+  if(!banWords.length) return pool;
+  return pool.filter(m => !banWords.some(w => (m.n||'').includes(w)));
+}
+
 function scoredPool(pool){
   const keys=personaKey();
   const mealBonus=MEAL_INFO[mealTime].bonus;
@@ -6345,6 +6419,7 @@ function scoredPool(pool){
     if(seasonBonus.includes(m.cat))sc+=1.2;
     if(m.season===curSeason)sc+=3.0;
     sc+=_metaBonus(m); // Phase 3 메타데이터 가중치 (time/weather)
+    sc+=_healthBonus(m); // Phase 4 건강정보 가중치 (bp/glu/chol/goal/activity)
     const lastCat=getLastCat();
 if(lastCat&&m.cat===lastCat)sc-=3.0;
 sc+=(Math.random()-.5)*1.2;
@@ -6353,10 +6428,16 @@ sc+=(Math.random()-.5)*1.2;
 }
 function getPool(){
   // 미선택 시는 전체 (가드는 pickMenu에서 차단)
-  if(!selCatV)return DB;
-  const baseCats=CAT_GROUP_MAP[selCatV];
-  if(!baseCats||!baseCats.length)return DB;
-  return DB.filter(m=>baseCats.includes(m.cat));
+  let pool;
+  if(!selCatV) pool = DB;
+  else {
+    const baseCats=CAT_GROUP_MAP[selCatV];
+    if(!baseCats||!baseCats.length) pool = DB;
+    else pool = DB.filter(m=>baseCats.includes(m.cat));
+  }
+  // 알레르기 필터 — 매칭되는 항목이 너무 많아 풀이 비면 원본 반환(가드)
+  const filtered = (typeof _allergyFilter === 'function') ? _allergyFilter(pool) : pool;
+  return filtered.length ? filtered : pool;
 }
 /* 카테고리 미선택 가드 — 3초 토스트 + 카드 강조(0.5s) + 자동 스크롤 */
 function _catGuardNudge(){
