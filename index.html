@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="icon" type="image/png" href="/icon-192.png">
 <link rel="shortcut icon" href="/icon-192.png">
-<title>오늘은 뭐 먹을까? 🍽️</title>
+<title>21끼면 식습관이 보인다 | 픽푸드</title>
 <!--
   ╔══════════════════════════════════════════════════╗
   ║  오늘은 뭐 먹을까? v6                           ║
@@ -572,7 +572,7 @@ body{
 /* 픽헬스 활성화 카드 — 잠금/해제 상태 */
 .pickhealth-card{margin-top:12px;border-radius:12px;padding:16px;background:#fff;}
 .pickhealth-lock{border:1.5px dashed #cfd8dc;background:#FAFAFA;}
-.pickhealth-unlock{border:1.5px solid #4CAF7D;background:linear-gradient(135deg,#E8F5E9,#F1F8E9);box-shadow:0 4px 14px rgba(76,175,125,.18);}
+.pickhealth-unlock{border:1.5px solid #EF9F27;background:#FAEEDA;color:#633806;box-shadow:0 4px 14px rgba(239,159,39,.20);}
 .ph-title{font-size:14px;font-weight:800;color:#2E7D32;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
 .pickhealth-lock .ph-title{color:#7A8590;}
 .ph-progress-wrap{background:#E5EDE7;border-radius:20px;height:8px;overflow:hidden;margin:6px 0;}
@@ -588,7 +588,8 @@ body{
 .ph-stage-item.done strong{color:#2e7d32;}
 .ph-done{color:#2e7d32;font-size:12px;margin-left:4px;font-weight:700;}
 .ph-need{color:#ff6b35;font-size:12px;margin-left:4px;font-weight:700;}
-.ph-unlock-btn{width:100%;padding:14px;border:none;border-radius:10px;background:linear-gradient(135deg,#4CAF7D,#2E9E6B);color:#fff;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.2px;box-shadow:0 4px 12px rgba(76,175,125,.35);transition:transform .15s ease;}
+.ph-unlock-btn{width:100%;padding:14px;border:none;border-radius:10px;background:#EF9F27;color:#fff;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.2px;box-shadow:0 4px 12px rgba(239,159,39,.35);transition:transform .15s ease;}
+.ph-unlock-headline{font-size:14.5px;font-weight:800;color:#633806;line-height:1.55;margin-bottom:10px;}
 .ph-unlock-btn:hover{transform:translateY(-1px);}
 /* 픽헬스 카카오 가입 유도 팝업 */
 .ph-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1200;display:flex;align-items:center;justify-content:center;padding:16px;}
@@ -6009,6 +6010,7 @@ function _renderPickHealthCard(d, profile){
         <div class="ph-unlock-logo">💊 픽헬스</div>
         <div class="ph-unlock-badge">🎉 연동 가능!</div>
       </div>
+      <div class="ph-unlock-headline">🎉 5끼 기록 완료! 이제 내 식습관 진단 받을 수 있어요 →</div>
       <div class="ph-unlock-summary">
         내 식습관 분석 완료: <span class="ph-highlight">${habit}</span><br>
         건강 점수 <span class="ph-score">${scoreTxt}점</span>
