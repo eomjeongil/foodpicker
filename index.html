@@ -36,6 +36,8 @@
 
 <style>
 :root{
+  /* 카드 라운드 통일 공통 변수 */
+  --pick-radius:12px;
   /* Background & Surface — 웜 화이트 톤 */
   --bg:#FFFAF5;
   --bg2:#FFF4EA;
@@ -524,7 +526,7 @@ body{
 .mdg-kcal{font-size:12px;color:#888;}
 .mdg-caret{font-size:13px;color:#888;font-weight:700;flex-shrink:0;}
 .mdg-body{padding:9px;background:#fff;}
-.meal-log-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;margin-bottom:4px;background:#FAFAFA;}
+.meal-log-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--pick-radius);margin-bottom:4px;background:#FAFAFA;}
 .meal-log-item:last-child{margin-bottom:0;}
 .mli-meal-icon{font-size:18px;flex-shrink:0;}
 .mli-name{flex:1;font-size:14px;font-weight:700;color:#1F1C18;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -606,7 +608,7 @@ body{
 .ml-deleted-list{margin-top:8px;border:1px solid #FFE0E0;border-radius:10px;padding:9px;background:#FFFAFA;display:none;}
 .ml-deleted-list.show{display:block;}
 .ml-deleted-empty{padding:16px;text-align:center;color:#aaa;font-size:13px;}
-.ml-deleted-item{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:8px;background:#fff;border:1px solid #f0e0e0;margin-bottom:5px;font-size:13px;}
+.ml-deleted-item{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:var(--pick-radius);background:#fff;border:1px solid #f0e0e0;margin-bottom:5px;font-size:13px;}
 .ml-deleted-item:last-child{margin-bottom:0;}
 .ml-del-meta{flex:1;color:#555;}
 .ml-del-name{font-weight:700;color:#1F1C18;}
@@ -662,7 +664,7 @@ body{
 .streak-text{flex:1;min-width:0;}
 .streak-title{font-size:14px;font-weight:800;color:#E65100;margin-bottom:2px;}
 .streak-sub{font-size:12px;color:#888;}
-.meal-streak-bar{text-align:center;font-size:14px;font-weight:800;color:#E65100;background:#FFF8E1;border-radius:8px;padding:9px;margin:6px 0;}
+.meal-streak-bar{text-align:center;font-size:14px;font-weight:800;color:#E65100;background:#FFF8E1;border-radius:var(--pick-radius);padding:9px;margin:6px 0;}
 /* 추천→기록 원스텝 (결과 카드 내) */
 .qls-section{padding:14px 0 6px;border-top:1px solid #f0f0f0;margin-top:8px;}
 .qls-title{font-size:14px;font-weight:800;color:#333;margin-bottom:10px;text-align:center;}
@@ -740,8 +742,8 @@ body{
 .report-section{margin:12px 0;}
 .report-section-title{font-size:16px;font-weight:800;color:#2E7D32;margin:0 0 8px;display:flex;align-items:center;gap:6px;}
 .report-good-list,.report-bad-list{display:flex;flex-direction:column;gap:4px;margin:6px 0;}
-.report-good-item{background:#E8F5E9;border-radius:8px;padding:7px 12px;margin-bottom:4px;font-size:14px;color:#2E7D32;}
-.report-bad-item{background:#FFF3E0;border-radius:8px;padding:7px 12px;margin-bottom:4px;font-size:14px;color:#E65100;}
+.report-good-item{background:#E8F5E9;border-radius:var(--pick-radius);padding:7px 12px;margin-bottom:4px;font-size:14px;color:#2E7D32;}
+.report-bad-item{background:#FFF3E0;border-radius:var(--pick-radius);padding:7px 12px;margin-bottom:4px;font-size:14px;color:#E65100;}
 .report-habit-type{display:inline-block;background:#E3F2FD;color:#1565C0;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:700;margin:8px 0;}
 .report-score{display:flex;align-items:baseline;gap:4px;margin:8px 0;}
 .rs-number{font-size:40px;font-weight:900;color:#FF6B35;line-height:1;}
@@ -788,16 +790,16 @@ body{
 .rd-severity-low{font-size:16px;}
 .rd-nutrient{font-size:17px;font-weight:800;color:#1F1C18;}
 .rd-deficit{font-size:13px;color:#C2392C;font-weight:700;margin-left:auto;}
-.rd-explanation{font-size:13px;color:#666;line-height:1.5;margin-bottom:10px;padding:9px;background:#F9F9F9;border-radius:8px;}
+.rd-explanation{font-size:13px;color:#666;line-height:1.5;margin-bottom:10px;padding:9px;background:#F9F9F9;border-radius:var(--pick-radius);}
 .rd-food-title{font-size:13px;font-weight:700;color:#2E7D32;margin-bottom:6px;}
-.rd-food-card{display:flex;align-items:center;gap:10px;padding:9px;background:#F9FFF9;border-radius:8px;margin-bottom:6px;}
+.rd-food-card{display:flex;align-items:center;gap:10px;padding:9px;background:#F9FFF9;border-radius:var(--pick-radius);margin-bottom:6px;}
 .rdf-emoji{font-size:22px;flex-shrink:0;}
 .rdf-info{flex:1;min-width:0;}
 .rdf-name{font-size:14px;font-weight:700;color:#1F1C18;}
 .rdf-benefit{font-size:12px;color:#888;margin-top:2px;}
 .rdf-buy-btn{padding:7px 12px;background:#FF6B35;color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;}
 .rdf-buy-btn:hover{background:#E55A2B;}
-.rd-menu-suggest{font-size:13px;color:#1565C0;background:#E3F2FD;padding:9px 12px;border-radius:8px;margin:8px 0;}
+.rd-menu-suggest{font-size:13px;color:#1565C0;background:#E3F2FD;padding:9px 12px;border-radius:var(--pick-radius);margin:8px 0;}
 .rd-supplement-note{font-size:12px;color:#aaa;border-top:1px solid #eee;padding-top:9px;margin-top:8px;line-height:1.4;}
 .rd-loading{padding:20px;text-align:center;color:#888;font-size:12.5px;background:#fff;border:1px dashed #ddd;border-radius:12px;}
 .rd-error{padding:16px;text-align:center;color:#C2392C;font-size:13px;background:#FFF5F5;border:1px solid #FFCDD2;border-radius:12px;}
@@ -820,7 +822,7 @@ body{
 .report-exercise{background:#fff;border:1px solid #E0F0E8;border-radius:12px;padding:16px;margin-bottom:12px;}
 .rex-title{font-size:14px;font-weight:800;color:#1F1C18;margin-bottom:4px;}
 .rex-subtitle{font-size:12px;color:#888;margin-bottom:10px;}
-.rex-card{display:flex;align-items:center;gap:10px;padding:12px;background:#F9FFF9;border-radius:8px;margin-bottom:6px;}
+.rex-card{display:flex;align-items:center;gap:10px;padding:12px;background:#F9FFF9;border-radius:var(--pick-radius);margin-bottom:6px;}
 .rex-emoji{font-size:26px;flex-shrink:0;}
 .rex-name{font-size:14px;font-weight:700;color:#1F1C18;}
 .rex-time{font-size:16px;font-weight:900;color:#4CAF7D;margin-top:2px;}
@@ -946,7 +948,7 @@ body{
 .hcb-benefits{margin-bottom:10px;}
 .hcb-benefit{font-size:13px;color:#444;padding:4px 0;}
 .hcb-privacy{
-  font-size:12px;color:#888;background:#fff;border-radius:8px;
+  font-size:12px;color:#888;background:#fff;border-radius:var(--pick-radius);
   padding:9px 12px;margin-bottom:12px;line-height:1.5;
 }
 .hcb-buttons{display:flex;gap:8px;}
@@ -1188,7 +1190,7 @@ body{
 }
 .match-detail-btn:hover{text-decoration:underline;}
 .match-detail-body{
-  display:none;background:#F9FFF9;border-radius:8px;
+  display:none;background:#F9FFF9;border-radius:var(--pick-radius);
   padding:13px 14px;margin-top:9px;font-size:12.5px;line-height:1.6;color:var(--text);
 }
 .match-detail-body.show{display:block;animation:slideUp .25s ease both;}
@@ -1539,7 +1541,7 @@ body{
 .legal-section{font-size:14px;}
 .legal-date{font-size:12px;color:#aaa;margin-bottom:12px;}
 .legal-notice{
-  background:#E3F2FD;color:#1565C0;padding:12px 14px;border-radius:8px;
+  background:#E3F2FD;color:#1565C0;padding:12px 14px;border-radius:var(--pick-radius);
   font-size:13px;font-weight:700;margin-bottom:14px;
 }
 .legal-notice-warn{background:#FFF3E0;color:#E65100;}
@@ -1984,7 +1986,7 @@ async function _logClick(type, menu) {
     .rm-date-slot textarea{width:100%;border:1px solid #DDD;border-radius:8px;padding:8px 10px;font-size:13px;background:#fff;outline:none;resize:vertical;box-sizing:border-box;font-family:inherit;}
     .rm-date-slot textarea:focus{border-color:#FF6B35;}
     .rm-date-slot .slot-recorded{display:block;font-size:12.5px;color:#666;line-height:1.6;word-break:keep-all;margin:4px 0 6px;padding:4px 8px;background:#f9f9f9;border-radius:6px;}.slot-meal-item{font-size:12.5px;color:#555;line-height:1.8;padding:0 2px;}
-    .rm-edit-guide{background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:9px 11px;font-size:12px;color:#A66800;margin:6px 0 0;line-height:1.5;}
+    .rm-edit-guide{background:#FFF8E1;border:1px solid #FFE082;border-radius:var(--pick-radius);padding:9px 11px;font-size:12px;color:#A66800;margin:6px 0 0;line-height:1.5;}
     .slot-edit-hint{font-size:11.5px;color:#9E9E9E;margin-top:6px;line-height:1.4;}
     @keyframes rmGuidePulse{0%{background:#FFF8E1;}40%{background:#FFE082;}100%{background:#FFF8E1;}}
     .rm-edit-guide.is-flash{animation:rmGuidePulse 1.2s ease;}
