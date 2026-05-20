@@ -1804,6 +1804,39 @@ async function _logClick(type, menu) {
     </div>
   </div>
 
+  <!-- 기본정보 접이식 — 첫 진입 간소화 (순수 CSS :target/:has 기반, JS 무변경) -->
+  <style>
+    .bi-anchor{display:block;height:0;overflow:hidden;scroll-margin-top:60px;}
+    .bi-toggle{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;
+      width:100%;margin:12px 0 4px;padding:13px 16px;border:1.5px dashed var(--border-strong);
+      border-radius:13px;background:#fff;color:var(--text2);font-size:13.5px;font-weight:800;
+      text-decoration:none;cursor:pointer;transition:border-color .15s,color .15s,background .15s;}
+    .bi-toggle:hover{border-color:var(--pr);color:var(--pr);background:var(--card2);}
+    .bi-toggle .bi-toggle-sub{font-size:11px;font-weight:700;color:var(--text3);width:100%;text-align:center;}
+    .bi-toggle .bi-arrow{font-size:11px;}
+    .bi-toggle-close{display:none;}
+    /* 기본정보 헤더 + 5개 카드 — 첫 진입 시 접힘 */
+    :is(.basic-info-header,.card:has(#gRow),.card:has(#aRow),.card:has(#hGoalChips),.card:has(#hActChips),.card:has(#hAlgChips)){display:none;}
+    /* 펼침 — 토글/링크 클릭(:target) 또는 기존 입력(성별 선택·비기본 연령) */
+    .wrap:is(:has(#biSection:target),:has(#gRow .sel-m),:has(#gRow .sel-f),:has(#aRow .sel-a:not([data-a="30"]))) :is(.basic-info-header,.card:has(#gRow),.card:has(#aRow),.card:has(#hGoalChips),.card:has(#hActChips),.card:has(#hAlgChips)){display:block;}
+    /* 펼친 상태 — '입력 ▼' 숨기고 '접기 ▲' 표시 */
+    .wrap:has(#biSection:target) .bi-toggle-open{display:none;}
+    .wrap:has(#biSection:target) .bi-toggle-close{display:flex;}
+    /* 기존 사용자(성별·비기본 연령 입력됨) — 토글 자체 숨김(섹션 상시 펼침) */
+    .wrap:is(:has(#gRow .sel-m),:has(#gRow .sel-f),:has(#aRow .sel-a:not([data-a="30"]))) .bi-toggle{display:none;}
+    /* 결과 카드 — 기본정보 입력 유도 링크 */
+    .bi-refine-link{display:block;margin-top:10px;padding:12px 14px;border-radius:12px;
+      background:var(--card2);border:1px solid var(--border);color:var(--pr);
+      font-size:13px;font-weight:800;text-align:center;text-decoration:none;}
+    .bi-refine-link:hover{background:#fff;border-color:var(--pr);}
+  </style>
+  <span id="biSection" class="bi-anchor" aria-hidden="true"></span>
+  <a class="bi-toggle bi-toggle-open" href="#biSection">
+    <span>📋 기본정보 입력 <span class="bi-arrow">▼</span></span>
+    <span class="bi-toggle-sub">성별·연령·건강목표·생활패턴·알레르기 — 더 정밀한 추천</span>
+  </a>
+  <a class="bi-toggle bi-toggle-close" href="#biClose">📋 기본정보 접기 <span class="bi-arrow">▲</span></a>
+
   <!-- 📋 기본 정보를 선택해 주세요 (필수 5개) -->
   <div class="basic-info-header" style="margin:14px 0 8px;padding:10px 4px;font-size:14px;font-weight:800;color:#FF6B35;letter-spacing:.3px;">
     📋 기본 정보를 선택해 주세요
@@ -2251,6 +2284,9 @@ async function _logClick(type, menu) {
 
       <!-- 💊 픽헬스 연동 CTA — showResult가 _renderCondPhCta로 끼니 수 기준 채움 -->
       <div id="condPhCta" class="cond-ph-cta"></div>
+
+      <!-- 더 정밀한 추천 유도 — 클릭 시 기본정보 섹션 펼침+스크롤 (:target) -->
+      <a class="bi-refine-link" href="#biSection">🎯 더 정밀한 추천을 원하면 → 기본정보 입력하기</a>
     </div>
   </div>
   <!-- ⑧ 히스토리 (추천 기록) — 리포트 보기 위로 이동 -->
