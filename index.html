@@ -590,6 +590,7 @@ body{
 .ph-need{color:#ff6b35;font-size:12px;margin-left:4px;font-weight:700;}
 .ph-unlock-btn{width:100%;padding:14px;border:none;border-radius:10px;background:#EF9F27;color:#fff;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.2px;box-shadow:0 4px 12px rgba(239,159,39,.35);transition:transform .15s ease;}
 .ph-unlock-headline{font-size:14.5px;font-weight:800;color:#633806;line-height:1.55;margin-bottom:10px;}
+.health-link-badge{background:#FAEEDA;border:0.5px solid #EF9F27;color:#633806;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;}
 .ph-unlock-btn:hover{transform:translateY(-1px);}
 /* 픽헬스 카카오 가입 유도 팝업 */
 .ph-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1200;display:flex;align-items:center;justify-content:center;padding:16px;}
@@ -638,12 +639,12 @@ body{
 .ph-lock-msg{font-size:13px;color:#666;line-height:1.5;margin-top:6px;}
 .ph-lock-sub{font-size:11px;color:#aaa;margin-top:4px;}
 .ph-unlock-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.ph-unlock-logo{font-size:20px;font-weight:900;color:#2E7D32;}
-.ph-unlock-badge{font-size:13px;background:#4CAF7D;color:#fff;padding:4px 12px;border-radius:20px;font-weight:700;}
+.ph-unlock-logo{font-size:20px;font-weight:900;color:#EF9F27;}
+.ph-unlock-badge{font-size:13px;background:#EF9F27;color:#fff;padding:4px 12px;border-radius:20px;font-weight:700;}
 .ph-unlock-summary{font-size:14px;color:#444;margin-bottom:10px;line-height:1.5;}
 .ph-highlight{background:#E3F2FD;color:#1565C0;padding:2px 7px;border-radius:6px;font-weight:700;font-size:13px;}
 .ph-score{color:#FF6B35;font-weight:900;font-size:18px;}
-.ph-unlock-preview{background:#F9FFF9;border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px;color:#555;}
+.ph-unlock-preview{background:#FAEEDA;border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px;color:#555;}
 .ph-preview-item{padding:5px 0;border-bottom:1px solid #E8F5E9;}
 .ph-preview-item:last-child{border-bottom:none;}
 .ph-unlock-note{font-size:11px;color:#aaa;text-align:center;margin-top:8px;}
@@ -1709,6 +1710,7 @@ async function _logClick(type, menu) {
     <span id="mealBadge" class="meal-badge mb-lunch">🌞 점심</span>
     <span id="clockStr" style="font-size:12px;color:var(--text2);"></span>
     <span id="seasonBadge" class="season-badge" style="display:none;"></span>
+    <span id="healthLinkBadge" class="health-link-badge" style="display:none;">건강정보 연동됨</span>
   </div>
   <div class="wx-tag" id="wxTag">🌤️ 확인 중...</div>
 </div>
@@ -3221,6 +3223,7 @@ function saveHealth(){
   try{localStorage.setItem(HEALTH_LS_KEY,JSON.stringify(selHealth));}catch(e){}
   // 서버 user_health 동기화 — 디바운스 (칩 토글 연타 시 과호출 방지)
   _scheduleHealthSync();
+  if(typeof _refreshHealthBadge==='function')_refreshHealthBadge();
 }
 let _healthSyncT=null;
 function _scheduleHealthSync(){
@@ -3366,6 +3369,7 @@ function clearHealth(){
   document.querySelectorAll("#healthCard .h-chip.on, #hGoalChips .h-chip.on, #hActChips .h-chip.on, #hAlgChips .h-chip.on, #hBpMedsChips .h-chip.on").forEach(c=>c.classList.remove("on"));
   try{localStorage.removeItem(HEALTH_LS_KEY);}catch(e){}
   toast("건강정보를 모두 지웠어요");
+  if(typeof _refreshHealthBadge==='function')_refreshHealthBadge();
 }
 function toggleHealth(){
   const card=document.getElementById("healthCard");
@@ -3410,6 +3414,13 @@ function renderHealthBadge(){
   if(!goals.length)return '';
   const label=goals.length>=2?goals.join(' · '):goals[0];
   return `<div class="health-badge" style="margin:0 0 10px;padding:9px 12px;border-radius:10px;background:linear-gradient(135deg,#FFF4E8,#FFE9D4);border:1px solid #FFD4A8;color:#B85C1A;font-size:12px;font-weight:800;text-align:center;">✨ ${label} 목표를 고려한 추천이에요</div>`;
+}
+// 헤더 픽헬스 연동 배지 — 건강정보 입력 완료 시 노출 (getHealthInfo 비-null 동일 조건)
+function _refreshHealthBadge(){
+  const el=document.getElementById('healthLinkBadge');
+  if(!el)return;
+  const linked=(typeof getHealthInfo==='function')&&!!getHealthInfo();
+  el.style.display=linked?'inline-block':'none';
 }
 // 카테고리 카드로 부드럽게 스크롤 (자연어 입력/다시추천 흐름 공통 사용)
 function scrollToCategory(){
@@ -3768,6 +3779,7 @@ async function _restoreHealthFromServer(){
       console.warn('[health] 서버 복원 실패, localStorage 사용:',e?.message||e);
     }
   }
+  if(typeof _refreshHealthBadge==='function')_refreshHealthBadge();
 }
 
 // DB 로드 완료 후 서버 복원 호출 — DB가 늦게 와도 칩/입력은 즉시 반영
@@ -6008,7 +6020,7 @@ function _renderPickHealthCard(d, profile){
     return `<div class="pickhealth-card pickhealth-unlock">
       <div class="ph-unlock-header">
         <div class="ph-unlock-logo">💊 픽헬스</div>
-        <div class="ph-unlock-badge">🎉 연동 가능!</div>
+        <div class="ph-unlock-badge">✅ 픽헬스 연동 가능</div>
       </div>
       <div class="ph-unlock-headline">🎉 5끼 기록 완료! 이제 내 식습관 진단 받을 수 있어요 →</div>
       <div class="ph-unlock-summary">
