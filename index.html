@@ -2147,23 +2147,6 @@ async function _logClick(type, menu) {
       <!-- 추천→선택/다시추천 — _renderQuickLogBtn 가 채움 (showResult 끝에 호출) -->
       <div id="quickLogWrap" style="display:none;"></div>
 
-      <!-- 🎯 AI 대안 메뉴 (왜 이 메뉴 바로 아래로 이동, 클릭 시 directPick) -->
-      <div class="ai-alts-section" id="aiAltsSection" style="display:none;">
-        <div class="ai-alts-title">다음 순위 추천메뉴 — 탭하면 1순위 메뉴로...</div>
-        <div class="ai-alts-list" id="aiAltsList"></div>
-      </div>
-
-      <!-- 건강정보 가중치 뱃지 (renderHealthBadge가 동적으로 채움) -->
-      <div id="healthBadgeSlot"></div>
-
-      <!-- 다른 메뉴 추천받기 — 카테고리로 스크롤해 사용자가 다시 추천받음 -->
-      <div style="margin-bottom:8px;">
-        <button onclick="onPickOther()" style="width:100%;padding:15px;border:1.5px solid #FFE3CC;border-radius:13px;background:#fff;color:#7A6E62;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 2px 8px rgba(255,107,53,.06);"
-          onmouseover="this.style.borderColor='#FF6B35';this.style.color='#FF6B35'"
-          onmouseout="this.style.borderColor='#FFE3CC';this.style.color='#7A6E62'">
-          🔁 다른 메뉴 추천받기
-        </button>
-      </div>
       <!-- 처음부터 다시 추천받기 — 건강정보 입력 섹션으로 스크롤 -->
       <div style="margin-bottom:12px;">
         <button onclick="onResetFromTop()" style="width:100%;padding:12px;border:1.5px solid #ddd;border-radius:13px;background:#fff;color:#7A6E62;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;"
@@ -2172,6 +2155,15 @@ async function _logClick(type, menu) {
           🔄 처음부터 다시 추천받기
         </button>
       </div>
+
+      <!-- 🎯 AI 대안 메뉴 (왜 이 메뉴 바로 아래로 이동, 클릭 시 directPick) -->
+      <div class="ai-alts-section" id="aiAltsSection" style="display:none;">
+        <div class="ai-alts-title">다음 순위 추천메뉴 — 탭하면 1순위 메뉴로...</div>
+        <div class="ai-alts-list" id="aiAltsList"></div>
+      </div>
+
+      <!-- 건강정보 가중치 뱃지 (renderHealthBadge가 동적으로 채움) -->
+      <div id="healthBadgeSlot"></div>
 
       <!-- 🛒 쿠팡 파트너스 — 결과카드 직하 배치 (수익 핵심 노출 위치) -->
       <div class="related-section" style="margin-bottom:14px;">
