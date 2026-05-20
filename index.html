@@ -5992,6 +5992,8 @@ async function verifyPickHealth(){
   if(b)b.innerHTML=html;
   // 리포트의 부족 영양소 섹션 하단 힌트도 같은 상태로 갱신
   _refreshReportPickhealthHint();
+  // A(7일 식습관 부족) 플래그 갱신 — 로드/끼니 변경 시 메뉴 점수 보정에 반영
+  _loadMealHistFlags();
 }
 function _refreshReportPickhealthHint(){
   const el=document.getElementById("reportPickhealthHint");
@@ -6344,6 +6346,31 @@ function _metaBonus(menu){
 }
 
 // ── 건강정보 기반 메뉴 점수 보정 ──────────────────────────
+/* ── A: 최근 7일 식습관 부족 분석 → 메뉴 점수 보정 (B 기반 _healthBonus와 독립·합산) ── */
+let _mealHistFlags=null;
+async function _loadMealHistFlags(){
+  try{
+    if(typeof FP_UID==='undefined'||!FP_UID) return;
+    const r=await fetch(`/api/meal-history-flags?uid=${encodeURIComponent(FP_UID)}`,{cache:"no-store"});
+    if(!r||!r.ok) return;
+    const j=await r.json();
+    if(j&&j.ok) _mealHistFlags=j.flags||null;
+  }catch(_){ /* 실패해도 무영향 — 보정 없이 기존 점수로 동작 */ }
+}
+function _nutriHistBonus(menu){
+  const f=_mealHistFlags;
+  if(!f) return 0;
+  let b=0;
+  const protein=+menu.protein||0, sodium=+menu.sodium||0, cat=menu.cat||'';
+  // 단백질 부족 경향 → 단백질 풍부 메뉴 가점
+  if(f.protein_low){ if(protein>=25)b+=2; else if(protein>=18)b+=1; }
+  // 나트륨 과다 경향 → 저염 가점 / 고염 감점
+  if(f.sodium_high_risk){ if(sodium&&sodium<=800)b+=1.5; else if(sodium>=1800)b-=1.5; }
+  // 채소 부족 → 건강식 가점 / 오메가3 부족 → 해산물 가점
+  if(f.veg_low&&cat==='health')b+=1.5;
+  if(f.omega3_low&&cat==='seafood')b+=1.5;
+  return b;
+}
 function _healthBonus(menu){
   const h = (typeof getHealthInfo === 'function') ? getHealthInfo() : null;
   if(!h) return 0;
@@ -6442,6 +6469,7 @@ function scoredPool(pool){
     if(m.season===curSeason)sc+=3.0;
     sc+=_metaBonus(m); // Phase 3 메타데이터 가중치 (time/weather)
     sc+=_healthBonus(m); // Phase 4 건강정보 가중치 (bp/glu/chol/goal/activity)
+    sc+=_nutriHistBonus(m); // A: 최근 7일 식습관 부족 분석 가중치
     const lastCat=getLastCat();
 if(lastCat&&m.cat===lastCat)sc-=3.0;
 sc+=(Math.random()-.5)*1.2;
