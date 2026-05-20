@@ -1782,14 +1782,16 @@ async function _logClick(type, menu) {
     #recentMealInput{display:none;}
     .wrap:has(#condChips .cond-chip.on) #recentMealInput,
     .wrap:has(#resultCard.show) #recentMealInput{display:block;}
-    /* 카테고리 카드 — 컨디션 미선택 시 흐리게 */
+    /* 카테고리 카드 — 컨디션 미선택 시 흐리게 (기존 사용자=성별 선택됨 시 정상) */
     #catCard{opacity:.5;transition:opacity .35s ease;}
     .wrap:has(#condChips .cond-chip.on) #catCard,
-    .wrap:has(#resultCard.show) #catCard{opacity:1;}
-    /* 추천 버튼 카드 — 컨디션 선택 전 숨김 */
+    .wrap:has(#resultCard.show) #catCard,
+    .wrap:has(#gRow .sel-m, #gRow .sel-f) #catCard{opacity:1;}
+    /* 추천 버튼 카드 — 컨디션 선택 전 숨김 (기존 사용자=성별 선택됨 시 항상 노출) */
     .card:has(> #pickBtn){display:none;}
     .wrap:has(#condChips .cond-chip.on) .card:has(> #pickBtn),
-    .wrap:has(#resultCard.show) .card:has(> #pickBtn){display:block;}
+    .wrap:has(#resultCard.show) .card:has(> #pickBtn),
+    .wrap:has(#gRow .sel-m, #gRow .sel-f) .card:has(> #pickBtn){display:block;}
   </style>
   <div class="card cond-card" id="conditionCard">
     <div class="sl">🩹 오늘 컨디션 <span class="health-item-hint">(누르면 바로 추천받아요!)</span></div>
