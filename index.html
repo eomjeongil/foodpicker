@@ -1763,6 +1763,32 @@ async function _logClick(type, menu) {
     </div>
   </div>
 
+  <!-- 🩹 오늘 컨디션 — 빠른 추천 (컨디션 선택 시 카테고리 자동 매핑 + 즉시 추천) -->
+  <style>
+    .cond-card{margin:14px 0 4px;}
+    .cond-chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
+    .cond-chip{padding:13px 6px;border:1.5px solid var(--border);border-radius:12px;background:#fff;color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1.35;transition:transform .15s,border-color .15s,color .15s,background .15s,box-shadow .15s;}
+    .cond-chip:hover{border-color:var(--pr);color:var(--pr);transform:translateY(-2px);}
+    .cond-chip:active{transform:translateY(0);}
+    .cond-chip.on{background:linear-gradient(135deg,#FF8E53,#FF6B35);border-color:#FF6B35;color:#fff;box-shadow:0 6px 16px rgba(255,107,53,.28);}
+    @media (max-width:380px){.cond-chip{font-size:11.5px;padding:12px 4px;}}
+    .cond-ph-cta{margin-top:14px;}
+    .cond-ph-cta-btn{width:100%;padding:15px;border:none;border-radius:13px;background:linear-gradient(135deg,#4CAF7D,#2E9E6B);color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 18px rgba(76,175,125,.3);transition:transform .18s,box-shadow .18s;}
+    .cond-ph-cta-btn:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(76,175,125,.42);}
+    .cond-ph-cta-sub{font-size:11px;color:var(--text3);text-align:center;margin-top:6px;line-height:1.4;}
+  </style>
+  <div class="card cond-card" id="conditionCard">
+    <div class="sl">🩹 오늘 컨디션 <span class="health-item-hint">(누르면 바로 추천받아요!)</span></div>
+    <div class="cond-chips" id="condChips">
+      <button type="button" class="cond-chip" data-cond="tired"    onclick="pickByCondition(this)">😴 피곤해요</button>
+      <button type="button" class="cond-chip" data-cond="upset"    onclick="pickByCondition(this)">🤢 속이 안 좋아요</button>
+      <button type="button" class="cond-chip" data-cond="hangover" onclick="pickByCondition(this)">🍺 술 마셨어요</button>
+      <button type="button" class="cond-chip" data-cond="workout"  onclick="pickByCondition(this)">💪 운동했어요</button>
+      <button type="button" class="cond-chip" data-cond="diet"     onclick="pickByCondition(this)">🥗 다이어트 중</button>
+      <button type="button" class="cond-chip" data-cond="hungry"   onclick="pickByCondition(this)">😊 그냥 배고파요</button>
+    </div>
+  </div>
+
   <!-- 📋 기본 정보를 선택해 주세요 (필수 5개) -->
   <div class="basic-info-header" style="margin:14px 0 8px;padding:10px 4px;font-size:14px;font-weight:800;color:#FF6B35;letter-spacing:.3px;">
     📋 기본 정보를 선택해 주세요
@@ -2207,6 +2233,9 @@ async function _logClick(type, menu) {
   </div>
 
       </div>
+
+      <!-- 💊 픽헬스 연동 CTA — showResult가 _renderCondPhCta로 끼니 수 기준 채움 -->
+      <div id="condPhCta" class="cond-ph-cta"></div>
     </div>
   </div>
   <!-- ⑧ 히스토리 (추천 기록) — 리포트 보기 위로 이동 -->
@@ -6514,13 +6543,42 @@ function _catGuardNudge(){
 /* ============================================================
    뽑기
    ============================================================ */
-function pickMenu(){
+/* ── 컨디션 기반 빠른 추천 — 컨디션 선택 시 카테고리 자동 매핑 + 즉시 추천 ── */
+function pickByCondition(el){
+  if(!_dbReady||!DB.length){
+    if(typeof toast==='function')toast('⏳ 메뉴 DB 로드 중...');
+    return;
+  }
+  const cond=(el&&el.dataset)?el.dataset.cond:'';
+  // 컨디션 칩 단일 선택 표시
+  document.querySelectorAll('#condChips .cond-chip').forEach(c=>c.classList.remove('on'));
+  if(el)el.classList.add('on');
+  if(typeof snd==='function')snd('click');
+  // 컨디션 → 카테고리(대분류 칩) 매핑. hungry 는 카테고리 무관(전체 무작위 추천).
+  const COND_CAT={tired:'kfood',upset:'health',hangover:'kfood',workout:'health',diet:'health'};
+  const cat=COND_CAT[cond]||'';
+  if(cat){
+    // 매핑된 카테고리 칩 자동 활성화 (selCatF 와 동일 효과)
+    selCatV=cat;
+    document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active',c.dataset.cat===cat));
+  }else{
+    // 그냥 배고파요 — 카테고리 무관, 전체 DB 무작위 추천
+    selCatV='';
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  }
+  if(typeof _ga==='function')_ga('pick_by_condition',{condition:cond,category:cat||'random'});
+  // 즉시 추천 — 칩 활성 애니메이션이 보이도록 살짝 지연. allowRandom 으로 미선택 가드 우회.
+  setTimeout(()=>{if(typeof pickMenu==='function')pickMenu({allowRandom:true});},280);
+}
+
+function pickMenu(opts){
   if (!_dbReady || !DB.length) {
     if (typeof toast === 'function') toast('⏳ 메뉴 DB 로드 중...');
     return;
   }
   // 카테고리 미선택 시 가드 — 3초 토스트 + 카드 강조 + 자동 스크롤
-  if(!selCatV){
+  // 단, allowRandom(컨디션 '그냥 배고파요' 등)이면 전체 DB 무작위 추천 허용
+  if(!selCatV && !(opts && opts.allowRandom)){
     _catGuardNudge();
     return;
   }
@@ -6855,6 +6913,27 @@ function _highlightMealLogItem(name){
   setTimeout(()=>target.classList.remove('mli-highlight'),2000);
 }
 
+/* ── 결과 카드 하단 픽헬스 연동 CTA — 끼니 수 기준 카피 분기 ── */
+function _renderCondPhCta(){
+  const el=document.getElementById('condPhCta');
+  if(!el)return;
+  // 끼니 수 — verifyPickHealth 결과(_phLastVerify) 우선, 없으면 기록 카운터 폴백
+  let meals=0;
+  if(typeof _phLastVerify!=='undefined'&&_phLastVerify&&typeof _phLastVerify.total_meals==='number'){
+    meals=_phLastVerify.total_meals;
+  }else{
+    const mc=document.getElementById('mealLogCount');
+    if(mc){const n=parseInt(mc.textContent,10);if(isFinite(n))meals=n;}
+  }
+  let label;
+  if(meals>=21)      label='📊 내 식습관 완전 분석 보기 →';
+  else if(meals>=14) label='💊 픽헬스 영양제 추천 받기 →';
+  else if(meals>=5)  label='🔬 픽헬스에서 첫 분석 결과 확인 →';
+  else               label='💊 픽헬스 연동하면 식습관 분석까지 →';
+  el.innerHTML=`<button type="button" class="cond-ph-cta-btn" onclick="openPickhealth()">${label}</button>`
+    +`<div class="cond-ph-cta-sub">현재 ${meals}끼 기록 — 픽푸드 식사 기록이 그대로 분석에 쓰여요</div>`;
+}
+
 function showResult(menu,nextMenus){
   curMenu=menu;
   // 새 결과 표시 — AI/영양/궁합 모두 reset (이전 결과 잔영 방지). 모든 호출 경로 공통.
@@ -6926,6 +7005,9 @@ function showResult(menu,nextMenus){
     gender: selGend,
     age_group: selAgeV
   });
+
+  // 💊 결과 카드 하단 픽헬스 연동 CTA — 끼니 수 기준 카피 갱신
+  if(typeof _renderCondPhCta==='function')_renderCondPhCta();
 
   setTimeout(()=>{
     const top=rc.getBoundingClientRect().top+window.scrollY-120;
