@@ -1809,11 +1809,12 @@ async function _logClick(type, menu) {
   <!-- 기본정보 접이식 — 첫 진입 간소화 (순수 CSS :target/:has 기반, JS 무변경) -->
   <style>
     .bi-anchor{display:block;height:0;overflow:hidden;scroll-margin-top:60px;}
+    /* 토글 디자인 통일 — .health-toggle 와 동일 치수(width/padding/radius/font), 색상만 회색으로 구분 */
     .bi-toggle{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;
-      width:100%;margin:12px 0 4px;padding:13px 16px;border:1.5px dashed var(--border-strong);
-      border-radius:13px;background:#fff;color:var(--text2);font-size:13.5px;font-weight:800;
-      text-decoration:none;cursor:pointer;transition:border-color .15s,color .15s,background .15s;}
-    .bi-toggle:hover{border-color:var(--pr);color:var(--pr);background:var(--card2);}
+      width:100%;margin:12px 0 8px;padding:18px 22px;border:none;
+      border-radius:14px;background:#F5F5F5;color:#555;font-size:16px;font-weight:800;line-height:1.5;
+      text-decoration:none;cursor:pointer;transition:background .15s,color .15s;}
+    .bi-toggle:hover{background:#ECECEC;color:#333;}
     .bi-toggle .bi-toggle-sub{font-size:11px;font-weight:700;color:var(--text3);width:100%;text-align:center;}
     .bi-toggle .bi-arrow{font-size:11px;}
     .bi-toggle-close{display:none;}
