@@ -594,6 +594,7 @@ body{
 .ph-unlock-headline{font-size:14.5px;font-weight:800;color:#633806;line-height:1.55;margin-bottom:10px;}
 .health-link-badge{background:#FAEEDA;border:0.5px solid #EF9F27;color:#633806;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;}
 .ph-unlock-btn:hover{transform:translateY(-1px);}
+.ph-report-cta{display:block;width:100%;box-sizing:border-box;background:#EF9F27;color:#fff;border-radius:var(--pick-radius);padding:12px;font-weight:600;font-size:14px;text-align:center;text-decoration:none;margin-bottom:10px;}
 /* 픽헬스 카카오 가입 유도 팝업 */
 .ph-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1200;display:flex;align-items:center;justify-content:center;padding:16px;}
 .ph-modal-inner{background:#fff;border-radius:16px;padding:22px 20px;width:100%;max-width:340px;box-shadow:0 16px 40px rgba(0,0,0,.2);text-align:center;}
@@ -6046,6 +6047,7 @@ function _renderPickHealthCard(d, profile){
           ${total>=21?'<span class="ph-done">✅</span>':'<span class="ph-need">('+Math.max(0,21-total)+'끼 남음)</span>'}
         </div>
       </div>
+      ${total>=21?`<a class="ph-report-cta" href="https://pickhealth.kr?uid=${encodeURIComponent(FP_UID)}&ref=foodpicker">${(typeof getHealthInfo==='function'&&getHealthInfo())?'내 식습관 리포트 업데이트하기 →':'내 21끼 식습관 완전 분석 보기 →'}</a>`:''}
       <button class="ph-unlock-btn" type="button" onclick="openPickhealth()">💊 픽헬스 맞춤 솔루션 보기 →</button>
       <div class="ph-unlock-note">* 설문 없이 내 실제 식습관으로 추천해요</div>
     </div>`;
