@@ -2144,6 +2144,9 @@ async function _logClick(type, menu) {
         <div class="ai-reason-body" id="aiReasonText">분석 중...</div>
       </div>
 
+      <!-- 추천→선택/다시추천 — _renderQuickLogBtn 가 채움 (showResult 끝에 호출) -->
+      <div id="quickLogWrap" style="display:none;"></div>
+
       <!-- 🎯 AI 대안 메뉴 (왜 이 메뉴 바로 아래로 이동, 클릭 시 directPick) -->
       <div class="ai-alts-section" id="aiAltsSection" style="display:none;">
         <div class="ai-alts-title">다음 순위 추천메뉴 — 탭하면 1순위 메뉴로...</div>
@@ -2212,9 +2215,6 @@ async function _logClick(type, menu) {
 
       <!-- 구분선 -->
       <div style="height:1px;background:var(--border);margin:14px 0 12px;"></div>
-
-      <!-- 추천→선택/다시추천 — _renderQuickLogBtn 가 채움 (showResult 끝에 호출) -->
-      <div id="quickLogWrap" style="display:none;"></div>
 
       <!-- 함께 먹으면 좋은 음식 — 메뉴 추천 시 자동 표시 -->
       <div class="match-section">
