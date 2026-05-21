@@ -6842,7 +6842,13 @@ function onPickOther(){
 // "처음부터 다시 추천받기" — 건강정보 입력 섹션으로 스크롤 (입력값은 보존)
 function onResetFromTop(){
   if(typeof _ga==="function")_ga("reset_from_top",{});
-  scrollToHealthInfo();
+  // 추천 방식 모드 해제 — 인사카드/기록창 노출·컨디션카드 숨김·추천방식 버튼 50/50 복원
+  var _w=document.querySelector('.wrap');
+  if(_w)_w.classList.remove('fpm-cond','fpm-health');
+  // 컨디션 칩 선택 해제 (남아 있으면 카테고리 카드가 계속 노출됨)
+  document.querySelectorAll('#condChips .cond-chip.on').forEach(function(c){c.classList.remove('on');});
+  // 결과 카드 숨김·입력값 초기화·최상단 스크롤 — 기존 resetAll() 그대로 활용
+  if(typeof resetAll==='function')resetAll();
 }
 
 /* ── 처음부터 다시 선택하기 — 모든 입력/상태 초기화 ── */
