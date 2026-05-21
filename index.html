@@ -1844,11 +1844,11 @@ async function _logClick(type, menu) {
       box-shadow:0 4px 14px rgba(255,138,53,.12);text-align:center;}
     .greeting-card .gc-text{font-size:14.5px;font-weight:800;color:var(--text2);
       line-height:1.55;letter-spacing:-.2px;margin:0;}
-    .pick-mode-row{display:flex;gap:9px;margin:12px 0 4px;}
+    .pick-mode-row{display:flex;gap:8px;margin:12px 0 4px;}
     .pick-mode-btn{flex:1;box-sizing:border-box;display:flex;align-items:center;justify-content:center;
       padding:16px 8px;border-radius:14px;border:1.5px solid transparent;
       font-family:inherit;font-size:13.5px;font-weight:800;line-height:1.35;text-align:center;
-      cursor:pointer;text-decoration:none;transition:transform .15s,box-shadow .15s;}
+      cursor:pointer;text-decoration:none;transition:flex-grow .3s ease,opacity .3s ease,font-size .3s ease,transform .15s,box-shadow .15s;}
     .pick-mode-btn:hover{transform:translateY(-2px);}
     .pmb-cond{background:linear-gradient(135deg,var(--pr2),var(--pr));border-color:var(--pr);color:#fff;
       box-shadow:0 5px 15px rgba(255,107,53,.28);}
@@ -1879,12 +1879,14 @@ async function _logClick(type, menu) {
     #healthCard{display:none;}
     /* 📋 내 기본정보 토글 — 기본 접힘 (건강정보 모드에서만 노출) */
     .wrap:not(.fpm-health) .bi-toggle{display:none;}
-    /* ③ 컨디션 모드 */
-    .wrap.fpm-cond .pmb-health{display:none;}
+    /* ③ 컨디션 모드 — 선택 60% / 미선택 40% (숨김 대신 비율 축소) */
+    .wrap.fpm-cond .pmb-cond{flex:3;}
+    .wrap.fpm-cond .pmb-health{flex:2;opacity:.55;font-size:12px;}
     .wrap.fpm-cond #greetingCard{display:none;}
     .wrap.fpm-cond #conditionCard{display:block;}
-    /* ④ 건강정보 모드 */
-    .wrap.fpm-health .pmb-cond{display:none;}
+    /* ④ 건강정보 모드 — 선택 60% / 미선택 40% (숨김 대신 비율 축소) */
+    .wrap.fpm-health .pmb-health{flex:3;}
+    .wrap.fpm-health .pmb-cond{flex:2;opacity:.55;font-size:12px;}
     .wrap.fpm-health #greetingCard{display:none;}
     .wrap.fpm-health #conditionCard{display:none;}
     .wrap.fpm-health #healthCard{display:block;}
