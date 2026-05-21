@@ -41,9 +41,9 @@
   /* Background & Surface — 웜 화이트 톤 */
   --bg:#0D1117;
   --bg2:#111827;
-  --card:#161B27;
+  --card:#1A1A2E;
   --card2:#1E2535;
-  --border:#2A3550;
+  --border:#2D2D4E;
   --border-strong:#3D5080;
   --shadow-sm:0 2px 8px rgba(0,0,0,.3);
   --shadow-md:0 6px 20px rgba(0,0,0,.4);
@@ -1861,8 +1861,10 @@ async function _logClick(type, menu) {
     .greeting-card>summary{list-style:none;cursor:pointer;
       display:flex;align-items:center;justify-content:center;gap:8px;}
     .greeting-card>summary::-webkit-details-marker{display:none;}
-    .greeting-card .gc-arrow{font-size:11px;color:var(--text2);transition:transform .2s;}
-    .greeting-card[open] .gc-arrow{transform:rotate(180deg);}
+    .greeting-card .gc-toggle{font-size:12px;font-weight:800;color:var(--text2);white-space:nowrap;}
+    .greeting-card .gc-open{display:none;}
+    .greeting-card[open] .gc-closed{display:none;}
+    .greeting-card[open] .gc-open{display:inline;}
     .greeting-body{margin-top:14px;text-align:left;}
     .greeting-desc{font-size:12.5px;font-weight:700;color:var(--text2);
       margin:0 0 10px;text-align:center;line-height:1.5;}
@@ -1894,7 +1896,7 @@ async function _logClick(type, menu) {
   <details class="greeting-card" id="greetingCard">
     <summary>
       <p class="gc-text" id="gcText">오늘 뭐 드셨어요? 생각나는대로 적어주세요</p>
-      <span class="gc-arrow" aria-hidden="true">▼</span>
+      <span class="gc-toggle" aria-hidden="true"><span class="gc-closed">(펼쳐보세요) ▼</span><span class="gc-open">(접기) ▲</span></span>
     </summary>
     <div class="greeting-body">
       <p class="greeting-desc">생각나는대로 적어주세요, 더 나은 정보가 제공됩니다</p>
@@ -1917,10 +1919,10 @@ async function _logClick(type, menu) {
     var el=document.getElementById('gcText');
     if(!el)return;
     var h=new Date().getHours(), txt;
-    if(h>=6&&h<11)       txt='어제 뭐 드셨어요? 생각나는대로 적어주시면 더 좋게 추천합니다 🌅 (펼쳐보세요)';
-    else if(h>=11&&h<17) txt='어제와 오늘 아침에 뭐 드셨어요? ☀️ (펼쳐보세요)';
-    else if(h>=17&&h<21) txt='어제와 오늘 아침 점심에 드신 메뉴는? 🌙 (펼쳐보세요)';
-    else                 txt='오늘 뭐 드셨죠? 🌛 (펼쳐보세요)';
+    if(h>=6&&h<11)       txt='어제 뭐 드셨어요? 생각나는대로 적어주시면 더 좋게 추천합니다 🌅';
+    else if(h>=11&&h<17) txt='어제와 오늘 아침에 뭐 드셨어요? ☀️';
+    else if(h>=17&&h<21) txt='어제와 오늘 아침 점심에 드신 메뉴는? 🌙';
+    else                 txt='오늘 뭐 드셨죠? 🌛';
     el.textContent=txt;
   })();
   </script>
