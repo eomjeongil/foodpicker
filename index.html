@@ -391,6 +391,45 @@ body{
 .hbadge{font-size:12px;padding:2px 9px;border-radius:50px;background:var(--bg2);color:var(--text2);}
 .clrbtn{margin-top:10px;font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;text-decoration:underline;display:block;}
 
+/* ── 펼치기/접기 토글 (다음순위 추천·궁합 음식·추천 기록 공통) ── */
+.alts-collapse,.match-collapse,.hist-collapse{margin:0;}
+.alts-collapse>summary,.match-collapse>summary,.hist-collapse>summary{
+  list-style:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  transition:filter .15s;
+}
+.alts-collapse>summary:hover,.match-collapse>summary:hover,.hist-collapse>summary:hover{filter:brightness(.98);}
+.alts-collapse>summary::-webkit-details-marker,
+.match-collapse>summary::-webkit-details-marker,
+.hist-collapse>summary::-webkit-details-marker{display:none;}
+.alts-collapse>summary .ac-open,.hist-collapse>summary .hc-open,.match-collapse>summary .mc-open{display:none;}
+.alts-collapse[open]>summary .ac-closed{display:none;}
+.alts-collapse[open]>summary .ac-open{display:inline;}
+.hist-collapse[open]>summary .hc-closed{display:none;}
+.hist-collapse[open]>summary .hc-open{display:inline;}
+.match-collapse[open]>summary .mc-closed{display:none;}
+.match-collapse[open]>summary .mc-open{display:inline;}
+/* ② 다음 순위 추천메뉴 토글 — 보라 테마 */
+.alts-collapse{margin-top:14px;}
+.alts-collapse>summary{
+  padding:13px 16px;border:1.5px solid #D9CEF0;border-radius:13px;
+  background:linear-gradient(135deg,#F3EEFC,#EDE6FA);
+  color:#5A2DA8;font-size:14px;font-weight:800;justify-content:center;
+}
+.alts-collapse[open]>summary{margin-bottom:4px;}
+.alts-collapse .ai-alts-section{margin-top:0;}
+/* ③ 궁합 음식 토글 — 그린 테마, .match-title 그대로 유지 */
+.match-collapse>summary .match-title{margin-bottom:0;}
+.match-collapse>summary .mc-toggle{font-size:12.5px;font-weight:800;color:#2E7E47;white-space:nowrap;}
+.match-collapse[open]>summary{margin-bottom:11px;}
+/* ⑥ 추천 기록 토글 */
+.hist-collapse>summary{
+  padding:13px 16px;border:1.5px solid var(--border);border-radius:12px;
+  background:#fff;color:var(--pr);font-size:13px;font-weight:800;
+  letter-spacing:1px;justify-content:center;
+}
+.hist-collapse[open]>summary{margin-bottom:13px;}
+
 /* ── 관리자 ── */
 .admin-trigger{position:fixed;bottom:80px;left:0;width:30px;height:50px;z-index:300;cursor:pointer;opacity:0;}
 .admin-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(45,42,38,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:22px;}
@@ -2156,11 +2195,17 @@ async function _logClick(type, menu) {
         </button>
       </div>
 
-      <!-- 🎯 AI 대안 메뉴 (왜 이 메뉴 바로 아래로 이동, 클릭 시 directPick) -->
-      <div class="ai-alts-section" id="aiAltsSection" style="display:none;">
-        <div class="ai-alts-title">다음 순위 추천메뉴 — 탭하면 1순위 메뉴로...</div>
-        <div class="ai-alts-list" id="aiAltsList"></div>
-      </div>
+      <!-- 🎯 AI 대안 메뉴 (왜 이 메뉴 바로 아래로 이동, 클릭 시 directPick) — 펼치기/접기 토글, 기본 접힘 -->
+      <details class="alts-collapse">
+        <summary class="alts-summary">
+          <span class="ac-closed">다음 순위 추천메뉴 펼쳐보세요 ▼</span>
+          <span class="ac-open">다음 순위 추천메뉴 접기 ▲</span>
+        </summary>
+        <div class="ai-alts-section" id="aiAltsSection" style="display:none;">
+          <div class="ai-alts-title">다음 순위 추천메뉴 — 탭하면 1순위 메뉴로...</div>
+          <div class="ai-alts-list" id="aiAltsList"></div>
+        </div>
+      </details>
 
       <!-- 건강정보 가중치 뱃지 (renderHealthBadge가 동적으로 채움) -->
       <div id="healthBadgeSlot"></div>
@@ -2208,10 +2253,15 @@ async function _logClick(type, menu) {
       <!-- 구분선 -->
       <div style="height:1px;background:var(--border);margin:14px 0 12px;"></div>
 
-      <!-- 함께 먹으면 좋은 음식 — 메뉴 추천 시 자동 표시 -->
+      <!-- 함께 먹으면 좋은 음식 — 메뉴 추천 시 자동 표시 — 펼치기/접기 토글, 기본 접힘 -->
       <div class="match-section">
-        <div class="match-title">🤝 이 음식과 함께 먹으면 좋은 음식</div>
-        <div id="matchRecommList" class="match-recomm-list"></div>
+        <details class="match-collapse">
+          <summary class="match-summary">
+            <div class="match-title">🤝 이 음식과 함께 먹으면 좋은 음식</div>
+            <span class="mc-toggle"><span class="mc-closed">펼쳐보세요 ▼</span><span class="mc-open">접기 ▲</span></span>
+          </summary>
+          <div id="matchRecommList" class="match-recomm-list"></div>
+        </details>
       </div>
 
       <!-- 광고 슬롯 2 (이전: 다이어트 CPA 위치) -->
@@ -2282,11 +2332,16 @@ async function _logClick(type, menu) {
       <a class="bi-refine-link" href="#biSection">🎯 더 정밀한 추천을 원하면 → 기본정보 입력하기</a>
     </div>
   </div>
-  <!-- ⑧ 히스토리 (추천 기록) — 리포트 보기 위로 이동 -->
+  <!-- ⑧ 히스토리 (추천 기록) — 리포트 보기 위로 이동 — 펼치기/접기 토글, 기본 접힘 -->
   <div class="hist-wrap" id="histWrap">
-    <div class="sl">📅 추천 기록</div>
-    <div id="histList"></div>
-    <button class="clrbtn" onclick="clearAll()">전체 초기화</button>
+    <details class="hist-collapse">
+      <summary class="hist-summary">
+        <span class="hc-closed">📅 추천 기록 펼쳐보세요 ▼</span>
+        <span class="hc-open">📅 추천 기록 접기 ▲</span>
+      </summary>
+      <div id="histList"></div>
+      <button class="clrbtn" onclick="clearAll()">전체 초기화</button>
+    </details>
   </div>
 
   <!-- ⑦ 오늘 식사 직접 입력 (접이식) — 민트(기록)이 보라(리포트)보다 위 -->
@@ -2322,7 +2377,6 @@ async function _logClick(type, menu) {
 
       <!-- 진행 바 -->
       <div class="meal-log-progress" style="margin-top:12px;">
-        <div class="mlp-count">📊 현재 <span id="mealLogCount">0</span>끼 기록 중</div>
         <div class="progress-wrap"><div class="progress-bar" id="mealLogProgressBar" style="width:0%"></div></div>
         <div class="mlp-next" id="mealLogNextMsg">기록을 불러오는 중...</div>
       </div>
@@ -2332,12 +2386,7 @@ async function _logClick(type, menu) {
       <!-- 픽헬스 활성화 슬롯 (기록 섹션 하단) — verifyPickHealth가 채움 -->
       
 
-      <!-- 삭제 복구 토글 + 목록 -->
-      <button class="ml-deleted-toggle" type="button" id="mealLogDeletedToggle"
-        onclick="toggleDeletedList()" style="display:none;">
-        🗑️ 삭제된 기록 복구하기
-      </button>
-      <div class="ml-deleted-list" id="mealLogDeletedList"></div>
+      <!-- 삭제 복구 토글 + 목록 — UI 노출 제거 (toggleDeletedList/restoreMealLog/_refreshDeletedToggle JS 함수는 보존, 모두 null-guard 있음) -->
 
       <!-- 식사 기록 CSV 내보내기 — 영구 숨김 (정책: 사용자에게 노출하지 않음. 향후 복구 가능) -->
       <div class="meal-export-section" id="mealExportSection" style="display:none !important;" data-force-hidden="1">
@@ -2394,6 +2443,8 @@ async function _logClick(type, menu) {
   <button class="report-trigger" id="pickHealthReportBtn" onclick="openPickhealth()" disabled>
     📊 내 식습관 건강 리포트 보기 (픽헬스)
   </button>
+  <!-- ⑤ "현재 N끼 기록 중" — 리포트 버튼 바로 아래로 이동 (기존 위치: 기록 진행바 내부) -->
+  <div class="mlp-count" style="text-align:center;margin-top:8px;">📊 현재 <span id="mealLogCount">0</span>끼 기록 중</div>
   <div id="reportBtnHint" style="font-size:11px;color:#999;text-align:center;margin-top:4px;">5끼 기록 후 활성화됩니다</div>
 
   <!-- ⑦++ 카카오 채널 구독 — 가로 컴팩트 -->
