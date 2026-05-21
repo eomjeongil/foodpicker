@@ -288,6 +288,17 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
   box-shadow:var(--shadow-lg);
 }
 .result-card.show{display:block;animation:popIn .45s cubic-bezier(.34,1.56,.64,1);}
+/* ① 추천 결과 카드 — 밝은 라벤더 화이트 서브테마 (토큰 스코프 오버라이드) */
+#resultCard{
+  --card:#F8F4FF;
+  --card2:#FFFFFF;
+  --bg2:#EFEAF8;
+  --border:#DDD8F0;
+  --border-strong:#C9C2E8;
+  --text:#1A1A2E;
+  --text2:#5A5575;
+  --text3:#8A85A5;
+}
 @keyframes popIn{from{opacity:0;transform:scale(.86) translateY(18px);}to{opacity:1;transform:scale(1) translateY(0);}}
 .food-img-wrap{position:relative;height:200px;overflow:hidden;background:linear-gradient(135deg,var(--card2),var(--card2));display:flex;align-items:center;justify-content:center;}
 .food-img{width:100%;height:100%;object-fit:cover;}
@@ -1407,6 +1418,7 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .ai-reason-head{font-size:12.5px;font-weight:800;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
 .ai-reason-body{font-size:14px;color:var(--text);line-height:1.55;}
 .ai-reason-body.loading{color:var(--text2);font-style:italic;}
+.ai-loading-msg{font-size:13.5px;color:var(--text2);font-style:italic;line-height:1.55;transition:opacity .2s;}
 
 /* ── AI 대안 메뉴 (next-card 대체, 더 큰 카드 + 클릭 액션) ── */
 .ai-alts-section{margin:14px 0 12px;animation:slideUp .35s ease both;}
@@ -5372,7 +5384,18 @@ function _aiShowSkeleton(){
   const altsSec=document.getElementById("aiAltsSection");
   const altsList=document.getElementById("aiAltsList");
   if(card)card.style.display="block";
-  if(txt)txt.innerHTML='<span class="skel skel-line skel-line-w90"></span><span class="skel skel-line skel-line-w70"></span>';
+  if(txt){
+    // ② AI 분석 로딩 멘트 — 2문장 1초 간격 교체 (스켈레톤 대체)
+    var _aiM=['AI가 회원님의 건강정보와 오늘 컨디션을 분석하고 있어요 🤔','잠깐만요, 딱 맞는 이유를 찾는 중이에요 ✨'],_aiI=0;
+    txt.innerHTML='<div class="ai-loading-msg">'+_aiM[0]+'</div>';
+    if(window._aiMsgTimer)clearInterval(window._aiMsgTimer);
+    window._aiMsgTimer=setInterval(function(){
+      _aiI=(_aiI+1)%2;
+      var _m=document.querySelector('#aiReasonText .ai-loading-msg');
+      if(_m){_m.textContent=_aiM[_aiI];}
+      else{clearInterval(window._aiMsgTimer);window._aiMsgTimer=null;}
+    },1000);
+  }
   if(altsSec)altsSec.style.display="block";
   if(altsList)altsList.innerHTML=[1,2,3].map(()=>`
     <div class="ai-alt-card skel-card">
@@ -6893,6 +6916,9 @@ function resetAll(){
   // 5) 결과 카드 + AI 이유/대안 + 영양/궁합 모두 숨김
   const rc=document.getElementById("resultCard");
   if(rc)rc.classList.remove("show");
+  // ③ 추천 선택 버튼 영역 초기화 — 다음 추천 시 _renderQuickLogBtn가 새로 채움
+  const _qlw=document.getElementById("quickLogWrap");
+  if(_qlw){_qlw.style.display="none";_qlw.innerHTML="";}
   curMenu=null;
   const aiCard=document.getElementById("aiReasonCard");
   if(aiCard)aiCard.style.display="none";
@@ -7106,8 +7132,22 @@ async function _quickLog(mealType){
         else setTimeout(apply,250);
       }
     }
-    const wrap=document.getElementById("quickLogWrap");
-    if(wrap){wrap.style.display="none";wrap.innerHTML="";}
+    if(success||dup){
+      // ③ "이 메뉴로 선택" 완료 — 버튼을 기록완료 상태로 고정 (기록 저장 기능은 그대로)
+      const _selBtn=document.getElementById("selectThisMenu");
+      if(_selBtn){
+        _selBtn.textContent="✅ 선택/기록완료";
+        _selBtn.disabled=true;
+        _selBtn.style.background="#6B6B8A";
+        _selBtn.style.boxShadow="none";
+        _selBtn.style.cursor="default";
+      }
+      const _retryBtn=document.getElementById("retryRecommend");
+      if(_retryBtn)_retryBtn.disabled=false;
+    }else{
+      const wrap=document.getElementById("quickLogWrap");
+      if(wrap){wrap.style.display="none";wrap.innerHTML="";}
+    }
     window._quickLogBusy=false;
   }
 }
