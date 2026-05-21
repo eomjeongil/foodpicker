@@ -1910,10 +1910,10 @@ async function _logClick(type, menu) {
     var el=document.getElementById('gcText');
     if(!el)return;
     var h=new Date().getHours(), txt;
-    if(h>=6&&h<11)       txt='어제 뭐 드셨어요? 생각나는대로 적어주시면 더 좋게 추천합니다 🌅';
-    else if(h>=11&&h<17) txt='어제와 오늘 아침에 뭐 드셨어요? ☀️';
-    else if(h>=17&&h<21) txt='어제와 오늘 아침 점심에 드신 메뉴는? 🌙';
-    else                 txt='오늘 뭐 드셨죠? 🌛';
+    if(h>=6&&h<11)       txt='어제 뭐 드셨어요? 생각나는대로 적어주시면 더 좋게 추천합니다 🌅 (펼쳐보세요)';
+    else if(h>=11&&h<17) txt='어제와 오늘 아침에 뭐 드셨어요? ☀️ (펼쳐보세요)';
+    else if(h>=17&&h<21) txt='어제와 오늘 아침 점심에 드신 메뉴는? 🌙 (펼쳐보세요)';
+    else                 txt='오늘 뭐 드셨죠? 🌛 (펼쳐보세요)';
     el.textContent=txt;
   })();
   </script>
