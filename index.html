@@ -2455,8 +2455,8 @@ async function _logClick(type, menu) {
   </div>
 
   <!-- ⑦ 오늘 식사 직접 입력 (접이식) — 민트(기록)이 보라(리포트)보다 위 -->
-  <div class="daily-meal-card open" id="dailyMealCard" style="margin:14px 0 0;">
-    <button id="dailyMealToggle" type="button" onclick="toggleDailyMeal()" aria-expanded="true"
+  <div class="daily-meal-card" id="dailyMealCard" style="margin:14px 0 0;">
+    <button id="dailyMealToggle" type="button" onclick="toggleDailyMeal()" aria-expanded="false"
       style="width:100%;padding:16px 20px;border:none;border-radius:14px;cursor:pointer;
         background:linear-gradient(135deg,var(--green),#2E9E6B);color:#fff;font-weight:800;font-size:14px;letter-spacing:.3px;line-height:1.5;
         display:flex;align-items:center;justify-content:center;gap:6px;text-align:center;
@@ -2466,7 +2466,7 @@ async function _logClick(type, menu) {
       <span class="dmt-state dmt-closed" style="color:#fff;">📝 내가 먹은 음식기록 확인하기 ▼</span>
       <span class="dmt-state dmt-open" style="color:#fff;">📝 내가 먹은 음식기록 확인하기 접기 ▲</span>
     </button>
-    <div id="dailyMealBody" style="display:block;margin-top:10px;border:1px solid var(--border);border-radius:var(--rsm);background:var(--card);padding:14px 16px 16px;">
+    <div id="dailyMealBody" style="display:none;margin-top:10px;border:1px solid var(--border);border-radius:var(--rsm);background:var(--card);padding:14px 16px 16px;">
       <!-- 안내 (21끼 + 픽헬스 솔루션 안내로 통합) -->
       <p class="meal-record-desc" style="font-size:13px;color:var(--text2);line-height:1.6;text-align:center;margin:6px 4px 12px;">
         최근 드신 음식 기록입니다.<br>
