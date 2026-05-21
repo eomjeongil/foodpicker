@@ -288,19 +288,9 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
   box-shadow:var(--shadow-lg);
 }
 .result-card.show{display:block;animation:popIn .45s cubic-bezier(.34,1.56,.64,1);}
-/* ① 추천 결과 카드 — 밝은 라벤더 화이트 서브테마 (토큰 스코프 오버라이드) */
-#resultCard{
-  --card:#F8F4FF;
-  --card2:#FFFFFF;
-  --bg2:#EFEAF8;
-  --border:#DDD8F0;
-  --border-strong:#C9C2E8;
-  --text:#1A1A2E;
-  --text2:#5A5575;
-  --text3:#8A85A5;
-}
 @keyframes popIn{from{opacity:0;transform:scale(.86) translateY(18px);}to{opacity:1;transform:scale(1) translateY(0);}}
-.food-img-wrap{position:relative;height:200px;overflow:hidden;background:linear-gradient(135deg,var(--card2),var(--card2));display:flex;align-items:center;justify-content:center;}
+/* ① 메뉴 이미지+제목 헤더 영역만 밝은 배경 유지 (결과 카드 본문은 다크 복구) */
+.food-img-wrap{position:relative;height:200px;overflow:hidden;background:#F8F4FF;display:flex;align-items:center;justify-content:center;}
 .food-img{width:100%;height:100%;object-fit:cover;}
 .food-img-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 35%,rgba(45,30,20,.78) 100%);}
 .food-img-title{position:absolute;bottom:14px;left:18px;right:18px;}
@@ -7145,8 +7135,8 @@ async function _quickLog(mealType){
       const _retryBtn=document.getElementById("retryRecommend");
       if(_retryBtn)_retryBtn.disabled=false;
     }else{
-      const wrap=document.getElementById("quickLogWrap");
-      if(wrap){wrap.style.display="none";wrap.innerHTML="";}
+      // ② 실패 — 버튼 영역 숨기지 않고 유지, 다시 시도할 수 있도록 버튼 재활성화 (display:none 금지)
+      document.querySelectorAll("#quickLogWrap .qls-btn").forEach(function(b){b.disabled=false;});
     }
     window._quickLogBusy=false;
   }
