@@ -1871,6 +1871,8 @@ async function _logClick(type, menu) {
     .greeting-card>summary{list-style:none;cursor:pointer;
       display:flex;align-items:center;justify-content:center;gap:8px;}
     .greeting-card>summary::-webkit-details-marker{display:none;}
+    /* 인사카드 토글 summary 내부 모든 텍스트/기호 골드 */
+    #greetingCard>summary,#greetingCard>summary *{color:var(--gold);}
     .greeting-card .gc-toggle{font-size:12px;font-weight:800;color:var(--text2);white-space:nowrap;}
     .greeting-card .gc-open{display:none;}
     .greeting-card[open] .gc-closed{display:none;}
