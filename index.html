@@ -1405,10 +1405,10 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
   padding:15px 16px;margin-bottom:14px;
   box-shadow:var(--shadow-sm);
 }
-.ai-reason-head{font-size:12.5px;font-weight:800;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
-.ai-reason-body{font-size:14px;color:var(--text);line-height:1.55;}
+.ai-reason-head{font-size:12.5px;font-weight:800;color:var(--gold);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.ai-reason-body{font-size:14px;color:#A0A0C0;line-height:1.55;}
 .ai-reason-body.loading{color:var(--text2);font-style:italic;}
-.ai-loading-msg{font-size:13.5px;color:var(--text2);font-style:italic;line-height:1.55;transition:opacity .2s;}
+.ai-loading-msg{font-size:13.5px;color:#A0A0C0;font-style:italic;line-height:1.55;transition:opacity .2s;}
 
 /* ── AI 대안 메뉴 (next-card 대체, 더 큰 카드 + 클릭 액션) ── */
 .ai-alts-section{margin:14px 0 12px;animation:slideUp .35s ease both;}
@@ -5434,8 +5434,8 @@ async function loadAiReason(){
     const tip=j.data.primary?.tip||"";
     const disclaimer=j.data.primary?.disclaimer||"";
     let html=`<div>${_escAt(reason)}</div>`;
-    if(tip)html+=`<div style="margin-top:8px;padding:8px 11px;background:#FFF7EE;border:1px solid #FFE3CC;border-radius:8px;font-size:12px;color:#7A5A14;">👨‍🍳 <strong>조리법 팁.</strong> ${_escAt(tip)}</div>`;
-    if(disclaimer)html+=`<div style="margin-top:8px;font-size:11px;color:var(--text3);font-style:italic;letter-spacing:.2px;">${_escAt(disclaimer)}</div>`;
+    if(tip)html+=`<div style="margin-top:8px;padding:8px 11px;background:rgba(242,180,65,.10);border:1px solid rgba(242,180,65,.30);border-radius:8px;font-size:12px;color:#A0A0C0;">👨‍🍳 <strong>조리법 팁.</strong> ${_escAt(tip)}</div>`;
+    if(disclaimer)html+=`<div style="margin-top:8px;font-size:11px;color:#A0A0C0;font-style:italic;letter-spacing:.2px;">${_escAt(disclaimer)}</div>`;
     txtEl.innerHTML=html;
     // 건강 배지를 결과 카드 상단 태그 영역에 추가 렌더 (기존 태그 유지)
     const badges=Array.isArray(j.data.healthBadges)?j.data.healthBadges:[];
