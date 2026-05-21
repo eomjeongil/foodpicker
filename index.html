@@ -39,23 +39,23 @@
   /* 카드 라운드 통일 공통 변수 */
   --pick-radius:12px;
   /* Background & Surface — 웜 화이트 톤 */
-  --bg:#1A1410;
-  --bg2:#221A10;
-  --card:#2A2018;
-  --card2:#332618;
-  --border:#4A3828;
-  --border-strong:#6A5040;
+  --bg:#0D1117;
+  --bg2:#111827;
+  --card:#161B27;
+  --card2:#1E2535;
+  --border:#2A3550;
+  --border-strong:#3D5080;
   --shadow-sm:0 2px 8px rgba(0,0,0,.3);
   --shadow-md:0 6px 20px rgba(0,0,0,.4);
   --shadow-lg:0 14px 38px rgba(0,0,0,.5);
   --shadow-xl:0 20px 56px rgba(0,0,0,.6);
 
   /* Brand — 코랄 오렌지 */
-  --pr:var(--pr); --pr2:var(--pr2);
+  --pr:#FF6B35; --pr2:#FF8E53;
   --pg:rgba(255,107,53,.22);
 
   /* Health — 소프트 그린 */
-  --green:var(--green); --greeng:rgba(76,175,125,.20);
+  --green:#4CAF7D; --greeng:rgba(76,175,125,.20);
 
   /* Accent palette */
   --gold:#F2B441; --goldg:rgba(242,180,65,.22);
@@ -68,12 +68,12 @@
 
   /* 신규 — 웜 옐로우 & 크림 (디자인 정리) */
   --yellow:#F2B441; --yellowg:rgba(242,180,65,.18);
-  --cream:#2A2018;
+  --cream:#1E2535;
 
   /* Text — 가독성 강화 (웜 라이트 배경 #FFFAF5 위 충분한 대비) */
-  --text:#FFE4CC;
-  --text2:#CCA882;
-  --text3:#997755;
+  --text:#FFFFFF;
+  --text2:#A8B8D0;
+  --text3:#6B7FA0;
 
   /* Radius */
   --r:18px; --rsm:12px; --rxs:8px;
@@ -104,35 +104,35 @@ body{
   position:sticky;top:0;z-index:100;
   display:flex;align-items:center;justify-content:space-between;
   padding:13px 20px;
-  background:#1A1410;
+  background:var(--bg);
   backdrop-filter:blur(14px);
   -webkit-backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--border);
+  border-bottom:1px solid var(--gold);
   font-size:14px;
 }
 .meal-badge{padding:6px 14px;border-radius:50px;font-weight:800;font-size:13px;letter-spacing:.3px;}
-.mb-morning{background:#352E18;color:#EDCF97;}
-.mb-lunch{background:#352218;color:var(--pr);}
-.mb-dinner{background:#182235;color:#97B7ED;}
-.mb-night{background:#1B312F;color:#9BE9E2;}
+.mb-morning{background:var(--card2);color:var(--text2);}
+.mb-lunch{background:var(--card2);color:var(--pr);}
+.mb-dinner{background:var(--card2);color:var(--text2);}
+.mb-night{background:var(--card2);color:var(--text2);}
 .season-badge{font-size:13px;padding:5px 12px;border-radius:50px;font-weight:800;}
-.sb-spring{background:#35181F;color:#E3A1B4;}
-.sb-summer{background:#182235;color:#97B7ED;}
-.sb-autumn{background:#352618;color:#EDC597;}
-.sb-winter{background:#1B312F;color:#9BE9E2;}
+.sb-spring{background:var(--card2);color:var(--text2);}
+.sb-summer{background:var(--card2);color:var(--text2);}
+.sb-autumn{background:var(--card2);color:var(--text2);}
+.sb-winter{background:var(--card2);color:var(--text2);}
 .wx-tag{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text2);font-weight:600;}
 
 /* ── HERO ── */
 .hero{position:relative;z-index:1;text-align:center;padding:36px 22px 24px;}
 .hero-icon{font-size:58px;display:block;margin-bottom:10px;animation:float 3.5s ease-in-out infinite;filter:drop-shadow(0 8px 20px rgba(255,107,53,.32));}
 @keyframes float{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-10px) rotate(4deg);}}
-.hero h1{font-family:'Black Han Sans',sans-serif;font-size:clamp(28px,7.5vw,44px);letter-spacing:-1px;background:linear-gradient(135deg,var(--pr) 0%,var(--pr2) 55%,#F2B441 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero h1{font-family:'Black Han Sans',sans-serif;font-size:clamp(28px,7.5vw,44px);letter-spacing:-1px;background:linear-gradient(135deg,var(--gold) 0%,var(--pr2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .hero-sub{font-family:'Gowun Dodum',sans-serif;color:var(--text2);margin-top:8px;font-size:13.5px;line-height:1.7;}
 .badge-row{display:flex;gap:7px;justify-content:center;margin-top:12px;flex-wrap:wrap;}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:6px 14px;border-radius:50px;font-size:12px;font-weight:800;}
-.b-gold{background:#352E18;color:#EDCF97;}
-.b-mint{background:#1B312F;color:#9BE9E2;}
-.b-green{background:#1C3020;color:#A5DEB7;}
+.b-gold{background:var(--card2);color:var(--text2);}
+.b-mint{background:var(--card2);color:var(--text2);}
+.b-green{background:var(--card2);color:var(--text2);}
 
 /* ── WRAP / CARD ── */
 .wrap{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:0 17px;}
@@ -149,7 +149,7 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 }
 .sl{
   font-size:13px;font-weight:800;letter-spacing:1.5px;
-  color:var(--pr);text-transform:uppercase;
+  color:var(--gold);text-transform:uppercase;
   margin-bottom:13px;display:flex;align-items:center;gap:8px;
 }
 .sl::after{content:'';flex:1;height:1px;background:var(--border);}
@@ -159,7 +159,7 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 /* ── PWA banner ── */
 .pwa-banner{
   display:none;
-  background:linear-gradient(135deg,#352518,#352918);
+  background:linear-gradient(135deg,var(--card2),var(--card2));
   border:1px solid var(--border-strong);
   border-radius:var(--rsm);padding:15px 17px;
   margin-bottom:12px;align-items:center;gap:12px;
@@ -232,10 +232,10 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
   font-size:13px;font-weight:700;cursor:pointer;text-align:center;
   transition:all .18s;user-select:none;
 }
-.tog:hover{border-color:var(--pr);color:var(--pr);background:#352318;}
-.sel-m{background:#182235!important;border-color:var(--blue)!important;color:#9CB4E8!important;}
-.sel-f{background:#351823!important;border-color:#E84B8E!important;color:#E69DBA!important;}
-.sel-a{background:#1B312F!important;border-color:var(--mint)!important;color:#9BE9E2!important;}
+.tog:hover{border-color:var(--pr);color:var(--pr);background:var(--card2);}
+.sel-m{background:var(--card2)!important;border-color:var(--blue)!important;color:var(--text2)!important;}
+.sel-f{background:var(--card2)!important;border-color:#E84B8E!important;color:var(--text2)!important;}
+.sel-a{background:var(--card2)!important;border-color:var(--mint)!important;color:var(--text2)!important;}
 
 /* ── CHIPS — 5개 그룹 카테고리 ── */
 .chips{display:flex;flex-wrap:wrap;gap:7px;}
@@ -289,7 +289,7 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 }
 .result-card.show{display:block;animation:popIn .45s cubic-bezier(.34,1.56,.64,1);}
 @keyframes popIn{from{opacity:0;transform:scale(.86) translateY(18px);}to{opacity:1;transform:scale(1) translateY(0);}}
-.food-img-wrap{position:relative;height:200px;overflow:hidden;background:linear-gradient(135deg,#352518,#352618);display:flex;align-items:center;justify-content:center;}
+.food-img-wrap{position:relative;height:200px;overflow:hidden;background:linear-gradient(135deg,var(--card2),var(--card2));display:flex;align-items:center;justify-content:center;}
 .food-img{width:100%;height:100%;object-fit:cover;}
 .food-img-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 35%,rgba(45,30,20,.78) 100%);}
 .food-img-title{position:absolute;bottom:14px;left:18px;right:18px;}
@@ -299,10 +299,10 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .result-body{background:var(--card);padding:20px;}
 .rtag-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:13px;}
 .rtag{font-size:13px;padding:5px 13px;border-radius:50px;font-weight:700;}
-.rt-cat{background:#352218;color:var(--pr);}
-.rt-per{background:#352E18;color:#EDCF97;}
-.rt-time{background:#1B312F;color:#9BE9E2;}
-.rt-wx{background:#182235;color:#9CB4E8;}
+.rt-cat{background:var(--card2);color:var(--pr);}
+.rt-per{background:var(--card2);color:var(--text2);}
+.rt-time{background:var(--card2);color:var(--text2);}
+.rt-wx{background:var(--card2);color:var(--text2);}
 
 /* ── 건강 배지 (결과 카드 상단 태그 영역) ── */
 .health-badge{
@@ -311,21 +311,21 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
   display:inline-flex;align-items:center;gap:3px;
   border:1px solid transparent;
 }
-.hb-bp{background:#351C18;color:#E8A29B;border-color:#6C2D2D;}
-.hb-glucose{background:#352218;color:#EDC197;border-color:#714928;}
-.hb-chol{background:#352E18;color:#EDD397;border-color:#715F28;}
-.hb-weight{background:#1C3020;color:#A5DEB7;border-color:#3A5F47;}
-.hb-muscle{background:#182235;color:#9CB4E8;border-color:#334866;}
-.hb-balanced{background:#281835;color:#B89EE5;border-color:#463069;}
-.hb-allergy{background:#2F241E;color:#DFBBA5;border-color:#5A4B3F;}
-.hb-bmi{background:#1B312F;color:#9BE9E2;border-color:#37625F;}
+.hb-bp{background:var(--card2);color:var(--text2);border-color:var(--border);}
+.hb-glucose{background:var(--card2);color:var(--text2);border-color:var(--border);}
+.hb-chol{background:var(--card2);color:var(--text2);border-color:var(--border);}
+.hb-weight{background:var(--card2);color:var(--text2);border-color:var(--border);}
+.hb-muscle{background:var(--card2);color:var(--text2);border-color:var(--border);}
+.hb-balanced{background:var(--card2);color:var(--text2);border-color:var(--border);}
+.hb-allergy{background:var(--card2);color:var(--text2);border-color:var(--border);}
+.hb-bmi{background:var(--card2);color:var(--text2);border-color:var(--border);}
 .tip-box{
-  background:linear-gradient(135deg,#352E18,#352F18);
-  border:1px solid #715F28;border-radius:var(--rsm);
-  padding:15px 16px;font-size:14px;color:#EDD297;
+  background:linear-gradient(135deg,var(--card2),var(--card2));
+  border:1px solid var(--border);border-radius:var(--rsm);
+  padding:15px 16px;font-size:14px;color:var(--text2);
   line-height:1.65;margin-bottom:14px;
 }
-.tip-box strong{color:#EDCF97;}
+.tip-box strong{color:var(--text2);}
 
 /* ── 연관상품 ── */
 .related-section{margin-bottom:14px;}
@@ -342,21 +342,21 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
   box-shadow:var(--shadow-sm);
 }
 .rel-btn:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);}
-.rel-milkit{border-color:#712828;background:linear-gradient(135deg,var(--card),#351818);}
+.rel-milkit{border-color:var(--border);background:linear-gradient(135deg,var(--card),var(--card2));}
 .rel-milkit:hover{border-color:var(--red);}
-.rel-ingred{border-color:#3A5F46;background:linear-gradient(135deg,var(--card),#1B3122);}
+.rel-ingred{border-color:var(--border);background:linear-gradient(135deg,var(--card),var(--card2));}
 .rel-ingred:hover{border-color:var(--green);}
-.rel-tool{border-color:#463069;background:linear-gradient(135deg,var(--card),#261933);}
+.rel-tool{border-color:var(--border);background:linear-gradient(135deg,var(--card),var(--card2));}
 .rel-tool:hover{border-color:var(--purple);}
-.rel-sauce{border-color:#715928;background:linear-gradient(135deg,var(--card),#352F18);}
+.rel-sauce{border-color:var(--border);background:linear-gradient(135deg,var(--card),var(--card2));}
 .rel-sauce:hover{border-color:var(--gold);}
 .rel-icon{font-size:24px;}
 .rel-label{font-size:14px;font-weight:800;color:var(--text);}
 .rel-sub{font-size:11.5px;color:var(--text2);line-height:1.4;}
 .rel-tag{position:absolute;top:9px;right:9px;font-size:12px;padding:4px 9px;border-radius:50px;font-weight:800;}
-.tag-hot{background:#351C18;color:var(--pr);}
-.tag-new{background:#1C3020;color:#A5DEB7;}
-.tag-sale{background:#352F18;color:#EDCF97;}
+.tag-hot{background:var(--card2);color:var(--pr);}
+.tag-new{background:var(--card2);color:var(--text2);}
+.tag-sale{background:var(--card2);color:var(--text2);}
 
 /* ── 액션 버튼 ── */
 .main-actions{display:flex;flex-direction:column;gap:9px;}
@@ -382,7 +382,7 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .brr{flex:1;padding:14px;border:1.5px solid var(--border);border-radius:var(--rsm);background:var(--card);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:5px;}
 .brr:hover{border-color:var(--pr);color:var(--pr);}
 .share-row{display:flex;gap:8px;}
-.bkakao{flex:1;padding:15px;border:none;border-radius:var(--rsm);background:var(--kakao);color:#EDC297;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;box-shadow:0 4px 12px rgba(254,229,0,.4);}
+.bkakao{flex:1;padding:15px;border:none;border-radius:var(--rsm);background:var(--kakao);color:var(--text2);font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;box-shadow:0 4px 12px rgba(254,229,0,.4);}
 .bkakao:hover{filter:brightness(1.05);transform:translateY(-1px);}
 .bcopy{flex:1;padding:15px;border:1.5px solid var(--border);border-radius:var(--rsm);background:var(--card);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;}
 .bcopy:hover{border-color:var(--mint);color:var(--mint);}
@@ -419,7 +419,7 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 /* ② 다음 순위 추천메뉴 토글 — 보라 테마 */
 .alts-collapse{margin-top:14px;}
 .alts-collapse>summary{
-  padding:13px 16px;border:1.5px solid var(--pr);border-radius:13px;
+  padding:13px 16px;border:1.5px solid var(--gold);border-radius:13px;
   background:var(--cream);
   color:var(--pr);font-size:14px;font-weight:800;justify-content:center;
 }
@@ -427,11 +427,11 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .alts-collapse .ai-alts-section{margin-top:0;}
 /* ③ 궁합 음식 토글 — 그린 테마, .match-title 그대로 유지 */
 .match-collapse>summary .match-title{margin-bottom:0;}
-.match-collapse>summary .mc-toggle{font-size:12.5px;font-weight:800;color:#A5DEB7;white-space:nowrap;}
+.match-collapse>summary .mc-toggle{font-size:12.5px;font-weight:800;color:var(--text2);white-space:nowrap;}
 .match-collapse[open]>summary{margin-bottom:11px;}
 /* ⑥ 추천 기록 토글 */
 .hist-collapse>summary{
-  padding:13px 16px;border:1.5px solid var(--pr);border-radius:12px;
+  padding:13px 16px;border:1.5px solid var(--gold);border-radius:12px;
   background:var(--cream);color:var(--pr);font-size:13px;font-weight:800;
   letter-spacing:1px;justify-content:center;
 }
@@ -460,10 +460,10 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .admin-logout{width:100%;padding:12px;border:none;border-radius:var(--rsm);background:transparent;color:var(--text3);font-size:12px;cursor:pointer;margin-top:6px;text-decoration:underline;}
 
 /* ── 파트너 바 ── */
-.partner-bar{background:#352918;border:1px solid var(--border);border-radius:var(--rsm);padding:11px 15px;font-size:12px;color:var(--text2);text-align:center;margin-bottom:12px;line-height:1.6;}
+.partner-bar{background:var(--card2);border:1px solid var(--border);border-radius:var(--rsm);padding:11px 15px;font-size:12px;color:var(--text2);text-align:center;margin-bottom:12px;line-height:1.6;}
 
 /* ── 시즌 배너 ── */
-.season-banner{background:linear-gradient(135deg,#352218,#352E18);border:1px solid #714928;border-radius:var(--rsm);padding:15px 16px;margin-bottom:12px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:all .18s;box-shadow:var(--shadow-sm);}
+.season-banner{background:linear-gradient(135deg,var(--card2),var(--card2));border:1px solid var(--border);border-radius:var(--rsm);padding:15px 16px;margin-bottom:12px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:all .18s;box-shadow:var(--shadow-sm);}
 .season-banner:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
 .sb-icon{font-size:33px;}
 .sb-text{flex:1;}
@@ -473,7 +473,7 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 
 /* ── TOAST / FAB ── */
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border-strong);color:var(--text);padding:14px 22px;border-radius:50px;font-size:14px;font-weight:700;z-index:9999;white-space:nowrap;box-shadow:var(--shadow-lg);animation:toastIn .3s cubic-bezier(.34,1.56,.64,1);}
-.toast.toast-warn{border-color:var(--pr);color:#EDB097;background:#352218;}
+.toast.toast-warn{border-color:var(--pr);color:var(--text2);background:var(--card2);}
 .toast.toast-multi{white-space:normal;max-width:300px;text-align:center;line-height:1.55;border-radius:14px;}
 /* 웹 푸시 권한 요청 토스트 (비활성화 — 카카오 브랜드 메시지 전환 예정) */
 .push-ask-toast{
@@ -505,7 +505,7 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 
 /* ── 식습관 기록 (meal_logs 단일 입력) ── */
 .meal-log-intro{text-align:center;padding:9px 5px 14px;}
-.meal-log-intro-title{font-size:17px;font-weight:800;color:#A6DEA8;margin-bottom:6px;letter-spacing:.2px;}
+.meal-log-intro-title{font-size:17px;font-weight:800;color:var(--text2);margin-bottom:6px;letter-spacing:.2px;}
 .meal-log-intro-desc{font-size:13px;color:var(--text2);line-height:1.6;}
 /* 식사 입력창 — 가시성 강화 (초록 테두리 + 그림자) */
 .meal-log-input-wrap{
@@ -535,7 +535,7 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .meal-log-dropdown.show{display:block;}
 .mld-item{display:flex;align-items:center;gap:8px;padding:12px 14px;cursor:pointer;font-size:14px;color:var(--text);border-bottom:1px solid var(--border);}
 .mld-item:last-child{border-bottom:none;}
-.mld-item:hover{background:#1D3021;}
+.mld-item:hover{background:var(--card2);}
 .mld-emoji{font-size:20px;flex-shrink:0;}
 .mld-name{flex:1;font-weight:700;}
 .mld-meta{font-size:12px;color:var(--text2);}
@@ -548,7 +548,7 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .mlp-meal-row{display:grid;grid-template-columns:repeat(2,1fr);}
 .mlp-btn{padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--card);font-size:14px;cursor:pointer;color:var(--text);font-family:'Noto Sans KR',sans-serif;transition:all .15s ease;}
 .mlp-btn:hover{border-color:var(--green);color:var(--green);}
-.mlp-btn.active{border-color:var(--green);color:#A6DEA8;background:#1D301E;font-weight:800;}
+.mlp-btn.active{border-color:var(--green);color:var(--text2);background:var(--card2);font-weight:800;}
 .mlp-save-btn{width:100%;margin-top:16px;padding:16px;background:linear-gradient(135deg,var(--green),#2E9E6B);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(76,175,125,.3);}
 .mlp-cancel-btn{width:100%;margin-top:8px;padding:14px;background:var(--card2);color:var(--text2);border:none;border-radius:10px;font-size:14px;cursor:pointer;}
 /* 반찬 빠른 추가 (팝업 내) + 기록 목록 인라인 태그 */
@@ -557,17 +557,17 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .sds-hint{font-size:12px;color:var(--text3);font-weight:400;}
 .sds-chips{display:flex;flex-wrap:wrap;gap:6px;}
 .sds-chip{padding:8px 14px;border:1.5px solid var(--border);border-radius:20px;background:var(--card);font-size:13px;cursor:pointer;transition:all .15s;color:var(--text2);}
-.sds-chip.on{border-color:var(--green);background:#1D301E;color:#A6DEA8;font-weight:700;}
+.sds-chip.on{border-color:var(--green);background:var(--card2);color:var(--text2);font-weight:700;}
 .mli-sides{font-size:12px;color:var(--text2);margin-left:4px;flex-shrink:0;white-space:nowrap;}
 .meal-log-list{display:flex;flex-direction:column;gap:6px;}
 .meal-log-list-empty{padding:20px;text-align:center;color:var(--text3);font-size:13px;}
 /* 날짜별 그룹 + 접기 */
-.meal-date-group{margin-bottom:8px;border:1px solid #3D5C4D;border-radius:12px;overflow:hidden;}
-.mdg-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:linear-gradient(135deg,#183518,#1E2F25);cursor:pointer;user-select:none;transition:background .15s;}
-.mdg-header:hover{background:#1D2F22;}
-.mdg-header:active{background:#1D301E;}
+.meal-date-group{margin-bottom:8px;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.mdg-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:linear-gradient(135deg,var(--card2),var(--card2));cursor:pointer;user-select:none;transition:background .15s;}
+.mdg-header:hover{background:var(--card2);}
+.mdg-header:active{background:var(--card2);}
 .mdg-header-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.mdg-date{font-size:14px;font-weight:800;color:#A6DEA8;}
+.mdg-date{font-size:14px;font-weight:800;color:var(--text2);}
 .mdg-count{font-size:12px;background:var(--green);color:#fff;padding:2px 9px;border-radius:10px;font-weight:700;}
 .mdg-kcal{font-size:12px;color:var(--text2);}
 .mdg-caret{font-size:13px;color:var(--text2);font-weight:700;flex-shrink:0;}
@@ -577,10 +577,10 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .mli-meal-icon{font-size:18px;flex-shrink:0;}
 .mli-name{flex:1;font-size:14px;font-weight:700;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .mli-kcal{font-size:13px;font-weight:700;color:var(--pr);flex-shrink:0;}
-.mli-del{background:var(--card);border:1px solid #71282F;border-radius:6px;color:#E7A29D;font-size:11.5px;font-weight:800;cursor:pointer;padding:5px 9px;line-height:1;flex-shrink:0;letter-spacing:.3px;}
-.mli-del:hover{background:#351818;border-color:#6C2D2D;color:#EC9898;}
+.mli-del{background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11.5px;font-weight:800;cursor:pointer;padding:5px 9px;line-height:1;flex-shrink:0;letter-spacing:.3px;}
+.mli-del:hover{background:var(--card2);border-color:var(--border);color:var(--text2);}
 /* DUPLICATE 시 해당 항목 강조 — _highlightMealLogItem 이 2초간 부착 */
-.mli-highlight{background:#352E18 !important;border:1px solid var(--pr) !important;transition:background .3s, border-color .3s;}
+.mli-highlight{background:var(--card2) !important;border:1px solid var(--pr) !important;transition:background .3s, border-color .3s;}
 .meal-log-more-btn{width:100%;padding:12px;background:none;border:1px dashed var(--border);border-radius:10px;color:var(--text2);font-size:13px;cursor:pointer;margin-top:6px;font-family:inherit;}
 .meal-log-more-btn:hover{border-color:var(--green);color:var(--green);}
 /* 식사 기록 CSV 내보내기 */
@@ -595,11 +595,11 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .meal-export-btn:hover{opacity:.9;transform:translateY(-1px);}
 .meal-export-btn:disabled{opacity:.6;cursor:default;transform:none;}
 .meal-export-hint{font-size:11px;color:var(--text3);text-align:center;line-height:1.5;}
-.meal-log-progress{background:#183518;border:1px solid #3D5C4D;border-radius:10px;padding:14px;margin-top:10px;}
-.mlp-count{font-size:14px;font-weight:700;color:#A6DEA8;margin-bottom:8px;}
+.meal-log-progress{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:10px;}
+.mlp-count{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:8px;}
 .mlp-next{font-size:14px;color:var(--text);margin-top:8px;line-height:1.55;white-space:normal;font-weight:600;}
 .mlp-next span{font-size:12px !important;}
-.progress-wrap{background:#1D301E;border-radius:20px;height:8px;overflow:hidden;display:block;width:100%;min-width:0;box-sizing:border-box;}
+.progress-wrap{background:var(--card2);border-radius:20px;height:8px;overflow:hidden;display:block;width:100%;min-width:0;box-sizing:border-box;}
 .progress-bar{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--green),#2E9E6B);transition:width .5s ease;display:block;min-width:2px;}
 @media (max-width:480px){
   .meal-log-progress{padding:12px;}
@@ -607,8 +607,8 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
   .meal-log-progress .progress-bar,.ph-progress-bar{height:100%;display:block;min-width:2px;}
 }
 /* 리포트 단계별 카드 */
-.report-stage-card{background:var(--card);border:1px solid #3D5C4D;border-radius:12px;padding:16px;margin-bottom:10px;}
-.report-stage-card h4{font-size:16px;font-weight:800;color:#A6DEA8;margin:0 0 10px;}
+.report-stage-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;}
+.report-stage-card h4{font-size:16px;font-weight:800;color:var(--text2);margin:0 0 10px;}
 .report-stage-card .rsc-row{display:flex;justify-content:space-between;font-size:14px;margin:6px 0;color:var(--text);}
 .report-stage-card .rsc-row .lbl{color:var(--text2);font-weight:600;}
 .report-stage-card .rsc-row .val{font-weight:800;}
@@ -619,57 +619,57 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .report-cta-btn{display:block;margin:12px auto 0;padding:14px 22px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--green),#2E9E6B);color:#fff;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(76,175,125,.35);}
 /* 픽헬스 활성화 카드 — 잠금/해제 상태 */
 .pickhealth-card{margin-top:12px;border-radius:12px;padding:16px;background:var(--card);}
-.pickhealth-lock{border:1.5px dashed #454F54;background:var(--card);}
-.pickhealth-unlock{border:1.5px solid #EF9F27;background:#352A18;color:#EDC597;box-shadow:0 4px 14px rgba(239,159,39,.20);}
-.ph-title{font-size:14px;font-weight:800;color:#A6DEA8;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.pickhealth-lock{border:1.5px dashed var(--border);background:var(--card);}
+.pickhealth-unlock{border:1.5px solid #EF9F27;background:var(--card2);color:var(--text2);box-shadow:0 4px 14px rgba(239,159,39,.20);}
+.ph-title{font-size:14px;font-weight:800;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
 .pickhealth-lock .ph-title{color:var(--text2);}
-.ph-progress-wrap{background:#212C24;border-radius:20px;height:8px;overflow:hidden;margin:6px 0;}
+.ph-progress-wrap{background:var(--card2);border-radius:20px;height:8px;overflow:hidden;margin:6px 0;}
 .ph-progress-bar{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--green),#2E9E6B);transition:width .5s ease;}
 .ph-status-msg{font-size:13px;color:var(--text2);margin:6px 0 10px;line-height:1.5;}
-.pickhealth-unlock .ph-status-msg{color:#A6DEA8;font-weight:700;}
-.ph-lock-btn{width:100%;padding:14px;border:none;border-radius:10px;background:#21282B;color:var(--text2);font-size:13.5px;font-weight:800;cursor:not-allowed;letter-spacing:.2px;}
-.ph-stage-guide{background:#21262B;border-radius:12px;padding:12px 14px;margin-bottom:14px;text-align:left;}
+.pickhealth-unlock .ph-status-msg{color:var(--text2);font-weight:700;}
+.ph-lock-btn{width:100%;padding:14px;border:none;border-radius:10px;background:var(--card2);color:var(--text2);font-size:13.5px;font-weight:800;cursor:not-allowed;letter-spacing:.2px;}
+.ph-stage-guide{background:var(--card2);border-radius:12px;padding:12px 14px;margin-bottom:14px;text-align:left;}
 .ph-stage-item{font-size:13px;color:var(--text2);padding:5px 0;line-height:1.5;border-bottom:1px solid var(--border);}
 .ph-stage-item:last-child{border-bottom:none;}
-.ph-stage-item.done{color:#A6DEA8;}
+.ph-stage-item.done{color:var(--text2);}
 .ph-stage-item strong{color:var(--text);}
-.ph-stage-item.done strong{color:#A6DEA8;}
-.ph-done{color:#A6DEA8;font-size:12px;margin-left:4px;font-weight:700;}
+.ph-stage-item.done strong{color:var(--text2);}
+.ph-done{color:var(--text2);font-size:12px;margin-left:4px;font-weight:700;}
 .ph-need{color:var(--pr);font-size:12px;margin-left:4px;font-weight:700;}
 .ph-unlock-btn{width:100%;padding:14px;border:none;border-radius:10px;background:#EF9F27;color:#fff;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.2px;box-shadow:0 4px 12px rgba(239,159,39,.35);transition:transform .15s ease;}
-.ph-unlock-headline{font-size:14.5px;font-weight:800;color:#EDC597;line-height:1.55;margin-bottom:10px;}
-.health-link-badge{background:#352A18;border:0.5px solid #EF9F27;color:#EDC597;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;}
+.ph-unlock-headline{font-size:14.5px;font-weight:800;color:var(--text2);line-height:1.55;margin-bottom:10px;}
+.health-link-badge{background:var(--card2);border:0.5px solid #EF9F27;color:var(--text2);font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;}
 .ph-unlock-btn:hover{transform:translateY(-1px);}
 .ph-report-cta{display:block;width:100%;box-sizing:border-box;background:#EF9F27;color:#fff;border-radius:var(--pick-radius);padding:12px;font-weight:600;font-size:14px;text-align:center;text-decoration:none;margin-bottom:10px;}
 /* 픽헬스 카카오 가입 유도 팝업 */
 .ph-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1200;display:flex;align-items:center;justify-content:center;padding:16px;}
 .ph-modal-inner{background:var(--card);border-radius:16px;padding:22px 20px;width:100%;max-width:340px;box-shadow:0 16px 40px rgba(0,0,0,.2);text-align:center;}
-.ph-modal-title{font-size:18px;font-weight:800;color:#A6DEA8;margin-bottom:6px;}
+.ph-modal-title{font-size:18px;font-weight:800;color:var(--text2);margin-bottom:6px;}
 .ph-modal-desc{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:14px;}
 .ph-modal-actions{display:flex;flex-direction:column;gap:8px;}
 .ph-kakao-btn{padding:13px;border:none;border-radius:10px;background:#FEE500;color:var(--text);font-size:16px;font-weight:800;cursor:pointer;}
 .ph-skip-btn{padding:13px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text2);font-size:14px;font-weight:600;cursor:pointer;}
 /* 삭제 복구 패널 */
-.ml-deleted-toggle{width:100%;padding:11px;background:none;border:1px dashed #71282F;border-radius:10px;color:#E7A29D;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;}
-.ml-deleted-toggle:hover{background:#351818;}
-.ml-deleted-list{margin-top:8px;border:1px solid #712828;border-radius:10px;padding:9px;background:#351818;display:none;}
+.ml-deleted-toggle{width:100%;padding:11px;background:none;border:1px dashed var(--border);border-radius:10px;color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;}
+.ml-deleted-toggle:hover{background:var(--card2);}
+.ml-deleted-list{margin-top:8px;border:1px solid var(--border);border-radius:10px;padding:9px;background:var(--card2);display:none;}
 .ml-deleted-list.show{display:block;}
 .ml-deleted-empty{padding:16px;text-align:center;color:var(--text3);font-size:13px;}
-.ml-deleted-item{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:var(--pick-radius);background:var(--card);border:1px solid #5C3D3D;margin-bottom:5px;font-size:13px;}
+.ml-deleted-item{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:var(--pick-radius);background:var(--card);border:1px solid var(--border);margin-bottom:5px;font-size:13px;}
 .ml-deleted-item:last-child{margin-bottom:0;}
 .ml-del-meta{flex:1;color:var(--text2);}
 .ml-del-name{font-weight:700;color:var(--text);}
 .ml-del-date{font-size:10.5px;color:var(--text3);margin-top:2px;}
-.ml-restore-btn{padding:6px 12px;border:1px solid var(--green);border-radius:7px;background:var(--card);color:#A6DEA8;font-size:11.5px;font-weight:700;cursor:pointer;}
-.ml-restore-btn:hover{background:#1D301E;}
+.ml-restore-btn{padding:6px 12px;border:1px solid var(--green);border-radius:7px;background:var(--card);color:var(--text2);font-size:11.5px;font-weight:700;cursor:pointer;}
+.ml-restore-btn:hover{background:var(--card2);}
 /* 🎉 21끼 달성 축하 팝업 */
 .achieve-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeIn .25s ease;}
 .achieve-popup-inner{background:var(--card);border-radius:20px;padding:28px 22px;width:90%;max-width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:popIn .35s cubic-bezier(.34,1.56,.64,1);}
 .ap-confetti{font-size:52px;margin-bottom:8px;}
 .ap-title{font-size:26px;font-weight:900;color:var(--text);margin-bottom:6px;}
 .ap-subtitle{font-size:16px;color:var(--text2);line-height:1.5;margin-bottom:16px;}
-.ap-benefits{background:#183518;border-radius:12px;padding:14px 16px;margin-bottom:16px;text-align:left;}
-.ap-benefit-item{font-size:14px;color:#A6DEA8;padding:5px 0;font-weight:600;}
+.ap-benefits{background:var(--card2);border-radius:12px;padding:14px 16px;margin-bottom:16px;text-align:left;}
+.ap-benefit-item{font-size:14px;color:var(--text2);padding:5px 0;font-weight:600;}
 .ap-kakao-btn{width:100%;padding:16px;background:#FEE500;color:var(--text);border:none;border-radius:12px;font-size:17px;font-weight:800;cursor:pointer;margin-bottom:8px;box-shadow:0 4px 14px rgba(254,229,0,.4);transition:transform .15s ease;}
 .ap-kakao-btn:hover{transform:translateY(-1px);}
 .ap-later-btn{width:100%;padding:14px;background:var(--card2);color:var(--text2);border:none;border-radius:12px;font-size:14px;cursor:pointer;margin-bottom:12px;}
@@ -677,41 +677,41 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .ap-note{font-size:11px;color:var(--text3);line-height:1.5;}
 /* ── 픽헬스 잠금/활성 카드 — 동기부여 카피 (작업 1) ── */
 .ph-intro{text-align:center;margin-bottom:14px;}
-.ph-intro-logo{font-size:22px;font-weight:900;color:#A6DEA8;margin-bottom:4px;}
+.ph-intro-logo{font-size:22px;font-weight:900;color:var(--text2);margin-bottom:4px;}
 .ph-intro-tagline{font-size:14px;color:var(--text2);line-height:1.5;}
-.ph-intro-features{background:#183518;border-radius:10px;padding:12px;margin-bottom:14px;}
-.ph-feature{font-size:13px;color:var(--text);padding:6px 0;border-bottom:1px solid #3A5F3D;line-height:1.4;}
+.ph-intro-features{background:var(--card2);border-radius:10px;padding:12px;margin-bottom:14px;}
+.ph-feature{font-size:13px;color:var(--text);padding:6px 0;border-bottom:1px solid var(--border);line-height:1.4;}
 .ph-feature:last-child{border-bottom:none;}
-.ph-feature strong{color:#A6DEA8;}
+.ph-feature strong{color:var(--text2);}
 .ph-lock-progress-wrap{margin-bottom:12px;}
 .ph-lock-progress-title{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:6px;}
 .ph-lock-msg{font-size:13px;color:var(--text2);line-height:1.5;margin-top:6px;}
 .ph-lock-sub{font-size:11px;color:var(--text3);margin-top:4px;}
 .ph-unlock-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.ph-unlock-logo{font-size:20px;font-weight:900;color:#EDCA97;}
+.ph-unlock-logo{font-size:20px;font-weight:900;color:var(--text2);}
 .ph-unlock-badge{font-size:13px;background:#EF9F27;color:#fff;padding:4px 12px;border-radius:20px;font-weight:700;}
 .ph-unlock-summary{font-size:14px;color:var(--text);margin-bottom:10px;line-height:1.5;}
-.ph-highlight{background:#182835;color:#97BFED;padding:2px 7px;border-radius:6px;font-weight:700;font-size:13px;}
+.ph-highlight{background:var(--card2);color:var(--text2);padding:2px 7px;border-radius:6px;font-weight:700;font-size:13px;}
 .ph-score{color:var(--pr);font-weight:900;font-size:18px;}
-.ph-unlock-preview{background:#352A18;border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px;color:var(--text2);}
-.ph-preview-item{padding:5px 0;border-bottom:1px solid #3A5F3D;}
+.ph-unlock-preview{background:var(--card2);border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px;color:var(--text2);}
+.ph-preview-item{padding:5px 0;border-bottom:1px solid var(--border);}
 .ph-preview-item:last-child{border-bottom:none;}
 .ph-unlock-note{font-size:11px;color:var(--text3);text-align:center;margin-top:8px;}
 /* 기록 섹션 상단 픽헬스 동기부여 힌트 (작업 2) */
 /* 픽헬스 힌트 — 끼니 수 무관 항상 표시 */
-.meal-log-pickhealth-hint{display:flex;align-items:flex-start;gap:8px;background:#2E1C31;border-radius:10px;padding:12px 14px;margin:10px 0;font-size:13px;color:#CC97ED;line-height:1.5;}
+.meal-log-pickhealth-hint{display:flex;align-items:flex-start;gap:8px;background:var(--card2);border-radius:10px;padding:12px 14px;margin:10px 0;font-size:13px;color:var(--text2);line-height:1.5;}
 .mlph-icon{font-size:18px;flex-shrink:0;line-height:1.2;}
-.mlph-text strong{color:#BE97ED;}
-.mlph-sub{display:block;color:#DD9BE9;font-size:12px;margin-top:2px;}
+.mlph-text strong{color:var(--text2);}
+.mlph-sub{display:block;color:var(--text2);font-size:12px;margin-top:2px;}
 /* 리포트 내 픽헬스 연동 힌트 (작업 3) */
 /* 리포트 최상단 — 21끼 미달 시 노란 카드로 픽헬스 동기 부여 */
 /* 연속 기록 스트릭 카드 (리포트 최상단) + 기록 섹션 스트릭 바 */
-.streak-card{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#352E18,#353218);border:1.5px solid #715F28;border-radius:12px;padding:14px 16px;margin-bottom:12px;}
+.streak-card{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--card2),var(--card2));border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
 .streak-emoji{font-size:31px;flex-shrink:0;}
 .streak-text{flex:1;min-width:0;}
-.streak-title{font-size:14px;font-weight:800;color:#EDB597;margin-bottom:2px;}
+.streak-title{font-size:14px;font-weight:800;color:var(--text2);margin-bottom:2px;}
 .streak-sub{font-size:12px;color:var(--text2);}
-.meal-streak-bar{text-align:center;font-size:14px;font-weight:800;color:#EDB597;background:#352E18;border-radius:var(--pick-radius);padding:9px;margin:6px 0;}
+.meal-streak-bar{text-align:center;font-size:14px;font-weight:800;color:var(--text2);background:var(--card2);border-radius:var(--pick-radius);padding:9px;margin:6px 0;}
 /* 추천→기록 원스텝 (결과 카드 내) */
 .qls-section{padding:14px 0 6px;border-top:1px solid var(--border);margin-top:8px;}
 .qls-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:10px;text-align:center;}
@@ -723,19 +723,19 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 }
 .qls-btn{
   padding:12px 6px;
-  background:#18351F;
-  border:1.5px solid #3B5E3D;
+  background:var(--card2);
+  border:1.5px solid var(--border);
   border-radius:12px;
   font-size:13px;
   font-weight:700;
-  color:#A6DEA8;
+  color:var(--text2);
   cursor:pointer;
   transition:all .15s;
   font-family:inherit;
   text-align:center;
   white-space:nowrap;
 }
-.qls-btn:hover{background:#1D301E;border-color:var(--green);transform:translateY(-1px);}
+.qls-btn:hover{background:var(--card2);border-color:var(--green);transform:translateY(-1px);}
 .qls-btn:active{transform:translateY(0);}
 .qls-btn:disabled{opacity:.6;cursor:default;}
 .qls-btn:nth-child(1){grid-column:1/2;grid-row:1;}
@@ -745,22 +745,22 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .qls-btn-unknown{
   grid-column:3/4;
   grid-row:2;
-  background:#18351F;
-  border:1.5px dashed #3B5E3D;
-  color:#A6DEA8;
+  background:var(--card2);
+  border:1.5px dashed var(--border);
+  color:var(--text2);
   font-size:12px;
   padding:12px 4px;
 }
-.qls-btn-unknown:hover{background:#1D301E;border-color:var(--green);transform:translateY(-1px);}
+.qls-btn-unknown:hover{background:var(--card2);border-color:var(--green);transform:translateY(-1px);}
 /* A+B 혼합 영양분석 정확도 배지 */
-.ab-badge{display:inline-flex;align-items:center;gap:4px;background:#1D301E;border:1px solid #3B5E3D;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;color:#A6DEA8;margin-bottom:8px;}
-.ab-badge.partial{background:#352E18;border-color:#715F28;color:#EDBF97;}
+.ab-badge{display:inline-flex;align-items:center;gap:4px;background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px;}
+.ab-badge.partial{background:var(--card2);border-color:var(--border);color:var(--text2);}
 .ab-badge.fallback{background:var(--card2);border-color:var(--border);color:var(--text2);}
-.ab-actual{background:#27321A;border:1px solid #4E6336;border-radius:10px;padding:10px 12px;margin:8px 0 10px;font-size:12px;color:#B3E4A0;line-height:1.6;}
-.ab-actual b{color:#A0E4A5;}
+.ab-actual{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin:8px 0 10px;font-size:12px;color:var(--text2);line-height:1.6;}
+.ab-actual b{color:var(--text2);}
 .ab-actual .ab-row{display:flex;justify-content:space-between;gap:8px;}
 .ab-actual .ab-row + .ab-row{margin-top:2px;}
-.ab-actual .ab-warn{color:#EDB597;font-weight:700;}
+.ab-actual .ab-warn{color:var(--text2);font-weight:700;}
 /* 리포트→추천 부족 영양소 카드 하단 버튼 (legacy — 인라인 칩으로 대체됨) */
 .rd-recommend-btn{width:100%;margin-top:10px;padding:12px;background:linear-gradient(135deg,var(--pr),#E65100);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
 .rd-recommend-btn:hover{filter:brightness(1.05);}
@@ -774,31 +774,31 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .hsc-diff.up{color:var(--green);}
 .hsc-diff.down{color:var(--pr);}
 .hsc-diff-sub{font-size:12px;color:var(--text3);font-weight:400;margin-left:4px;}
-.report-top-hint{display:flex;align-items:flex-start;gap:8px;background:#353218;border:1px solid #716A28;border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:13px;}
-.report-top-hint--achieved{background:#2E1C31;border-color:#5C3762;}
+.report-top-hint{display:flex;align-items:flex-start;gap:8px;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:13px;}
+.report-top-hint--achieved{background:var(--card2);border-color:var(--border);}
 .rth-msg{flex:1;min-width:0;color:var(--text2);line-height:1.55;font-weight:600;}
-.report-top-hint--achieved .rth-msg{color:#CC97ED;}
+.report-top-hint--achieved .rth-msg{color:var(--text2);}
 .rth-icon{font-size:20px;flex-shrink:0;}
 .rth-text{flex:1;min-width:0;}
-.rth-title{font-weight:800;color:#EDBF97;margin-bottom:2px;font-size:14px;}
+.rth-title{font-weight:800;color:var(--text2);margin-bottom:2px;font-size:14px;}
 .rth-desc{color:var(--text2);line-height:1.5;}
-.rth-sub{display:block;color:#DD9BE9;font-size:12px;margin-top:2px;}
-.report-pickhealth-hint{background:#2E1C31;border:1px solid #5C3762;border-radius:10px;padding:12px 14px;font-size:13px;color:#CC97ED;line-height:1.6;margin-top:10px;}
-.report-pickhealth-hint.activated{background:#1D301E;border-color:#3B5E3D;color:#A6DEA8;}
+.rth-sub{display:block;color:var(--text2);font-size:12px;margin-top:2px;}
+.report-pickhealth-hint{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--text2);line-height:1.6;margin-top:10px;}
+.report-pickhealth-hint.activated{background:var(--card2);border-color:var(--border);color:var(--text2);}
 /* ── 리포트 식습관 평가 + 부족 영양소 ── */
 .report-section{margin:12px 0;}
-.report-section-title{font-size:16px;font-weight:800;color:#A6DEA8;margin:0 0 8px;display:flex;align-items:center;gap:6px;}
+.report-section-title{font-size:16px;font-weight:800;color:var(--text2);margin:0 0 8px;display:flex;align-items:center;gap:6px;}
 .report-good-list,.report-bad-list{display:flex;flex-direction:column;gap:4px;margin:6px 0;}
-.report-good-item{background:#1D301E;border-radius:var(--pick-radius);padding:7px 12px;margin-bottom:4px;font-size:14px;color:#A6DEA8;}
-.report-bad-item{background:#352A18;border-radius:var(--pick-radius);padding:7px 12px;margin-bottom:4px;font-size:14px;color:#EDB597;}
-.report-habit-type{display:inline-block;background:#182835;color:#97BFED;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:700;margin:8px 0;}
+.report-good-item{background:var(--card2);border-radius:var(--pick-radius);padding:7px 12px;margin-bottom:4px;font-size:14px;color:var(--text2);}
+.report-bad-item{background:var(--card2);border-radius:var(--pick-radius);padding:7px 12px;margin-bottom:4px;font-size:14px;color:var(--text2);}
+.report-habit-type{display:inline-block;background:var(--card2);color:var(--text2);padding:5px 14px;border-radius:20px;font-size:13px;font-weight:700;margin:8px 0;}
 .report-score{display:flex;align-items:baseline;gap:4px;margin:8px 0;}
 .rs-number{font-size:40px;font-weight:900;color:var(--pr);line-height:1;}
 .rs-label{font-size:16px;color:var(--text2);}
 .rs-bar-wrap{flex:1;background:var(--card2);border-radius:20px;height:8px;overflow:hidden;margin-left:10px;align-self:center;}
 .rs-bar{height:100%;border-radius:20px;background:linear-gradient(90deg,#FFB300,var(--pr));transition:width .5s ease;}
 /* ── 단계별 리포트 추가 카드 (건강점수/주간추이/베스트워스트/목표진행) ── */
-.health-score-card{text-align:center;padding:18px;background:linear-gradient(135deg,#352E18,#353218);border-radius:14px;margin-bottom:12px;border:1px solid #715F28;}
+.health-score-card{text-align:center;padding:18px;background:linear-gradient(135deg,var(--card2),var(--card2));border-radius:14px;margin-bottom:12px;border:1px solid var(--border);}
 .hsc-score{font-size:56px;font-weight:900;color:var(--pr);line-height:1;}
 .hsc-total{font-size:18px;color:var(--text2);}
 .hsc-label{font-size:16px;font-weight:700;margin-top:4px;}
@@ -821,8 +821,8 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .wt-recommend-line{font-size:11px;color:var(--text3);text-align:right;margin-top:4px;}
 .best-worst-card{display:flex;gap:8px;margin-bottom:12px;}
 .bw-card{flex:1;padding:12px;border-radius:10px;font-size:12px;}
-.bw-best{background:#1D301E;border:1px solid #3B5E3D;}
-.bw-worst{background:#352A18;border:1px solid #715428;}
+.bw-best{background:var(--card2);border:1px solid var(--border);}
+.bw-worst{background:var(--card2);border:1px solid var(--border);}
 .bw-title{font-size:13px;font-weight:800;margin-bottom:4px;}
 .goal-progress{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;}
 .gp-item{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;}
@@ -836,23 +836,23 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .rd-severity-medium{font-size:16px;}
 .rd-severity-low{font-size:16px;}
 .rd-nutrient{font-size:17px;font-weight:800;color:var(--text);}
-.rd-deficit{font-size:13px;color:#E8A29B;font-weight:700;margin-left:auto;}
+.rd-deficit{font-size:13px;color:var(--text2);font-weight:700;margin-left:auto;}
 .rd-explanation{font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:10px;padding:9px;background:var(--card);border-radius:var(--pick-radius);}
-.rd-food-title{font-size:13px;font-weight:700;color:#A6DEA8;margin-bottom:6px;}
-.rd-food-card{display:flex;align-items:center;gap:10px;padding:9px;background:#183518;border-radius:var(--pick-radius);margin-bottom:6px;}
+.rd-food-title{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:6px;}
+.rd-food-card{display:flex;align-items:center;gap:10px;padding:9px;background:var(--card2);border-radius:var(--pick-radius);margin-bottom:6px;}
 .rdf-emoji{font-size:22px;flex-shrink:0;}
 .rdf-info{flex:1;min-width:0;}
 .rdf-name{font-size:14px;font-weight:700;color:var(--text);}
 .rdf-benefit{font-size:12px;color:var(--text2);margin-top:2px;}
 .rdf-buy-btn{padding:7px 12px;background:var(--pr);color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;}
 .rdf-buy-btn:hover{background:#E55A2B;}
-.rd-menu-suggest{font-size:13px;color:#97BFED;background:#182835;padding:9px 12px;border-radius:var(--pick-radius);margin:8px 0;}
+.rd-menu-suggest{font-size:13px;color:var(--text2);background:var(--card2);padding:9px 12px;border-radius:var(--pick-radius);margin:8px 0;}
 .rd-supplement-note{font-size:12px;color:var(--text3);border-top:1px solid var(--border);padding-top:9px;margin-top:8px;line-height:1.4;}
 .rd-loading{padding:20px;text-align:center;color:var(--text2);font-size:12.5px;background:var(--card);border:1px dashed var(--border);border-radius:12px;}
-.rd-error{padding:16px;text-align:center;color:#E8A29B;font-size:13px;background:#351818;border:1px solid #71282F;border-radius:12px;}
+.rd-error{padding:16px;text-align:center;color:var(--text2);font-size:13px;background:var(--card2);border:1px solid var(--border);border-radius:12px;}
 /* 오늘 칼로리 + 운동 추천 카드 */
-.report-today-kcal{background:linear-gradient(135deg,#1D301E,#27321A);border-radius:12px;padding:16px;margin-bottom:12px;}
-.rtk-title{font-size:14px;font-weight:700;color:#A6DEA8;margin-bottom:8px;}
+.report-today-kcal{background:linear-gradient(135deg,var(--card2),var(--card2));border-radius:12px;padding:16px;margin-bottom:12px;}
+.rtk-title{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:8px;}
 .rtk-numbers{display:flex;align-items:baseline;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
 .rtk-actual{font-size:26px;font-weight:900;color:var(--text);}
 .rtk-divider{color:var(--text3);font-size:16px;}
@@ -863,19 +863,19 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .rtk-gauge-over{background:linear-gradient(90deg,var(--pr),#C62828);}
 .rtk-gauge-under{background:linear-gradient(90deg,#FFB300,#FF8F00);}
 .rtk-status{font-size:13px;font-weight:700;text-align:right;}
-.rtk-over{color:#EA9999;}
-.rtk-under{color:#EDC797;}
-.rtk-ok{color:#A6DEA8;}
-.report-exercise{background:var(--card);border:1px solid #3D5C4D;border-radius:12px;padding:16px;margin-bottom:12px;}
+.rtk-over{color:var(--text2);}
+.rtk-under{color:var(--text2);}
+.rtk-ok{color:var(--text2);}
+.report-exercise{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;}
 .rex-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:4px;}
 .rex-subtitle{font-size:12px;color:var(--text2);margin-bottom:10px;}
-.rex-card{display:flex;align-items:center;gap:10px;padding:12px;background:#183518;border-radius:var(--pick-radius);margin-bottom:6px;}
+.rex-card{display:flex;align-items:center;gap:10px;padding:12px;background:var(--card2);border-radius:var(--pick-radius);margin-bottom:6px;}
 .rex-emoji{font-size:26px;flex-shrink:0;}
 .rex-name{font-size:14px;font-weight:700;color:var(--text);}
 .rex-time{font-size:16px;font-weight:900;color:var(--green);margin-top:2px;}
 .rex-basis{font-size:11px;color:var(--text3);margin-top:2px;}
 .rex-disclaimer{font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5;border-top:1px solid var(--border);padding-top:9px;}
-.rex-no-data{padding:16px;text-align:center;color:var(--text2);font-size:12.5px;background:#183518;border:1px dashed #3D5C4D;border-radius:10px;margin-bottom:12px;}
+.rex-no-data{padding:16px;text-align:center;color:var(--text2);font-size:12.5px;background:var(--card2);border:1px dashed var(--border);border-radius:10px;margin-bottom:12px;}
 
 /* ── HERO CTA — 랜덤 픽 직링 ── */
 .hero-cta{
@@ -909,7 +909,7 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .health-toggle .ht-hint{font-size:11.5px;font-weight:700;color:rgba(255,255,255,.92);letter-spacing:.2px;}
 .health-toggle .ht-open{display:none;}
 .health-card.open .health-toggle{
-  background:linear-gradient(135deg,#2E9E6B,#1B7A52);
+  background:linear-gradient(135deg,#2E9E6B,var(--card2));
   box-shadow:0 4px 14px rgba(76,175,125,.3);
 }
 .health-card.open .ht-closed{display:none;}
@@ -918,12 +918,12 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .health-body{display:none;padding:16px 20px 20px;}
 .health-card.open .health-body{display:block;animation:slideDown .35s ease;}
 .health-notice{
-  background:linear-gradient(135deg,#352718,#352F18);
-  border:1px solid #715F28;border-radius:var(--rxs);
+  background:linear-gradient(135deg,var(--card2),var(--card2));
+  border:1px solid var(--border);border-radius:var(--rxs);
   padding:12px 14px;margin-bottom:14px;
-  font-size:11.5px;color:#EDD297;line-height:1.55;font-weight:600;
+  font-size:11.5px;color:var(--text2);line-height:1.55;font-weight:600;
 }
-.health-notice strong{color:#EDCF97;font-weight:800;}
+.health-notice strong{color:var(--text2);font-weight:800;}
 .h-row{margin-bottom:13px;}
 .h-row:last-child{margin-bottom:0;}
 .h-label{
@@ -934,8 +934,8 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
   margin-left:6px;font-size:10.5px;font-weight:700;letter-spacing:.2px;
   padding:2px 8px;border-radius:50px;
 }
-.h-label-hint.h-multi{background:#281835;color:#B89EE5;}
-.h-label-hint.h-single{background:#352E18;color:#EDCF97;}
+.h-label-hint.h-multi{background:var(--card2);color:var(--text2);}
+.h-label-hint.h-single{background:var(--card2);color:var(--text2);}
 /* 다중선택 칩: 선택 시 좌측에 ✓ 표시 */
 .h-chips.multi .h-chip.on::before{
   content:'✓';margin-right:5px;font-weight:900;letter-spacing:0;
@@ -957,10 +957,10 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 }
 .h-bmi-num{font-family:'Black Han Sans',sans-serif;color:var(--text);font-size:20px;letter-spacing:-.3px;}
 .h-bmi-badge{font-size:10.5px;padding:4px 11px;border-radius:50px;font-weight:800;letter-spacing:.3px;}
-.h-bmi-low{background:#182235;color:#9CB4E8;}
-.h-bmi-normal{background:#1C3020;color:#A5DEB7;}
-.h-bmi-over{background:#352E18;color:#EDCF97;}
-.h-bmi-obese{background:#351C18;color:#E8A29B;}
+.h-bmi-low{background:var(--card2);color:var(--text2);}
+.h-bmi-normal{background:var(--card2);color:var(--text2);}
+.h-bmi-over{background:var(--card2);color:var(--text2);}
+.h-bmi-obese{background:var(--card2);color:var(--text2);}
 .h-chips{display:flex;flex-wrap:wrap;gap:6px;}
 .h-chip{
   padding:7px 14px;border-radius:50px;
@@ -970,16 +970,16 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 }
 .h-chip:hover{border-color:var(--pr);color:var(--pr);}
 /* 단일선택 — 카테고리별 활성 컬러 */
-.h-chip.bp.on{background:#351C18;border-color:var(--red);color:#E8A29B;}
-.h-chip.glu.on{background:#352218;border-color:var(--orange);color:#EDCF97;}
-.h-chip.chol.on{background:#352E18;border-color:var(--gold);color:#EDCF97;}
-.h-chip.goal.on{background:#1C3020;border-color:var(--green);color:#A5DEB7;}
+.h-chip.bp.on{background:var(--card2);border-color:var(--red);color:var(--text2);}
+.h-chip.glu.on{background:var(--card2);border-color:var(--orange);color:var(--text2);}
+.h-chip.chol.on{background:var(--card2);border-color:var(--gold);color:var(--text2);}
+.h-chip.goal.on{background:var(--card2);border-color:var(--green);color:var(--text2);}
 /* 다중선택 — 가족력 / 알레르기 / 생활습관 */
-.h-chip.fam.on{background:#35181E;border-color:#E63988;color:#EA9ABD;}
-.h-chip.alg.on{background:#281835;border-color:var(--purple);color:#B89EE5;}
-.h-chip.lifestyle.on{background:#182235;border-color:#3949AB;color:#9AA1EA;}
+.h-chip.fam.on{background:var(--card2);border-color:#E63988;color:var(--text2);}
+.h-chip.alg.on{background:var(--card2);border-color:var(--purple);color:var(--text2);}
+.h-chip.lifestyle.on{background:var(--card2);border-color:#3949AB;color:var(--text2);}
 /* 별도 토글 — 혈압약 복용 (혈압 상태와 독립). 약 계열 빨강 톤. */
-.h-chip.bp-meds.on{background:#351C18;border-color:var(--red);color:#E8A29B;}
+.h-chip.bp-meds.on{background:var(--card2);border-color:var(--red);color:var(--text2);}
 .h-clear{
   margin-top:4px;font-size:12px;color:var(--text3);
   background:none;border:none;cursor:pointer;text-decoration:underline;
@@ -988,10 +988,10 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 
 /* ── 건강정보 저장 동의 박스 / 동의 완료 핀 ── */
 .health-consent-box{
-  background:#181C35;border:1.5px solid #383E61;border-radius:12px;
+  background:var(--card2);border:1.5px solid var(--border);border-radius:12px;
   padding:16px;margin:12px 0 8px;
 }
-.hcb-title{font-size:14px;font-weight:800;color:#A3ACE0;margin-bottom:10px;}
+.hcb-title{font-size:14px;font-weight:800;color:var(--text2);margin-bottom:10px;}
 .hcb-benefits{margin-bottom:10px;}
 .hcb-benefit{font-size:13px;color:var(--text);padding:4px 0;}
 .hcb-privacy{
@@ -1001,7 +1001,7 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .hcb-buttons{display:flex;gap:8px;}
 .hcb-agree-btn{
   flex:2;padding:13px;border:none;border-radius:10px;
-  background:linear-gradient(135deg,#3949AB,#1A237E);
+  background:linear-gradient(135deg,#3949AB,var(--card2));
   color:#fff;font-size:14px;font-weight:800;cursor:pointer;
 }
 .hcb-decline-btn{
@@ -1010,11 +1010,11 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 }
 .health-consent-agreed{
   display:flex;align-items:center;gap:8px;
-  padding:12px 14px;background:#1D301E;border:1px solid #3B5E3D;
+  padding:12px 14px;background:var(--card2);border:1px solid var(--border);
   border-radius:10px;margin:12px 0 8px;
 }
 .hca-icon{font-size:18px;}
-.hca-text{flex:1;font-size:13px;font-weight:700;color:#A6DEA8;}
+.hca-text{flex:1;font-size:13px;font-weight:700;color:var(--text2);}
 .hca-withdraw{font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;text-decoration:underline;}
 
 /* ── 건강정보 섹션 구조 (5개 섹션 + 구분선) ── */
@@ -1039,7 +1039,7 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
   padding:12px 10px;border:1.5px solid var(--border);border-radius:12px;
   background:var(--card);cursor:pointer;transition:all .15s;text-align:center;
 }
-.activity-chip.on{border-color:var(--pr);background:#352018;}
+.activity-chip.on{border-color:var(--pr);background:var(--card2);}
 .ac-icon{font-size:22px;margin-bottom:2px;}
 .ac-label{font-size:13px;font-weight:700;color:var(--text);}
 .ac-desc{font-size:11px;color:var(--text3);margin-top:2px;line-height:1.3;}
@@ -1049,53 +1049,53 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
   padding:9px 16px;border:1.5px solid var(--border);border-radius:20px;
   background:var(--card);font-size:13px;cursor:pointer;color:var(--text2);
 }
-.pregnancy-chip.on{border-color:#EC407A;background:#351821;color:#ED97B9;font-weight:700;}
+.pregnancy-chip.on{border-color:#EC407A;background:var(--card2);color:var(--text2);font-weight:700;}
 
 /* ── 영양정보 (파란 계열) ── */
 .nutri-btn{
-  width:100%;padding:15px;border:2px solid #285071;border-radius:var(--rsm);
-  background:linear-gradient(135deg,#182835,#182835);
-  color:#97BFED;font-size:14px;font-weight:800;cursor:pointer;
+  width:100%;padding:15px;border:2px solid var(--border);border-radius:var(--rsm);
+  background:linear-gradient(135deg,var(--card2),var(--card2));
+  color:var(--text2);font-size:14px;font-weight:800;cursor:pointer;
   display:flex;align-items:center;justify-content:center;gap:8px;
   margin-bottom:10px;transition:all .18s;
   box-shadow:0 4px 12px rgba(21,101,192,.14);
 }
-.nutri-btn:hover{transform:translateY(-2px);background:linear-gradient(135deg,#182835,#90CAF9);border-color:#42A5F5;box-shadow:0 6px 16px rgba(21,101,192,.22);}
+.nutri-btn:hover{transform:translateY(-2px);background:linear-gradient(135deg,var(--card2),#90CAF9);border-color:#42A5F5;box-shadow:0 6px 16px rgba(21,101,192,.22);}
 .nutri-btn.loading{opacity:.7;cursor:wait;}
 /* ── 음식 이야기 (보라 계열) ── */
 .story-btn{
-  width:100%;padding:15px;border:2px solid #5C3762;border-radius:var(--rsm);
-  background:linear-gradient(135deg,#2E1C31,#2E1C31);
-  color:#CC97ED;font-size:14px;font-weight:800;cursor:pointer;
+  width:100%;padding:15px;border:2px solid var(--border);border-radius:var(--rsm);
+  background:linear-gradient(135deg,var(--card2),var(--card2));
+  color:var(--text2);font-size:14px;font-weight:800;cursor:pointer;
   display:flex;align-items:center;justify-content:center;gap:8px;
   margin-bottom:10px;transition:all .18s;
   box-shadow:0 4px 12px rgba(106,27,154,.14);
 }
-.story-btn:hover{transform:translateY(-2px);background:linear-gradient(135deg,#2E1C31,#CE93D8);border-color:#AB47BC;box-shadow:0 6px 16px rgba(106,27,154,.22);}
+.story-btn:hover{transform:translateY(-2px);background:linear-gradient(135deg,var(--card2),#CE93D8);border-color:#AB47BC;box-shadow:0 6px 16px rgba(106,27,154,.22);}
 .story-btn.loading{opacity:.7;cursor:wait;}
 .nutri-section{display:none;margin-bottom:10px;}
 .nutri-section.show{display:block;animation:slideUp .35s ease both;}
 .nutri-card{
-  background:linear-gradient(135deg,#1B312E,#352718);
-  border:1px solid #37625F;border-radius:var(--rsm);padding:16px 17px;
+  background:linear-gradient(135deg,var(--card2),var(--card2));
+  border:1px solid var(--border);border-radius:var(--rsm);padding:16px 17px;
   box-shadow:var(--shadow-sm);
 }
 .nutri-head{display:flex;align-items:center;gap:8px;margin-bottom:11px;font-size:14px;font-weight:800;color:var(--text);}
 .nutri-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;}
-.nutri-cell{background:var(--card);border:1px solid #3E5B57;border-radius:var(--rxs);padding:11px 13px;}
+.nutri-cell{background:var(--card);border:1px solid var(--border);border-radius:var(--rxs);padding:11px 13px;}
 .nutri-cell .nk{font-size:10.5px;color:var(--text2);font-weight:700;letter-spacing:.3px;}
 .nutri-cell .nv{font-size:18px;color:var(--text);font-weight:800;font-family:'Black Han Sans',sans-serif;margin-top:2px;letter-spacing:-.3px;}
 .nutri-tags{display:flex;flex-wrap:wrap;gap:5px;}
-.nutri-tag{font-size:12px;padding:4px 11px;border-radius:50px;font-weight:700;background:#1C3020;color:#A5DEB7;}
-.nutri-tag.warn{background:#351C18;color:var(--red);}
+.nutri-tag{font-size:12px;padding:4px 11px;border-radius:50px;font-weight:700;background:var(--card2);color:var(--text2);}
+.nutri-tag.warn{background:var(--card2);color:var(--red);}
 .nutri-note{font-size:12px;color:var(--text3);margin-top:9px;font-style:italic;line-height:1.5;}
 
 /* ── CPA (텐핑 다이어트) ── */
 .cpa-card{
   display:flex;align-items:center;gap:11px;
   padding:15px 16px;border-radius:var(--rsm);
-  background:linear-gradient(135deg,#1B3122,#1E2F25);
-  border:1px solid #3A5F47;
+  background:linear-gradient(135deg,var(--card2),var(--card2));
+  border:1px solid var(--border);
   margin-bottom:10px;cursor:pointer;text-decoration:none;
   transition:all .18s;box-shadow:var(--shadow-sm);
   position:relative;overflow:hidden;
@@ -1103,16 +1103,16 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .cpa-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(76,175,125,.22);border-color:var(--green);}
 .cpa-icon{font-size:31px;flex-shrink:0;}
 .cpa-text{flex:1;min-width:0;}
-.cpa-title{font-size:13.5px;font-weight:800;color:#A5DEB7;line-height:1.3;}
-.cpa-desc{font-size:12px;color:#B6CEBF;margin-top:2px;line-height:1.45;}
-.cpa-tag{position:absolute;top:8px;right:42px;font-size:9.5px;padding:2px 7px;border-radius:50px;background:rgba(76,175,125,.18);color:#A5DEB7;font-weight:800;letter-spacing:.3px;}
+.cpa-title{font-size:13.5px;font-weight:800;color:var(--text2);line-height:1.3;}
+.cpa-desc{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.45;}
+.cpa-tag{position:absolute;top:8px;right:42px;font-size:9.5px;padding:2px 7px;border-radius:50px;background:rgba(76,175,125,.18);color:var(--text2);font-weight:800;letter-spacing:.3px;}
 .cpa-arrow{color:var(--green);font-size:22px;font-weight:800;flex-shrink:0;transition:transform .2s;}
 .cpa-card.open .cpa-arrow{transform:rotate(180deg);}
 
 /* ── CPA 펼치기(아코디언) 본문 — 다이어트/쿠킹 공통 ── */
 .cpa-body{
   display:none;
-  background:linear-gradient(135deg,#352718,#352F18);
+  background:linear-gradient(135deg,var(--card2),var(--card2));
   border:1px solid var(--border);
   border-radius:var(--rsm);
   padding:16px 18px;margin-top:-6px;margin-bottom:12px;
@@ -1134,11 +1134,11 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .cpa-body-cta.cooking{background:linear-gradient(135deg,#FF9F45,var(--pr));box-shadow:0 6px 16px var(--orangeg);}
 
 /* 가독성 보강 — 웜 라이트 배경 보일성 강화 */
-.sl{font-weight:900;color:var(--pr);}
+.sl{font-weight:900;color:var(--gold);}
 .related-title{color:var(--text);font-weight:900;}
 .rtag{font-weight:700;}
-.tip-box{color:#EBCD99;font-weight:600;}
-.tip-box strong{color:#EDC697;}
+.tip-box{color:var(--text2);font-weight:600;}
+.tip-box strong{color:var(--text2);}
 .nutri-note{color:var(--text2);font-weight:600;}
 .report-stat .l{color:var(--text);font-weight:700;}
 .share-block-title{color:var(--text);font-weight:800;}
@@ -1147,17 +1147,17 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 
 /* ── 영양 스토리 / 인사이트 (lazy nutrition 확장) ── */
 .nutri-story{
-  background:#352718;border:1px solid #714928;
+  background:var(--card2);border:1px solid var(--border);
   border-radius:var(--rxs);padding:13px 15px;margin-top:10px;
-  font-size:12.5px;color:#EDD297;line-height:1.55;
+  font-size:12.5px;color:var(--text2);line-height:1.55;
 }
 .nutri-story::before{content:'📖 ';font-size:16px;}
-.nutri-story strong{color:#EDCF97;font-weight:800;}
+.nutri-story strong{color:var(--text2);font-weight:800;}
 .nutri-insight{
-  background:linear-gradient(135deg,#352E18,#352F18);
-  border:1px solid #715F28;border-radius:var(--rxs);
+  background:linear-gradient(135deg,var(--card2),var(--card2));
+  border:1px solid var(--border);border-radius:var(--rxs);
   padding:13px 15px;margin-top:8px;
-  font-size:12.5px;color:#EDD297;line-height:1.55;
+  font-size:12.5px;color:var(--text2);line-height:1.55;
 }
 .nutri-insight::before{content:'✨ ';font-size:16px;}
 .nutri-insight strong{color:var(--pr);font-weight:800;}
@@ -1174,18 +1174,18 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
   font-size:11.5px;font-weight:800;letter-spacing:.3px;
   margin-bottom:5px;display:flex;align-items:center;gap:6px;
 }
-.sc-origin   {background:linear-gradient(135deg,#352718,#352B18);border-color:#714928;}
-.sc-origin   .story-card-head{color:#EDCF97;}
-.sc-regional {background:linear-gradient(135deg,#1B3122,#1E2F25);border-color:#3A5F47;}
-.sc-regional .story-card-head{color:#A5DEB7;}
-.sc-season   {background:linear-gradient(135deg,#2C1835,#261933);border-color:#463069;}
-.sc-season   .story-card-head{color:#B89EE5;}
-.sc-funfact  {background:linear-gradient(135deg,#352E18,#352F18);border-color:#715F28;}
+.sc-origin   {background:linear-gradient(135deg,var(--card2),var(--card2));border-color:var(--border);}
+.sc-origin   .story-card-head{color:var(--text2);}
+.sc-regional {background:linear-gradient(135deg,var(--card2),var(--card2));border-color:var(--border);}
+.sc-regional .story-card-head{color:var(--text2);}
+.sc-season   {background:linear-gradient(135deg,var(--card2),var(--card2));border-color:var(--border);}
+.sc-season   .story-card-head{color:var(--text2);}
+.sc-funfact  {background:linear-gradient(135deg,var(--card2),var(--card2));border-color:var(--border);}
 .sc-funfact  .story-card-head{color:var(--pr);}
-.sc-world    {background:linear-gradient(135deg,#182235,#182335);border-color:#334866;}
-.sc-world    .story-card-head{color:#9CB4E8;}
-.sc-trend    {background:linear-gradient(135deg,#35181E,#351821);border-color:#6C2D3F;}
-.sc-trend    .story-card-head{color:#E69DBA;}
+.sc-world    {background:linear-gradient(135deg,var(--card2),var(--card2));border-color:var(--border);}
+.sc-world    .story-card-head{color:var(--text2);}
+.sc-trend    {background:linear-gradient(135deg,var(--card2),var(--card2));border-color:var(--border);}
+.sc-trend    .story-card-head{color:var(--text2);}
 
 /* ── 칼로리 운동 소모 카드 ── */
 .nutri-exercise{
@@ -1198,28 +1198,28 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .nutri-ex-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 @media (max-width:380px){.nutri-ex-list{grid-template-columns:1fr;}}
 .nutri-ex-item{
-  background:var(--card);border:1px solid #37625F;border-radius:var(--rxs);
+  background:var(--card);border:1px solid var(--border);border-radius:var(--rxs);
   padding:12px 13px;display:flex;align-items:center;gap:10px;
   box-shadow:var(--shadow-sm);
 }
 .nutri-ex-emoji{font-size:26px;line-height:1;flex-shrink:0;}
 .nutri-ex-text{flex:1;min-width:0;}
 .nutri-ex-name{font-size:13px;font-weight:800;color:var(--text);}
-.nutri-ex-min{font-size:14px;font-weight:700;color:#9BE9E2;margin-top:2px;font-family:'Black Han Sans',sans-serif;letter-spacing:-.2px;}
+.nutri-ex-min{font-size:14px;font-weight:700;color:var(--text2);margin-top:2px;font-family:'Black Han Sans',sans-serif;letter-spacing:-.2px;}
 .nutri-ex-foot{
   font-size:10.5px;color:var(--text3);margin-top:7px;font-style:italic;
 }
 
 /* ── 함께 먹으면 좋은 음식 (자동 추천) ── */
 .match-section{
-  background:linear-gradient(135deg,#1D3024,#1D3023);
-  border:1px solid #3B5E4A;border-radius:var(--rsm);
+  background:linear-gradient(135deg,var(--card2),var(--card2));
+  border:1px solid var(--border);border-radius:var(--rsm);
   padding:16px 17px;margin-bottom:10px;box-shadow:var(--shadow-sm);
 }
-.match-title{display:flex;align-items:center;gap:8px;margin-bottom:11px;font-size:13.5px;font-weight:800;color:#A5DEB7;}
+.match-title{display:flex;align-items:center;gap:8px;margin-bottom:11px;font-size:13.5px;font-weight:800;color:var(--text2);}
 .match-recomm-list{display:flex;flex-direction:column;gap:8px;}
 .match-recomm-card{
-  background:var(--card);border:1px solid #3D5C4D;border-left:4px solid var(--green);
+  background:var(--card);border:1px solid var(--border);border-left:4px solid var(--green);
   border-radius:12px;padding:14px 16px;
   animation:slideUp .35s ease both;
 }
@@ -1237,12 +1237,12 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 }
 .match-detail-btn:hover{text-decoration:underline;}
 .match-detail-body{
-  display:none;background:#183518;border-radius:var(--pick-radius);
+  display:none;background:var(--card2);border-radius:var(--pick-radius);
   padding:13px 14px;margin-top:9px;font-size:12.5px;line-height:1.6;color:var(--text);
 }
 .match-detail-body.show{display:block;animation:slideUp .25s ease both;}
 .match-evidence{font-size:12px;color:var(--text2);margin-top:6px;line-height:1.45;}
-.match-kcal-balance{font-size:11.5px;color:#A5DEB7;margin-top:5px;font-weight:700;}
+.match-kcal-balance{font-size:11.5px;color:var(--text2);margin-top:5px;font-weight:700;}
 .match-buy-btn{
   display:block;margin-top:10px;padding:11px 16px;
   background:linear-gradient(135deg,var(--pr),#FF8C42);
@@ -1252,10 +1252,10 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 }
 .match-buy-btn:hover{transform:translateY(-1px);}
 .match-skel-card{
-  background:var(--card);border:1px solid #3D5C4D;border-left:4px solid #3B5E4A;
+  background:var(--card);border:1px solid var(--border);border-left:4px solid var(--border);
   border-radius:12px;padding:16px;
 }
-.match-loading-text{font-size:13px;color:#A5DEB7;font-weight:700;margin-bottom:6px;letter-spacing:.2px;}
+.match-loading-text{font-size:13px;color:var(--text2);font-weight:700;margin-bottom:6px;letter-spacing:.2px;}
 .match-fallback-note{font-size:12px;color:var(--text2);margin-top:6px;text-align:right;letter-spacing:.2px;}
 .match-err{padding:16px;color:var(--text2);font-size:12.5px;text-align:center;}
 .match-err button{margin-left:6px;background:none;border:none;color:var(--pr);font-weight:800;cursor:pointer;text-decoration:underline;}
@@ -1272,18 +1272,18 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
   transition:all .18s;text-decoration:none;
 }
 .share-btn:hover{transform:translateY(-2px);}
-.sb-kakao{background:var(--kakao);color:#EDC297;box-shadow:0 4px 12px rgba(254,229,0,.4);}
+.sb-kakao{background:var(--kakao);color:var(--text2);box-shadow:0 4px 12px rgba(254,229,0,.4);}
 .sb-web{background:linear-gradient(135deg,var(--pr),var(--pr2));color:#fff;box-shadow:0 4px 12px var(--pg);}
-.sb-twitter{background:#000;color:#fff;}
-.sb-copy{background:var(--card);color:#9BE9E2;border:1.5px solid #37625F;}
+.sb-twitter{background:var(--card2);color:#fff;}
+.sb-copy{background:var(--card);color:var(--text2);border:1.5px solid var(--border);}
 
 /* ── 날씨 컨텍스트 배너 ── */
 .weather-banner{
   display:none;
-  background:linear-gradient(135deg,#182235,#182335);
-  border:1px solid #334866;border-radius:var(--rsm);
+  background:linear-gradient(135deg,var(--card2),var(--card2));
+  border:1px solid var(--border);border-radius:var(--rsm);
   padding:14px 17px;margin-bottom:10px;
-  font-size:14px;font-weight:700;color:#9CB4E8;line-height:1.45;
+  font-size:14px;font-weight:700;color:var(--text2);line-height:1.45;
   box-shadow:var(--shadow-sm);
 }
 .weather-banner.show{display:block;animation:slideDown .35s ease;}
@@ -1291,14 +1291,14 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 /* ── 카카오 채널 구독 (가로 컴팩트 레이아웃) ── */
 .channel-card-compact{
   display:flex;align-items:center;gap:12px;
-  background:#353218;border:1.5px solid #715F28;border-radius:14px;
+  background:var(--card2);border:1.5px solid var(--border);border-radius:14px;
   padding:14px 16px;margin-bottom:8px;
 }
 .ccc-left{flex:1;min-width:0;}
 .ccc-flow{margin-bottom:4px;display:flex;align-items:center;gap:4px;line-height:1;}
 .ccc-icon{font-size:20px;line-height:1;display:inline-flex;align-items:center;}
-.ccc-arrow{font-size:13px;color:#bbb;line-height:1;display:inline-flex;align-items:center;margin:0 2px;}
-.ccc-title{font-size:12px;font-weight:800;color:#EDBF97;margin-bottom:4px;}
+.ccc-arrow{font-size:13px;color:var(--text2);line-height:1;display:inline-flex;align-items:center;margin:0 2px;}
+.ccc-title{font-size:12px;font-weight:800;color:var(--text2);margin-bottom:4px;}
 .ccc-desc{font-size:12px;color:var(--text2);line-height:1.5;}
 .ccc-right{flex-shrink:0;}
 .ccc-btn{
@@ -1333,8 +1333,8 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
   display:none;margin-left:4px;padding:4px 9px;font-size:10.5px;font-weight:700;
   border-radius:50px;letter-spacing:.2px;align-self:center;flex-shrink:0;
 }
-.dm-tag.is-db{background:#1C3020;color:#A5DEB7;border:1px solid #3A5F47;display:inline-block;}
-.dm-tag.is-manual{background:#352518;color:#EDB397;border:1px solid #714828;display:inline-block;}
+.dm-tag.is-db{background:var(--card2);color:var(--text2);border:1px solid var(--border);display:inline-block;}
+.dm-tag.is-manual{background:var(--card2);color:var(--text2);border:1px solid var(--border);display:inline-block;}
 .dm-ac{
   position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:50;
   background:var(--card);border:1px solid var(--border-strong);border-radius:10px;
@@ -1346,18 +1346,18 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
   border-bottom:1px solid var(--border);
 }
 .dm-ac-item:last-child{border-bottom:none;}
-.dm-ac-item:hover, .dm-ac-item.act{background:#352718;}
+.dm-ac-item:hover, .dm-ac-item.act{background:var(--card2);}
 .dm-ac-emoji{font-size:20px;flex-shrink:0;}
 .dm-ac-name{flex:1;font-weight:700;color:var(--text);}
 .dm-ac-meta{font-size:12px;color:var(--text2);font-weight:700;}
 .dm-ac-manual{color:var(--pr);font-weight:800;}
 /* 빈 입력 시 안내 행 — 클릭 비활성, 회색 텍스트 */
-.dm-ac-hint{cursor:default;color:var(--text2);font-weight:700;background:#2B2B21;}
-.dm-ac-hint:hover{background:#2B2B21;}
+.dm-ac-hint{cursor:default;color:var(--text2);font-weight:700;background:var(--card2);}
+.dm-ac-hint:hover{background:var(--card2);}
 .dm-ac-hint .dm-ac-name{color:var(--text2);font-weight:700;font-size:12.5px;}
 /* 매칭 결과와 직접 입력 행 사이 구분선 (강한 시각적 분리) */
-.dm-ac-item.dm-ac-manual-row{border-top:2px solid var(--border-strong);background:linear-gradient(135deg,#352618,#352718);}
-.dm-ac-item.dm-ac-manual-row:hover{background:linear-gradient(135deg,#352818,#352818);}
+.dm-ac-item.dm-ac-manual-row{border-top:2px solid var(--border-strong);background:linear-gradient(135deg,var(--card2),var(--card2));}
+.dm-ac-item.dm-ac-manual-row:hover{background:linear-gradient(135deg,var(--card2),var(--card2));}
 .dm-ac-item.dm-ac-manual-row .dm-ac-name{color:var(--pr);font-weight:800;font-size:12.5px;}
 .report-overlay{
   display:none;position:fixed;inset:0;z-index:600;
@@ -1388,30 +1388,30 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .report-bar-fill{height:100%;background:linear-gradient(90deg,var(--pr),var(--gold));border-radius:50px;transition:width .8s ease;}
 .report-bar-cnt{min-width:32px;text-align:right;color:var(--text2);font-weight:700;font-size:11.5px;}
 .report-insight{
-  background:linear-gradient(135deg,#352E18,#352F18);
-  border:1px solid #715F28;border-radius:var(--rxs);
+  background:linear-gradient(135deg,var(--card2),var(--card2));
+  border:1px solid var(--border);border-radius:var(--rxs);
   padding:13px 15px;margin-top:14px;
-  font-size:12.5px;color:#EDD297;line-height:1.55;
+  font-size:12.5px;color:var(--text2);line-height:1.55;
 }
-.report-insight strong{color:#EDCF97;font-weight:800;}
+.report-insight strong{color:var(--text2);font-weight:800;}
 .report-empty{text-align:center;color:var(--text2);padding:24px 18px;font-size:13.5px;line-height:1.6;}
 .report-close{width:100%;margin-top:14px;padding:15px;border:1px solid var(--border-strong);border-radius:var(--rsm);background:var(--card);color:var(--text2);font-size:16px;font-weight:700;cursor:pointer;}
 
 /* ── AI 추천 이유 카드 ── */
 .ai-reason-card{
-  background:linear-gradient(135deg,#2C1835,#261933);
-  border:1px solid #463069;border-radius:var(--rsm);
+  background:linear-gradient(135deg,var(--card2),var(--card2));
+  border:1px solid var(--border);border-radius:var(--rsm);
   padding:15px 16px;margin-bottom:14px;
   box-shadow:var(--shadow-sm);
 }
-.ai-reason-head{font-size:12.5px;font-weight:800;color:#B89EE5;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.ai-reason-head{font-size:12.5px;font-weight:800;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
 .ai-reason-body{font-size:14px;color:var(--text);line-height:1.55;}
 .ai-reason-body.loading{color:var(--text2);font-style:italic;}
 
 /* ── AI 대안 메뉴 (next-card 대체, 더 큰 카드 + 클릭 액션) ── */
 .ai-alts-section{margin:14px 0 12px;animation:slideUp .35s ease both;}
 .ai-alts-title{
-  font-size:14px;font-weight:800;letter-spacing:.5px;color:#B89EE5;
+  font-size:14px;font-weight:800;letter-spacing:.5px;color:var(--text2);
   margin-bottom:11px;display:flex;align-items:center;gap:6px;
 }
 .ai-alts-title::before{content:'🎯';font-size:18px;}
@@ -1419,8 +1419,8 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .ai-alt-card{
   display:flex;align-items:center;gap:13px;
   padding:16px 18px;border-radius:var(--rsm);
-  background:linear-gradient(135deg,var(--card),#2C1835);
-  border:1.5px solid #463069;
+  background:linear-gradient(135deg,var(--card),var(--card2));
+  border:1.5px solid var(--border);
   cursor:pointer;transition:all .2s;
   box-shadow:var(--shadow-sm);
 }
@@ -1448,16 +1448,16 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .nm-protein{background:linear-gradient(90deg,var(--green),#06D6A0);}
 .nm-fat{background:linear-gradient(90deg,#E84B8E,#FF6B9C);}
 .nutri-macro-legend{display:flex;justify-content:space-between;margin-top:5px;font-size:10.5px;color:var(--text2);font-weight:700;}
-.nutri-macro-legend .lg-c{color:#EDCF97;}
-.nutri-macro-legend .lg-p{color:#A5DEB7;}
-.nutri-macro-legend .lg-f{color:#E69DBA;}
+.nutri-macro-legend .lg-c{color:var(--text2);}
+.nutri-macro-legend .lg-p{color:var(--text2);}
+.nutri-macro-legend .lg-f{color:var(--text2);}
 
 /* ── 좋은 사람/피해야 할 사람 ── */
 .nutri-people{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
 @media (max-width:380px){.nutri-people{grid-template-columns:1fr;}}
 .np-card{padding:12px 13px;border-radius:var(--rxs);font-size:11.5px;line-height:1.5;}
-.np-good{background:#1C3020;border:1px solid #3A5F47;color:#A5DEB7;}
-.np-avoid{background:#351C18;border:1px solid #6C2D2D;color:#E8A29B;}
+.np-good{background:var(--card2);border:1px solid var(--border);color:var(--text2);}
+.np-avoid{background:var(--card2);border:1px solid var(--border);color:var(--text2);}
 .np-title{font-weight:800;font-size:12px;margin-bottom:4px;letter-spacing:.3px;}
 
 /* ── 슬롯 머신 효과 (메뉴 cycling) ── */
@@ -1474,7 +1474,7 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 /* ── 스켈레톤 (로딩 placeholder) ── */
 .skel{
   display:inline-block;width:100%;
-  background:linear-gradient(90deg,#30281D 0%,#332A19 50%,#30281D 100%);
+  background:linear-gradient(90deg,var(--card2) 0%,var(--card2) 50%,var(--card2) 100%);
   background-size:200% 100%;
   animation:shimmer .8s ease-in-out infinite;
   border-radius:6px;vertical-align:middle;
@@ -1487,7 +1487,7 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .skel-line-w90{width:90%;}
 .skel-emoji{width:32px;height:32px;border-radius:50%;flex-shrink:0;}
 .ai-alt-card.skel-card{cursor:default;}
-.ai-alt-card.skel-card:hover{transform:none;box-shadow:var(--shadow-sm);border-color:#463069;}
+.ai-alt-card.skel-card:hover{transform:none;box-shadow:var(--shadow-sm);border-color:var(--border);}
 
 /* ── 스피너 (영양/궁합 로딩) ── */
 .spinner{
@@ -1503,18 +1503,18 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 
 /* ── 에러 상태 + 재시도 ── */
 .err-state{
-  background:#351C18;border:1px solid #6C2D2D;
+  background:var(--card2);border:1px solid var(--border);
   border-radius:var(--rxs);padding:13px 15px;
-  font-size:12.5px;color:#E8A29B;
+  font-size:12.5px;color:var(--text2);
   display:flex;align-items:center;gap:10px;line-height:1.4;
 }
 .err-state-msg{flex:1;min-width:0;font-weight:700;}
 .err-retry-btn{
-  padding:8px 15px;border:1px solid #6C2D2D;border-radius:50px;
-  background:var(--card);color:#E8A29B;font-size:11.5px;font-weight:800;cursor:pointer;
+  padding:8px 15px;border:1px solid var(--border);border-radius:50px;
+  background:var(--card);color:var(--text2);font-size:11.5px;font-weight:800;cursor:pointer;
   flex-shrink:0;min-height:34px;transition:all .15s;
 }
-.err-retry-btn:hover{background:#351C18;}
+.err-retry-btn:hover{background:var(--card2);}
 
 /* ── 모바일 380px 이하 최적화 ── */
 @media (max-width:380px){
@@ -1552,10 +1552,10 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
   cursor:pointer;padding:2px 0;text-decoration:underline;font-family:inherit;
 }
 .footer-link:hover{color:var(--pr);}
-.footer-link-privacy{color:#97BFED;font-weight:700;}
-.footer-divider{color:#ddd;font-size:12px;}
+.footer-link-privacy{color:var(--text2);font-weight:700;}
+.footer-divider{color:var(--text);font-size:12px;}
 .footer-copy{font-size:12px;color:var(--text3);line-height:1.6;}
-.footer-sub{font-size:11px;color:#ccc;}
+.footer-sub{font-size:11px;color:var(--text);}
 
 /* ── 법적 약관 모달 (이용약관/개인정보처리방침/면책고지 공용) ── */
 .legal-modal-overlay{
@@ -1581,17 +1581,17 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 .legal-modal-body{overflow-y:auto;padding:18px 22px;flex:1;-webkit-overflow-scrolling:touch;}
 .legal-modal-footer{padding:14px 22px;border-top:1px solid var(--border);flex-shrink:0;}
 .legal-modal-btn{
-  width:100%;padding:15px;background:#1F1C18;color:#fff;
+  width:100%;padding:15px;background:var(--card2);color:#fff;
   border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;
 }
 /* 약관 본문 스타일 */
 .legal-section{font-size:14px;}
 .legal-date{font-size:12px;color:var(--text3);margin-bottom:12px;}
 .legal-notice{
-  background:#182835;color:#97BFED;padding:12px 14px;border-radius:var(--pick-radius);
+  background:var(--card2);color:var(--text2);padding:12px 14px;border-radius:var(--pick-radius);
   font-size:13px;font-weight:700;margin-bottom:14px;
 }
-.legal-notice-warn{background:#352A18;color:#EDB597;}
+.legal-notice-warn{background:var(--card2);color:var(--text2);}
 .legal-article{margin-bottom:16px;padding-bottom:18px;border-bottom:1px solid var(--border);}
 .legal-article:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
 .legal-article-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px;}
@@ -1823,7 +1823,7 @@ async function _logClick(type, menu) {
     .cond-ph-cta-btn:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(76,175,125,.42);}
     .cond-ph-cta-sub{font-size:11px;color:var(--text3);text-align:center;margin-top:6px;line-height:1.4;}
     /* ── 첫 진입 UX — 컨디션 우선 노출 (CSS :has() 기반, JS 무변경) ── */
-    .cond-hero-hint{margin-top:9px;padding:10px 12px;border-radius:10px;background:linear-gradient(135deg,#352D18,#352318);border:1.5px solid #714B28;color:#EDBB97;font-size:13.5px;font-weight:800;text-align:center;letter-spacing:-.2px;line-height:1.4;}
+    .cond-hero-hint{margin-top:9px;padding:10px 12px;border-radius:10px;background:linear-gradient(135deg,var(--card2),var(--card2));border:1.5px solid var(--border);color:var(--text2);font-size:13.5px;font-weight:800;text-align:center;letter-spacing:-.2px;line-height:1.4;}
     /* 최근 식사 기록 — 인사 카드 바로 아래로 이동, 첫 진입부터 항상 노출 (숨김 규칙 제거) */
     /* 카테고리 카드 — 컨디션 미선택 시 흐리게 (기존 사용자=성별 선택됨 시 정상) */
     #catCard{opacity:.5;transition:opacity .35s ease;}
@@ -1840,9 +1840,9 @@ async function _logClick(type, menu) {
   <!-- ① 시간대별 인사 카드 + ② 기록창 + ③ 추천 방식 선택 — Hero 아래·컨디션 카드 위 (첫 진입 프로세스 개편) -->
   <style>
     .greeting-card{margin:14px 0 0;padding:18px 18px;border-radius:16px;
-      background:linear-gradient(135deg,#352718,#352618);border:1.5px solid #714E28;
+      background:linear-gradient(135deg,var(--card2),var(--card2));border:1.5px solid var(--border);
       box-shadow:0 4px 14px rgba(255,138,53,.12);text-align:center;}
-    .greeting-card .gc-text{font-size:14.5px;font-weight:800;color:#EDBB97;
+    .greeting-card .gc-text{font-size:14.5px;font-weight:800;color:var(--text2);
       line-height:1.55;letter-spacing:-.2px;margin:0;}
     .pick-mode-row{display:flex;gap:9px;margin:12px 0 4px;}
     .pick-mode-btn{flex:1;box-sizing:border-box;display:flex;align-items:center;justify-content:center;
@@ -1861,10 +1861,10 @@ async function _logClick(type, menu) {
     .greeting-card>summary{list-style:none;cursor:pointer;
       display:flex;align-items:center;justify-content:center;gap:8px;}
     .greeting-card>summary::-webkit-details-marker{display:none;}
-    .greeting-card .gc-arrow{font-size:11px;color:#EDBB97;transition:transform .2s;}
+    .greeting-card .gc-arrow{font-size:11px;color:var(--text2);transition:transform .2s;}
     .greeting-card[open] .gc-arrow{transform:rotate(180deg);}
     .greeting-body{margin-top:14px;text-align:left;}
-    .greeting-desc{font-size:12.5px;font-weight:700;color:#EDBB97;
+    .greeting-desc{font-size:12.5px;font-weight:700;color:var(--text2);
       margin:0 0 10px;text-align:center;line-height:1.5;}
 
     /* ───── ③④ 추천 방식 모드 — 첫 진입 모두 접힘, 모드 선택 시 노출 ───── */
@@ -1905,8 +1905,8 @@ async function _logClick(type, menu) {
         <div id="rmDateSlots" class="rm-date-slots"></div>
         <div class="rm-edit-guide" id="rmEditGuide" style="display:none;">💡 위 기록에서 수정할 메뉴가 있다면 삭제 후, 실제 드신 메뉴를 다시 입력해주세요.</div>
         <div class="recent-meal-btns" style="display:flex;gap:8px;margin-top:10px;">
-          <button id="recentMealSkip" type="button" style="flex:1;padding:12px;border:1px solid #B8AA98;border-radius:10px;background:#D9CFC0;color:#1A1410;font-size:13px;font-weight:700;cursor:pointer;">건너뛰기</button>
-          <button id="recentMealSave" type="button" style="flex:2;padding:12px;border:none;border-radius:10px;background:var(--yellow);color:#1A1410;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px var(--yellowg);">기록 저장</button>
+          <button id="recentMealSkip" type="button" style="flex:1;padding:12px;border:1px solid var(--border-strong);border-radius:10px;background:var(--border);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;">건너뛰기</button>
+          <button id="recentMealSave" type="button" style="flex:2;padding:12px;border:none;border-radius:10px;background:var(--gold);color:var(--bg);font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px var(--yellowg);">기록 저장</button>
         </div>
       </div>
     </div>
@@ -1969,7 +1969,7 @@ async function _logClick(type, menu) {
     .bi-anchor{display:block;height:0;overflow:hidden;scroll-margin-top:60px;}
     /* 토글 디자인 통일 — .health-toggle 와 동일 치수(width/padding/radius/font), 색상만 회색으로 구분 */
     .bi-toggle{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;
-      width:100%;margin:12px 0 8px;padding:18px 22px;border:1.5px solid var(--pr);
+      width:100%;margin:12px 0 8px;padding:18px 22px;border:1.5px solid var(--gold);
       border-radius:14px;background:var(--cream);color:var(--pr);font-size:16px;font-weight:800;line-height:1.5;
       text-decoration:none;cursor:pointer;transition:background .15s,color .15s;}
     .bi-toggle:hover{background:var(--bg2);color:var(--pr);}
@@ -2210,19 +2210,19 @@ async function _logClick(type, menu) {
   <!-- 🍽 최근 메뉴 자연어 입력 — 날짜별 2칸 슬롯 (어제 + 그제) -->
   <style>
     .rm-date-slots{display:flex;flex-direction:column;gap:10px;margin:10px 0 6px;}
-    .rm-date-slot{border:1px solid #714928;border-radius:10px;padding:10px;background:var(--card);}
+    .rm-date-slot{border:1px solid var(--border);border-left:4px solid var(--gold);border-radius:10px;padding:10px;background:var(--card2);}
     .rm-date-slot.disabled{background:var(--card);border-color:var(--border);}
     .rm-date-slot .slot-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
     .rm-date-slot .slot-date{font-size:13px;font-weight:800;color:var(--text);}
     .rm-date-slot .slot-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;}
-    .rm-date-slot .slot-badge.recorded{background:#1D301E;color:#A6DEA8;}
-    .rm-date-slot .slot-badge.empty{background:#352A18;color:#EDB597;}
+    .rm-date-slot .slot-badge.recorded{background:var(--card2);color:var(--text2);}
+    .rm-date-slot .slot-badge.empty{background:var(--card2);color:var(--text2);}
     .rm-date-slot textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;background:var(--card);outline:none;resize:vertical;box-sizing:border-box;font-family:inherit;}
     .rm-date-slot textarea:focus{border-color:var(--pr);}
     .rm-date-slot .slot-recorded{display:block;font-size:12.5px;color:var(--text2);line-height:1.6;word-break:keep-all;margin:4px 0 6px;padding:4px 8px;background:var(--card);border-radius:6px;}.slot-meal-item{font-size:12.5px;color:var(--text2);line-height:1.8;padding:0 2px;}
-    .rm-edit-guide{background:#352E18;border:1px solid #715F28;border-radius:var(--pick-radius);padding:9px 11px;font-size:12px;color:#EDCD97;margin:6px 0 0;line-height:1.5;}
+    .rm-edit-guide{background:var(--card2);border:1px solid var(--border);border-radius:var(--pick-radius);padding:9px 11px;font-size:12px;color:var(--text2);margin:6px 0 0;line-height:1.5;}
     .slot-edit-hint{font-size:11.5px;color:var(--text3);margin-top:6px;line-height:1.4;}
-    @keyframes rmGuidePulse{0%{background:#352E18;}40%{background:#FFE082;}100%{background:#352E18;}}
+    @keyframes rmGuidePulse{0%{background:var(--card2);}40%{background:#FFE082;}100%{background:var(--card2);}}
     .rm-edit-guide.is-flash{animation:rmGuidePulse 1.2s ease;}
     /* ── 카카오 로그인 필수 게이트 ─────────────────── */
     .login-gate-overlay{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;}
@@ -2231,12 +2231,12 @@ async function _logClick(type, menu) {
     .lgm-icon{font-size:46px;margin-bottom:14px;line-height:1;}
     .lgm-title{font-size:19px;font-weight:800;color:var(--text);line-height:1.4;margin:0 0 10px;}
     .lgm-desc{font-size:13.5px;color:var(--text2);line-height:1.6;margin:0 0 18px;}
-    .lgm-benefits{list-style:none;padding:14px 16px;margin:0 0 18px;background:#21262B;border-radius:12px;text-align:left;}
+    .lgm-benefits{list-style:none;padding:14px 16px;margin:0 0 18px;background:var(--card2);border-radius:12px;text-align:left;}
     .lgm-benefits li{font-size:13.5px;color:var(--text);padding:3px 0;line-height:1.5;}
     .lgm-kakao-btn{width:100%;padding:14px;background:#FEE500;border:none;border-radius:12px;font-size:15.5px;font-weight:800;color:var(--text);cursor:pointer;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;transition:transform .15s,box-shadow .15s;}
     .lgm-kakao-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(254,229,0,0.5);}
     .lgm-kakao-notice{font-size:11.5px;color:var(--text3);margin:-6px 0 14px;text-align:center;}
-    .lgm-retry-msg{background:#351818;border:1px solid #71282F;border-radius:10px;padding:12px;margin:0 0 12px;font-size:13px;color:#EA9999;line-height:1.6;text-align:center;}
+    .lgm-retry-msg{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;margin:0 0 12px;font-size:13px;color:var(--text2);line-height:1.6;text-align:center;}
     .lgm-retry-btn{margin-top:8px;padding:8px 20px;background:var(--pr);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
     .lgm-retry-btn:hover{background:#E55A2B;}
     .lgm-footer{font-size:11.5px;color:var(--text3);line-height:1.5;margin:0;}
@@ -2354,7 +2354,7 @@ async function _logClick(type, menu) {
 
       <!-- 이 음식 이야기 (6항목 카드 — 유래/지역/제철/사실/세계/트렌드) -->
       <div class="nutri-section" id="storySection">
-        <div class="nutri-card" style="background:linear-gradient(135deg,#352618,#352718);border-color:#714928;">
+        <div class="nutri-card" style="background:linear-gradient(135deg,var(--card2),var(--card2));border-color:var(--border);">
           <div class="nutri-head"><span>📖</span><span id="storyTitle">이 음식 이야기</span></div>
           <div class="story-grid" id="storyGrid"></div>
         </div>
@@ -2384,24 +2384,24 @@ async function _logClick(type, menu) {
             <div class="main-actions">
 
   <!-- ③ 궁합 과일 — 가독성 보강 + 펼치기 토글 표시 -->
-  <button id="fruitMatchBtn" onclick="toggleFruitMatch()" style="width:100%;padding:15px;border:1.5px solid #3A5F47;border-radius:13px;background:linear-gradient(135deg,#1C3020 0%,#1B312F 100%);color:#9AA1EA;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:all .18s;margin-bottom:0;box-shadow:0 4px 14px rgba(76,175,125,.18);">
+  <button id="fruitMatchBtn" onclick="toggleFruitMatch()" style="width:100%;padding:15px;border:1.5px solid var(--border);border-radius:13px;background:linear-gradient(135deg,var(--card2) 0%,var(--card2) 100%);color:var(--text2);font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:all .18s;margin-bottom:0;box-shadow:0 4px 14px rgba(76,175,125,.18);">
     <span>🍎 이 음식과 궁합 맞는 과일 찾기</span>
-    <span id="fruitMatchToggle" style="font-size:13px;font-weight:800;color:#9AA1EA;">펼치기 ▼</span>
+    <span id="fruitMatchToggle" style="font-size:13px;font-weight:800;color:var(--text2);">펼치기 ▼</span>
   </button>
   <div id="fruitSection"><div id="fruitCardWrap"></div></div>
 
   <!-- ④ 레시피 + 유튜브 한 줄 -->
   <div style="display:flex;gap:8px;">
-    <button onclick="openRecipe()" style="flex:1;padding:14px;border:1.5px solid #3A5F47;border-radius:13px;background:#1B3122;color:#A5DEB7;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(76,175,125,.14);">
+    <button onclick="openRecipe()" style="flex:1;padding:14px;border:1.5px solid var(--border);border-radius:13px;background:var(--card2);color:var(--text2);font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(76,175,125,.14);">
       👨‍🍳 네이버 레시피
     </button>
-    <button onclick="openYoutube()" style="flex:1;padding:14px;border:1.5px solid #6C2D2D;border-radius:13px;background:#351818;color:#E8A29B;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(230,57,70,.14);">
+    <button onclick="openYoutube()" style="flex:1;padding:14px;border:1.5px solid var(--border);border-radius:13px;background:var(--card2);color:var(--text2);font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(230,57,70,.14);">
       🎬 유튜브 요리
     </button>
   </div>
 
   <!-- 신선 식재료 구매 (네이버/유튜브 바로 아래로 이동) -->
-  <button onclick="openIngredients()" style="width:100%;padding:14px;border:1.5px solid #715F28;border-radius:13px;background:linear-gradient(135deg,#352F18,#352E18);color:#EDCF97;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(242,180,65,.18);">
+  <button onclick="openIngredients()" style="width:100%;padding:14px;border:1.5px solid var(--border);border-radius:13px;background:linear-gradient(135deg,var(--card2),var(--card2));color:var(--text2);font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(242,180,65,.18);">
     🥬 이 레시피의 신선 식재료 구매
   </button>
 
@@ -2470,7 +2470,7 @@ async function _logClick(type, menu) {
       <!-- 안내 (21끼 + 픽헬스 솔루션 안내로 통합) -->
       <p class="meal-record-desc" style="font-size:13px;color:var(--text2);line-height:1.6;text-align:center;margin:6px 4px 12px;">
         최근 드신 음식 기록입니다.<br>
-        영양학적으로 <strong style="color:#A6DEA8;">21끼</strong>를 기록하면 유의미한 건강 식습관 리포트가 만들어집니다.<br>
+        영양학적으로 <strong style="color:var(--text2);">21끼</strong>를 기록하면 유의미한 건강 식습관 리포트가 만들어집니다.<br>
         21끼를 기록하여 <strong style="color:var(--pr);">픽헬스</strong>에서 내 식습관 기반 맞춤 건강 솔루션을 받으세요.
       </p>
 
@@ -2478,7 +2478,7 @@ async function _logClick(type, menu) {
       <div id="mealStreakBar" class="meal-streak-bar" style="display:none;"></div>
 
       <!-- 리스트 가이드 안내 -->
-      <p class="meal-list-guide" style="font-size:12.5px;color:var(--text2);line-height:1.5;background:#352718;border:1px solid #714928;border-radius:10px;padding:10px 12px;margin:0 0 10px;">
+      <p class="meal-list-guide" style="font-size:12.5px;color:var(--text2);line-height:1.5;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin:0 0 10px;">
         📋 아래 목록에서 기록을 확인하고 삭제하거나, 하단에서 새로운 음식을 추가할 수 있어요.
       </p>
 
@@ -2510,7 +2510,7 @@ async function _logClick(type, menu) {
 
       <!-- 전체 초기화 버튼 — 영구 숨김 (정책: 사용자에게 노출하지 않음. 함수는 보존, 향후 복구 가능) -->
       <button id="mealLogResetBtn" type="button" onclick="resetMealLogs()" data-force-hidden="1"
-        style="display:none;width:100%;padding:10px;background:none;border:1px solid #71282F;border-radius:8px;color:#EC9898;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;">
+        style="display:none;width:100%;padding:10px;background:none;border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;margin-top:8px;">
         🗑️ 전체 기록 초기화
       </button>
     </div>
@@ -2519,7 +2519,7 @@ async function _logClick(type, menu) {
   <!-- 날짜/끼니 선택 팝업 (body 마지막에서 분리해 z-index 보장) -->
   <div class="meal-log-popup" id="mealLogPopup" style="display:none;">
     <div class="meal-log-popup-inner">
-      <div class="mlp-popup-menu" id="mlpPopupMenu" style="font-size:13px;font-weight:800;color:#A6DEA8;margin-bottom:14px;text-align:center;"></div>
+      <div class="mlp-popup-menu" id="mlpPopupMenu" style="font-size:13px;font-weight:800;color:var(--text2);margin-bottom:14px;text-align:center;"></div>
       <div class="mlp-title">언제 드셨나요?</div>
       <div class="mlp-date-row">
         <button id="mlpBtnToday"     class="mlp-btn active" data-date="today"     onclick="selectLogDate(this)" type="button">오늘</button>
@@ -2591,7 +2591,7 @@ async function _logClick(type, menu) {
     © 2026 PickFood · picki.kr<br>
     <span class="footer-sub">AI 기반 메뉴 추천 서비스 · 의료 진단을 대체하지 않습니다</span>
   </div>
-  <div style="background:#21262B;border-top:1px solid var(--border);padding:12px 20px;text-align:center;font-size:11px;color:var(--text3);line-height:1.6;">
+  <div style="background:var(--card2);border-top:1px solid var(--border);padding:12px 20px;text-align:center;font-size:11px;color:var(--text3);line-height:1.6;">
     본 서비스의 일부 구매 링크는 <strong>쿠팡 파트너스</strong> 제휴 링크이며, 링크를 통해 구매 시 일정액의 수수료를 제공받을 수 있습니다.<br>
     이는 구매자에게 추가 비용을 발생시키지 않습니다.
   </div>
