@@ -54,7 +54,7 @@ function _renderFruitCard(menuName, data) {
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
         <span style="font-size:20px;">🍎</span>
         <div>
-          <div data-slot="title" style="font-size:13px;font-weight:800;color:var(--gold);letter-spacing:-.3px;"></div>
+          <div data-slot="title" style="font-size:13px;font-weight:800;color:#A8E063;letter-spacing:-.3px;"></div>
           <div style="font-size:11px;color:var(--text2);margin-top:1px;">영양 시너지 · 소화 촉진 · 건강 보완</div>
         </div>
       </div>
@@ -105,7 +105,7 @@ function _renderFruitCard(menuName, data) {
     infoDiv.appendChild(reasonDiv);
 
     const cta = document.createElement('div');
-    cta.style.cssText = 'flex-shrink:0;font-size:11.5px;font-weight:800;color:#1A237E;background:rgba(26,35,126,.1);padding:5px 11px;border-radius:50px;white-space:nowrap;';
+    cta.style.cssText = 'flex-shrink:0;font-size:11.5px;font-weight:800;color:#F2B441;background:rgba(242,180,65,.12);padding:5px 11px;border-radius:50px;white-space:nowrap;';
     cta.textContent = '🛒 보러가기';
 
     a.appendChild(emojiSpan);
