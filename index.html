@@ -7123,13 +7123,8 @@ function _renderCondPhCta(){
     const mc=document.getElementById('mealLogCount');
     if(mc){const n=parseInt(mc.textContent,10);if(isFinite(n))meals=n;}
   }
-  let label;
-  if(meals>=21)      label='📊 내 식습관 완전 분석 보기 →';
-  else if(meals>=14) label='💊 픽헬스 영양제 추천 받기 →';
-  else if(meals>=5)  label='🔬 픽헬스에서 첫 분석 결과 확인 →';
-  else               label='💊 픽헬스 연동하면 식습관 분석까지 →';
-  el.innerHTML=`<button type="button" class="cond-ph-cta-btn" onclick="openPickhealth()">${label}</button>`
-    +`<div class="cond-ph-cta-sub">현재 ${meals}끼 기록 — 픽푸드 식사 기록이 그대로 분석에 쓰여요</div>`;
+  // "내 식습관 완전 분석 보기" CTA 버튼 삭제 — 안내 문구만 유지 (openPickhealth 함수는 보존)
+  el.innerHTML=`<div class="cond-ph-cta-sub">현재 ${meals}끼 기록 — 픽푸드 식사 기록이 그대로 분석에 쓰여요</div>`;
 }
 
 function showResult(menu,nextMenus){
