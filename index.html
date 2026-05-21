@@ -1849,12 +1849,61 @@ async function _logClick(type, menu) {
     .pmb-health{background:linear-gradient(135deg,#4CAF7D,#2E9E6B);border-color:#2E9E6B;color:#fff;
       box-shadow:0 5px 15px rgba(76,175,125,.28);}
     .pmb-health:hover{box-shadow:0 9px 22px rgba(76,175,125,.4);}
+
+    /* ───── ① 인사 카드 펼치기/접기 (기본 접힘) ───── */
+    .greeting-card>summary{list-style:none;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;gap:8px;}
+    .greeting-card>summary::-webkit-details-marker{display:none;}
+    .greeting-card .gc-arrow{font-size:11px;color:#B4540F;transition:transform .2s;}
+    .greeting-card[open] .gc-arrow{transform:rotate(180deg);}
+    .greeting-body{margin-top:14px;text-align:left;}
+    .greeting-desc{font-size:12.5px;font-weight:700;color:#B4540F;
+      margin:0 0 10px;text-align:center;line-height:1.5;}
+
+    /* ───── ③④ 추천 방식 모드 — 첫 진입 모두 접힘, 모드 선택 시 노출 ───── */
+    /* 기본(모드 미선택) — 컨디션 카드·카테고리 카드 접힘 */
+    #conditionCard{display:none;}
+    #catCard{display:none;}
+    .wrap:has(#condChips .cond-chip.on) #catCard,
+    .wrap:has(#resultCard.show) #catCard{display:block;}
+    /* 건강정보 카드(✨ 입력하면 더 정밀해져요) — 기본 접힘 */
+    #healthCard{display:none;}
+    /* 📋 내 기본정보 토글 — 기본 접힘 (건강정보 모드에서만 노출) */
+    .wrap:not(.fpm-health) .bi-toggle{display:none;}
+    /* ③ 컨디션 모드 */
+    .wrap.fpm-cond .pmb-health{display:none;}
+    .wrap.fpm-cond #greetingCard{display:none;}
+    .wrap.fpm-cond #conditionCard{display:block;}
+    /* ④ 건강정보 모드 */
+    .wrap.fpm-health .pmb-cond{display:none;}
+    .wrap.fpm-health #greetingCard{display:none;}
+    .wrap.fpm-health #conditionCard{display:none;}
+    .wrap.fpm-health #healthCard{display:block;}
+    .wrap.fpm-health #catCard{display:block;opacity:1;}
+    .wrap.fpm-health .card:has(> #pickBtn){display:block;}
   </style>
 
-  <!-- ① 시간대별 인사 카드 -->
-  <div class="greeting-card" id="greetingCard">
-    <p class="gc-text" id="gcText">오늘 뭐 드셨어요? 생각나는대로 적어주세요</p>
-  </div>
+  <!-- ① 시간대별 인사 카드 — 펼치기/접기(기본 접힘), 펼치면 안내문구 + 기록창(#recentMealInput) -->
+  <details class="greeting-card" id="greetingCard">
+    <summary>
+      <p class="gc-text" id="gcText">오늘 뭐 드셨어요? 생각나는대로 적어주세요</p>
+      <span class="gc-arrow" aria-hidden="true">▼</span>
+    </summary>
+    <div class="greeting-body">
+      <p class="greeting-desc">생각나는대로 적어주세요, 더 나은 정보가 제공됩니다</p>
+      <!-- ② 최근 식사 기록 — 인사 카드 내부로 이동 (마크업 이동, id/JS 무변경) -->
+      <div class="card recent-meal-section" id="recentMealInput">
+        <p class="recent-meal-title" style="font-size:15px;font-weight:800;color:#FF6B35;margin:0 0 4px;">최근 먹은 메뉴를 날짜별로 적어주세요</p>
+        <p class="recent-meal-sub" id="rmSubText" style="font-size:12px;color:var(--text2);margin:0 0 6px;">기록이 없는 날짜를 채워주세요 🍽️</p>
+        <div id="rmDateSlots" class="rm-date-slots"></div>
+        <div class="rm-edit-guide" id="rmEditGuide" style="display:none;">💡 위 기록에서 수정할 메뉴가 있다면 삭제 후, 실제 드신 메뉴를 다시 입력해주세요.</div>
+        <div class="recent-meal-btns" style="display:flex;gap:8px;margin-top:10px;">
+          <button id="recentMealSkip" type="button" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;">건너뛰기</button>
+          <button id="recentMealSave" type="button" style="flex:2;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#FF6B35,#FF8758);color:#fff;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(255,107,53,.25);">기록 저장</button>
+        </div>
+      </div>
+    </div>
+  </details>
   <script>
   /* ① 시간대별 인사 문구 — 신규 스크립트 (기존 JS 무변경) */
   (function(){
@@ -1869,23 +1918,31 @@ async function _logClick(type, menu) {
   })();
   </script>
 
-  <!-- ② 최근 식사 기록 — 인사 카드 바로 아래로 이동 (마크업 이동, id/JS 무변경) -->
-  <div class="card recent-meal-section" id="recentMealInput">
-    <p class="recent-meal-title" style="font-size:15px;font-weight:800;color:#FF6B35;margin:0 0 4px;">최근 먹은 메뉴를 날짜별로 적어주세요</p>
-    <p class="recent-meal-sub" id="rmSubText" style="font-size:12px;color:var(--text2);margin:0 0 6px;">기록이 없는 날짜를 채워주세요 🍽️</p>
-    <div id="rmDateSlots" class="rm-date-slots"></div>
-    <div class="rm-edit-guide" id="rmEditGuide" style="display:none;">💡 위 기록에서 수정할 메뉴가 있다면 삭제 후, 실제 드신 메뉴를 다시 입력해주세요.</div>
-    <div class="recent-meal-btns" style="display:flex;gap:8px;margin-top:10px;">
-      <button id="recentMealSkip" type="button" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;">건너뛰기</button>
-      <button id="recentMealSave" type="button" style="flex:2;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#FF6B35,#FF8758);color:#fff;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(255,107,53,.25);">지금 기록하고 내 메뉴 받기 →</button>
-    </div>
-  </div>
-
-  <!-- ③ 추천 방식 선택 — 기록창 아래·컨디션 카드 위 -->
+  <!-- ③④ 추천 방식 선택 — 기록창 아래·컨디션 카드 위 (모드 전환) -->
   <div class="pick-mode-row">
-    <button type="button" class="pick-mode-btn pmb-cond" onclick="document.getElementById('conditionCard')?.scrollIntoView({behavior:'smooth',block:'start'})">😊 컨디션으로 바로 추천</button>
-    <a class="pick-mode-btn pmb-health" href="#biSection">💊 건강정보로 정밀 추천</a>
+    <button type="button" class="pick-mode-btn pmb-cond" onclick="_fpPickMode('cond')">😊 지금 컨디션으로 바로 추천받기</button>
+    <button type="button" class="pick-mode-btn pmb-health" onclick="_fpPickMode('health')">💊 건강정보로 정밀추천받기</button>
   </div>
+  <script>
+  /* ③④ 추천 방식 모드 전환 — 신규 스크립트 (기존 JS·함수 무변경) */
+  function _fpPickMode(mode){
+    var wrap=document.querySelector('.wrap');
+    if(!wrap)return;
+    if(mode==='health'){
+      wrap.classList.remove('fpm-cond');
+      wrap.classList.add('fpm-health');
+      /* 기본정보 토글 펼침 — 기존 :target(#biSection) 메커니즘 활용 */
+      if(location.hash!=='#biSection')location.hash='#biSection';
+    }else{
+      wrap.classList.remove('fpm-health');
+      wrap.classList.add('fpm-cond');
+      /* 기본정보 펼침 해제 — #biSection:target 무효화 (기존 '접기' #biClose와 동일) */
+      if(location.hash==='#biSection')location.hash='#biClose';
+      var cc=document.getElementById('conditionCard');
+      if(cc&&typeof cc.scrollIntoView==='function')cc.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+  }
+  </script>
 
   <div class="card cond-card" id="conditionCard">
     <div class="sl">🩹 오늘 컨디션 <span class="health-item-hint">(누르면 바로 추천받아요!)</span></div>
