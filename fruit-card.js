@@ -54,19 +54,19 @@ function _renderFruitCard(menuName, data) {
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
         <span style="font-size:20px;">🍎</span>
         <div>
-          <div data-slot="title" style="font-size:13px;font-weight:800;color:#1A237E;letter-spacing:-.3px;"></div>
+          <div data-slot="title" style="font-size:13px;font-weight:800;color:var(--gold);letter-spacing:-.3px;"></div>
           <div style="font-size:11px;color:var(--text2);margin-top:1px;">영양 시너지 · 소화 촉진 · 건강 보완</div>
         </div>
       </div>
       <div style="padding:8px 12px;background:rgba(255,209,102,.06);
                   border:1px solid rgba(255,209,102,.15);border-radius:10px;
-                  font-size:11px;color:#9A7A10;margin-bottom:12px;line-height:1.6;">
+                  font-size:11px;color:#A0A0C0;margin-bottom:12px;line-height:1.6;">
         ⚡ <strong>이 음식의 주의점:</strong> <span data-slot="risk"></span>
       </div>
       <div data-slot="fruits" style="display:flex;flex-direction:column;gap:8px;"></div>
       <div data-slot="avoid-wrap" style="display:none;margin-top:12px;padding:10px 14px;
                   background:rgba(232,0,61,.08);border:1px solid rgba(232,0,61,.2);
-                  border-radius:10px;font-size:12px;color:rgba(255,100,100,.9);">
+                  border-radius:10px;font-size:12px;color:#A0A0C0;">
         ⚠️ <strong>피해야 할 과일:</strong> <span data-slot="avoid"></span>
       </div>
       <div style="margin-top:12px;text-align:center;font-size:10px;color:var(--text2);
@@ -96,10 +96,10 @@ function _renderFruitCard(menuName, data) {
     const infoDiv = document.createElement('div');
     infoDiv.style.cssText = 'flex:1;min-width:0;';
     const nameDiv = document.createElement('div');
-    nameDiv.style.cssText = 'font-size:15px;font-weight:800;color:#1A237E;margin-bottom:4px;';
+    nameDiv.style.cssText = 'font-size:15px;font-weight:800;color:#A0A0C0;margin-bottom:4px;';
     nameDiv.textContent = f.name || '';
     const reasonDiv = document.createElement('div');
-    reasonDiv.style.cssText = 'font-size:12px;font-weight:700;color:#1A237E;line-height:1.6;letter-spacing:-.2px;';
+    reasonDiv.style.cssText = 'font-size:12px;font-weight:700;color:#A0A0C0;line-height:1.6;letter-spacing:-.2px;';
     reasonDiv.textContent = f.reason || '';
     infoDiv.appendChild(nameDiv);
     infoDiv.appendChild(reasonDiv);
