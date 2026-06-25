@@ -58,7 +58,7 @@
   --green:#4CAF7D; --greeng:rgba(76,175,125,.20);
 
   /* Accent palette */
-  --gold:#F2B441; --goldg:rgba(242,180,65,.22);
+  --gold:var(--pick-gold); --goldg:rgba(242,180,65,.22);   /* 픽 시리즈 공통 토큰 */
   --mint:#2EC4B6; --mintg:rgba(46,196,182,.22);
   --blue:#4D96FF; --blueg:rgba(77,150,255,.22);
   --red:#E63946; --redg:rgba(230,57,70,.22);
@@ -67,7 +67,7 @@
   --kakao:#FEE500;
 
   /* 신규 — 웜 옐로우 & 크림 (디자인 정리) */
-  --yellow:#F2B441; --yellowg:rgba(242,180,65,.18);
+  --yellow:var(--gold); --yellowg:rgba(242,180,65,.18);   /* --gold와 동일값 → 통합 */
   --cream:#1E2535;
 
   /* Text — 가독성 강화 (웜 라이트 배경 #FFFAF5 위 충분한 대비) */
@@ -156,48 +156,6 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
 /* 카드 섹션 헤더 (h3 / .section-title) — 다크 텍스트 + weight 700 */
 .card>h3,.card>.section-title{color:var(--text);font-weight:700;}
 
-/* ── PWA banner ── */
-.pwa-banner{
-  display:none;
-  background:linear-gradient(135deg,var(--card2),var(--card2));
-  border:1px solid var(--border-strong);
-  border-radius:var(--rsm);padding:15px 17px;
-  margin-bottom:12px;align-items:center;gap:12px;
-  animation:slideDown .4s ease;
-  box-shadow:var(--shadow-sm);
-}
-.pwa-banner.show{display:flex;}
-@keyframes slideDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
-.pwa-icon{font-size:29px;flex-shrink:0;}
-.pwa-text{flex:1;}
-.pwa-title{font-size:14px;font-weight:800;color:var(--text);}
-.pwa-desc{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.5;}
-.pwa-actions{display:flex;gap:6px;flex-shrink:0;}
-.pwa-install{padding:9px 16px;border-radius:50px;border:none;background:var(--pr);color:#fff;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;box-shadow:0 4px 12px var(--pg);}
-.pwa-close{padding:9px 13px;border-radius:50px;border:1px solid var(--border-strong);background:var(--card);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;}
-
-/* ── iOS popup ── */
-.ios-popup{
-  display:none;position:fixed;inset:0;z-index:1000;
-  background:rgba(45,42,38,.45);backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
-  align-items:flex-end;justify-content:center;padding:22px;
-}
-.ios-popup.show{display:flex;animation:fadeIn .3s ease;}
-@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-.ios-popup-inner{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:var(--r);padding:24px 22px;width:100%;max-width:420px;
-  position:relative;box-shadow:var(--shadow-xl);
-}
-.ios-popup-title{font-family:'Black Han Sans',sans-serif;font-size:21px;color:var(--text);margin-bottom:16px;text-align:center;}
-.ios-steps{display:flex;flex-direction:column;gap:10px;}
-.ios-step{display:flex;align-items:center;gap:12px;padding:13px 15px;background:var(--bg2);border-radius:var(--rsm);}
-.ios-step-num{width:26px;height:26px;border-radius:50%;background:var(--pr);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 8px var(--pg);}
-.ios-step-text{font-size:14px;line-height:1.5;color:var(--text);}
-.ios-step-text strong{color:var(--pr);}
-.ios-close{width:100%;margin-top:16px;padding:15px;border:1px solid var(--border-strong);border-radius:var(--rsm);background:var(--card);color:var(--text2);font-size:16px;font-weight:700;cursor:pointer;}
-.ios-arrow{display:inline-block;font-size:20px;}
 
 /* ── INPUT ── */
 .irow{display:flex;gap:8px;width:100%;overflow:hidden;}
@@ -1649,6 +1607,14 @@ input,textarea,select{background:var(--card);color:var(--text);border-color:var(
   background: var(--green) !important;
   color: #fff !important;
 }
+/* 상단 sticky 헤더 (픽셀럽·픽템스 패턴) */
+.pf-app-header{position:sticky;top:0;z-index:300;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:#0d1117;border-bottom:1px solid rgba(255,255,255,0.08);}
+.pf-brand{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0;}
+.pf-brand-mark{font-family:'Syne','Pretendard',sans-serif;font-size:22px;font-weight:800;color:#ffffff;letter-spacing:1.2px;}
+.pf-brand-accent{color:#e8a020;}
+.pf-brand-ko{font-size:14px;font-weight:700;color:#e8a020;}
+.pf-brand-tag{font-size:11px;color:#9a9ac0;}
+.pf-health-link{flex-shrink:0;background:rgba(0,200,122,0.16);color:#00c87a;border:1px solid rgba(0,200,122,0.45);border-radius:999px;padding:7px 12px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;}
 </style>
 <script>
 /* UUID 기기 ID — 로컬 영구 저장. 모든 서버 API 호출에 함께 전송. */
@@ -1705,6 +1671,22 @@ async function _logClick(type, menu) {
 <script>
 // picki 로그인 상태 즉시 체크 (버튼 깜빡임 방지)
 (function() {
+  // URL token 수신 처리 (broadcast 복귀 시)
+  var urlParams = new URLSearchParams(location.search);
+  var urlToken = urlParams.get('token') || urlParams.get('picki_token');
+  if (urlToken) {
+    localStorage.setItem('picki_jwt', urlToken);
+    document.cookie = 'picki_jwt=' + urlToken + ';path=/;max-age=' + (10*365*24*60*60) + ';samesite=lax';
+        fetch('/auth/cross?token='+encodeURIComponent(urlToken)+'&silent=1').catch(function(){});
+            try{
+              var _b=urlToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+              var _bytes=Uint8Array.from(atob(_b+'='.repeat((4-_b.length%4)%4)),function(c){return c.charCodeAt(0);});
+              var _p=JSON.parse(new TextDecoder('utf-8').decode(_bytes));
+              if(_p&&(!_p.exp||_p.exp*1000>Date.now())){window._pickiPreNick=_p.nickname||'회원';}
+            }catch(e){}
+        if(urlParams.get('from')==='picki'||urlParams.get('picki_auth')==='success'){localStorage.setItem('picki_referrer','1');}
+        history.replaceState({}, '', location.pathname);
+  }
   function _parseJWT(t) {
     try {
       var b64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
@@ -1721,20 +1703,34 @@ async function _logClick(type, menu) {
   var token = _getCk('picki_jwt') || localStorage.getItem('picki_jwt');
   if (token) {
     var p = _parseJWT(token);
-    if (p && p.exp * 1000 > Date.now()) {
+    if (p && (!p.exp || p.exp * 1000 > Date.now())) {
       window._pickiPreLoggedIn = true;
       window._pickiPrePayload = p;
       var s = document.createElement('style');
-      s.textContent = '#kakaoLoginBtn,#kakaoLoginBtnHealth,.kakao-login-btn-header,.picki-login-btn:not(#picciLoginBtn){display:none!important}'
+      s.textContent = '#kakaoLoginBtnHealth,.kakao-login-btn-header,.picki-login-btn:not(#picciLoginBtn){display:none!important}'
         + '.channel-card-compact.ccc-card-locked{opacity:1!important;filter:none!important}'
         + '.channel-card-compact.ccc-card-locked .ccc-btn{pointer-events:auto!important}';
       document.head.appendChild(s);
+          var nick = p.nickname || "회원"; var btn = document.getElementById("kakaoLoginBtn"); if(btn){btn.textContent=nick+"님 ✓";btn.style.background="#4CAF7D";btn.style.color="#fff";btn.style.borderRadius="20px";btn.onclick=function(){if(confirm("로그아웃 하시겠어요?")){document.cookie="picki_jwt=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";localStorage.removeItem("picki_jwt");location.reload();}}}
     }
   }
 })();
 </script>
+<link rel="stylesheet" href="/shared/pick-design.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+
+<header class="pf-app-header">
+  <div class="pf-brand">
+    <span class="pf-brand-mark">Pick<span class="pf-brand-accent">Food</span></span>
+    <span class="pf-brand-ko">픽푸드</span>
+    <span class="pf-brand-tag">21끼의 기록이 당신의 식습관을 바꿉니다</span>
+  </div>
+  <button class="kakao-login-btn" id="kakaoLoginBtn" onclick="_startPickiOAuthFlow()" style="background:#FEE500;color:#191919;border:none;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">🔐 카카오 로그인</button>
+</header>
 
 <!-- 카카오 로그인 필수 게이트 — 비로그인 시 전면 차단 -->
 <div id="loginGateOverlay" class="login-gate-overlay" style="display:none;">
@@ -1797,27 +1793,6 @@ async function _logClick(type, menu) {
   </div>
 
   
-  <!-- 아이폰 설치 안내 팝업 -->
-  <div class="ios-popup" id="iosPopup">
-    <div class="ios-popup-inner">
-      <div class="ios-popup-title">📱 홈 화면에 추가하기</div>
-      <div class="ios-steps">
-        <div class="ios-step">
-          <div class="ios-step-num">1</div>
-          <div class="ios-step-text">하단 메뉴바의 <strong>공유 버튼 <span class="ios-arrow">⎙</span></strong> 을 탭해요</div>
-        </div>
-        <div class="ios-step">
-          <div class="ios-step-num">2</div>
-          <div class="ios-step-text">스크롤을 내려 <strong>"홈 화면에 추가"</strong> 를 탭해요</div>
-        </div>
-        <div class="ios-step">
-          <div class="ios-step-num">3</div>
-          <div class="ios-step-text">우측 상단 <strong>"추가"</strong> 버튼을 탭하면 완료!</div>
-        </div>
-      </div>
-      <button class="ios-close" onclick="closeIosPopup()">닫기</button>
-    </div>
-  </div>
 
   <!-- 🩹 오늘 컨디션 — 빠른 추천 (컨디션 선택 시 카테고리 자동 매핑 + 즉시 추천) -->
   <style>
@@ -2613,23 +2588,6 @@ async function _logClick(type, menu) {
 </div>
 
 <!-- 푸터 — 법적 필수 링크 3종 + 카피라이트 -->
-<footer class="app-footer">
-  <div class="footer-links">
-    <button type="button" onclick="openModal('terms')" class="footer-link">이용약관</button>
-    <span class="footer-divider">|</span>
-    <button type="button" onclick="openModal('privacy')" class="footer-link footer-link-privacy">개인정보처리방침</button>
-    <span class="footer-divider">|</span>
-    <button type="button" onclick="openModal('health-disclaimer')" class="footer-link">건강정보 면책고지</button>
-  </div>
-  <div class="footer-copy">
-    © 2026 PickFood · picki.kr<br>
-    <span class="footer-sub">AI 기반 메뉴 추천 서비스 · 의료 진단을 대체하지 않습니다</span>
-  </div>
-  <div style="background:var(--card2);border-top:1px solid var(--border);padding:12px 20px;text-align:center;font-size:11px;color:var(--text3);line-height:1.6;">
-    본 서비스의 일부 구매 링크는 <strong>쿠팡 파트너스</strong> 제휴 링크이며, 링크를 통해 구매 시 일정액의 수수료를 제공받을 수 있습니다.<br>
-    이는 구매자에게 추가 비용을 발생시키지 않습니다.
-  </div>
-</footer>
 
 <!-- 법적 약관 모달 (terms / privacy / health-disclaimer 공용) -->
 <div class="legal-modal-overlay" id="legalModalOverlay" onclick="closeLegalModal()" style="display:none;">
@@ -2731,9 +2689,9 @@ async function _logClick(type, menu) {
    ============================================================ */
 // 파트너스 ID (난독화 처리)
 const _cfg = (()=>{
-  const _a = "11782769-27ea-48c3-ab3f-ebdab57227a0"; // ← 재발급 키로 교체
+  const _a = "AF6541428"; // 쿠팡파트너스 어필리에이트 ID
   const _b = "food_picker_v6";
-  const _c = "YOUR_KAKAO_JS_KEY";               // ← 카카오 JS 키
+  const _c = "89140b7a9273aacb383fc9993fcd8169";  // ← 카카오 JS 키
   const _d = "https://pickfood.kr";       // ← 배포 URL
   const _e = "";                                                    // ← OpenWeatherMap 키는 서버(.env: OPENWEATHERMAP_API_KEY)로 이동 — 클라이언트에서 직접 호출하지 않음
   return {p:_a, s:_b, k:_c, u:_d, w:_e};
@@ -2753,7 +2711,7 @@ function _cu(kw, sid, cat){
   // subId에 카테고리 포함 → 파트너스 리포트에서 카테고리별 전환율 분석 가능
   const _cat = cat || (curMenu?.cat) || "etc";
   const _sid = sid || `${_cfg.s}_${_cat}`;
-  return `https://www.coupang.com/np/search?q=${encodeURIComponent(kw)}&channel=user&partner=${_cfg.p}&subId=${_sid}`;
+  return `https://www.coupang.com/np/search?q=${encodeURIComponent(kw)}&channel=user&affiliate=${_cfg.p}&subId=${_sid}`;
 }
 
 /* ============================================================
@@ -2894,23 +2852,6 @@ function adminLogout(){
   document.getElementById("adminOverlay").classList.remove("show");
 }
 
-/* ============================================================
-   📲 PWA 설치 유도
-   ============================================================ */
-let deferredPrompt = null;
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-const isAndroid = /Android/.test(navigator.userAgent);
-const isMobile = isIOS || isAndroid;
-const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-const pwaDismissed = localStorage.getItem("fp6_pwa_dismissed");
-
-// 이미 설치됐거나 배너 닫은 경우 표시 안 함
-function showIosGuide(){
-  document.getElementById("iosPopup").classList.add("show");
-}
-function closeIosPopup(){
-  document.getElementById("iosPopup").classList.remove("show");
-}
 
 /* ============================================================
    🌸 계절 / 🕐 시간대 / ☁️ 날씨
@@ -4186,7 +4127,7 @@ async function loadNutrition(){
       <div class="nutri-cell"><div class="nk">지방</div><div class="nv">${d.fat??"-"} g</div></div>`;
     document.getElementById("nutriTags").innerHTML=(d.tags||[]).map(t=>{
       const w=/주의|과다|높음|많음|excess|warn/i.test(t);
-      return `<span class="nutri-tag${w?' warn':''}">${t}</span>`;
+      return `<span class="nutri-tag${w?' warn':''}">${_escAt(t)}</span>`;
     }).join("");
     document.getElementById("nutriNote").textContent=d.note||"※ 1인분 평균 추정치 (실제 양에 따라 차이)";
     // 탄단지 비율 바 (kcal 기준 정규화)
@@ -6392,7 +6333,7 @@ function openPickHealthInvite(){
           c => c.charCodeAt(0)
         )
       ));
-      if (_p && _p.exp * 1000 > Date.now()) {
+      if (_p && (!_p.exp || _p.exp * 1000 > Date.now())) {
         _nick = _p.nickname || '회원';
       }
     }
@@ -6844,7 +6785,7 @@ function pickMenu(opts){
   const slotInterval=setInterval(()=>{
     if(!btnTxt)return;
     const m=slotItems[Math.floor(Math.random()*slotItems.length)];
-    btnTxt.textContent=`${m.e||"🍽"} ${m.n}`;
+    /* [버그수정] 버튼 텍스트 고정 — 음식명은 결과 영역(showResult)에만 표시. 버튼 텍스트는 건드리지 않음 */
     slotI++;
   },65);
   setTimeout(()=>{
@@ -7240,7 +7181,13 @@ function showResult(menu,nextMenus){
 
   // 연관상품
   const TAG_CLS2={HOT:"tag-hot",NEW:"tag-new",SALE:"tag-sale"};
-  const related = menu.related||[];
+  // [버그수정 2026-05-23] related 누락 메뉴(336/1981건)에서 4개 버튼이 사라지던 문제 — 메뉴명 기반 fallback 생성
+  const related = (menu.related && menu.related.length) ? menu.related : [
+    {icon:"🛒",label:menu.n+" 밀키트",sub:"쿠팡 검색",q:menu.n+" 밀키트",cls:"rel-milkit",tag:"HOT"},
+    {icon:"🥬",label:menu.n+" 재료",sub:"신선 식재료",q:menu.n+" 재료",cls:"rel-ingred",tag:null},
+    {icon:"🫙",label:menu.n+" 소스",sub:"전용 소스",q:menu.n+" 소스",cls:"rel-sauce",tag:null},
+    {icon:"🍳",label:"조리 도구",sub:"필요한 주방 도구",q:"주방 도구",cls:"rel-tool",tag:null}
+  ];
   document.getElementById("relatedGrid").innerHTML = related.map((r,i)=>{
     const sid = `${_cfg.s}_${menu.cat}_${r.cls.replace('rel-','')}_${i===0?'main':'sub'}`;
     const gaCall = `_ga('coupang_click',{menu_name:'${menu.n}',category:'${menu.cat}',product_type:'${r.cls}',position:${i}})`;
@@ -8081,7 +8028,7 @@ document.addEventListener('keydown',e=>{
 </script>
 <script src="fruit-db.js"></script>
 <script src="fruit-card.js"></script>
-<script>window.PWA_OPTIONS={name:"픽푸드",color:"#FF6B35"};</script>
+<script>window.PWA_OPTIONS={name:"픽푸드",color:"#FF6B35",engName:"PICKFOOD",bgColor:"#0D1117",logoColor:"#FF6B35"};</script>
 <script src="/pwa-install.js" defer></script>
 <script>
 // picki 로그인 상태 처리 (카카오 OAuth via picki.kr) + ccc 카드 통합 UX
@@ -8112,7 +8059,7 @@ document.addEventListener('keydown',e=>{
                     || (document.cookie.match(/(?:^|;\s*)picki_jwt=([^;]+)/)?.[1] || null);
       if (token) {
         const payload = _parseJWT(token);
-        if (payload && payload.uid && payload.exp * 1000 > Date.now()) {
+        if (payload && payload.uid && (!payload.exp || payload.exp * 1000 > Date.now())) {
           overlay.style.display = 'none';
           return;
         }
@@ -8187,7 +8134,7 @@ document.addEventListener('keydown',e=>{
     if (!token) return;
 
     const payload = _parseJWT(token);
-    if (!payload || payload.exp * 1000 < Date.now()) {
+    if (!payload || (payload.exp && payload.exp * 1000 < Date.now())) {
       document.cookie = "picki_jwt=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
       localStorage.removeItem("picki_jwt");
       return;
@@ -8291,7 +8238,7 @@ document.addEventListener('keydown',e=>{
 
   // ── OAuth 시작
   window._startPickiOAuthFlow = function() {
-    const returnTo = "https://pickfood.kr/auth/cross";
+    const returnTo = "https://picki.kr/api/auth/broadcast?next=https://pickfood.kr";
     location.href = "https://picki.kr/api/auth/kakao?return_to="
       + encodeURIComponent(returnTo);
   };
@@ -8435,7 +8382,7 @@ document.addEventListener('keydown',e=>{
       const tk = _getCookie("picki_jwt") || localStorage.getItem("picki_jwt");
       if (tk) {
         const p = _parseJWT(tk);
-        if (p && p.exp * 1000 > Date.now()) {
+        if (p && (!p.exp || p.exp * 1000 > Date.now())) {
           payload = p;
           window._pickiUser = p;
           window._pickiJWT = tk;
@@ -8499,5 +8446,7 @@ document.addEventListener('keydown',e=>{
   setTimeout(_activatePickiBtn, 2000);
 })();
 </script>
+  <script src="/shared/pick-footer.js" defer></script>
+<script src="https://picki.kr/shared/picki-back-button.js"></script>
 </body>
 </html>
