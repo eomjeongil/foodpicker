@@ -1684,7 +1684,6 @@ async function _logClick(type, menu) {
               var _p=JSON.parse(new TextDecoder('utf-8').decode(_bytes));
               if(_p&&(!_p.exp||_p.exp*1000>Date.now())){window._pickiPreNick=_p.nickname||'회원';}
             }catch(e){}
-        if(urlParams.get('from')==='picki'||urlParams.get('picki_auth')==='success'){localStorage.setItem('picki_referrer','1');}
         history.replaceState({}, '', location.pathname);
   }
   function _parseJWT(t) {
